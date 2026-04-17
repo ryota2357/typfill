@@ -15,8 +15,14 @@ export type CompileInputs = {
 // Reactive container for the resume form. `data` is the deeply-proxied state
 // every form component binds to. `compileInputs` is the consolidated bundle
 // the preview/worker consume — debouncing happens downstream in the preview.
+//
+// `version` bumps whenever `data` is wholesale replaced (restore from storage,
+// import from share link, reset). The page uses `{#key store.version}` to
+// remount the form so `untrack`-initialized child state (e.g. the 作成日付
+// radio mode in BasicInfoForm) is re-seeded from the new data.
 export class ResumeStore {
 	data: ResumeData = $state(structuredClone(RESUME_EMPTY_DATA));
+	version = $state(0);
 
 	compileInputs: CompileInputs = $derived.by(() => ({
 		sources: buildCompileSources(resumeModule, this.data),
@@ -24,6 +30,18 @@ export class ResumeStore {
 		mainPath: resumeModule.mainPath
 	}));
 
+	constructor(initial?: ResumeData) {
+		if (initial) this.data = initial;
+	}
+
+	replaceData(next: ResumeData): void {
+		this.data = next;
+		this.version++;
+	}
+
+	reset(): void {
+		this.replaceData(structuredClone(RESUME_EMPTY_DATA));
+	}
 }
 
 // Form components receive `data` (the proxy) directly per the

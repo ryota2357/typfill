@@ -13,6 +13,18 @@ type Pending = {
 	detach: () => void;
 };
 
+// Thrown when the worker reports a failed compile/export. The diagnostics list
+// from the failed job is preserved so the UI can still render `error`/`warning`
+// entries even though there's no successful artifact.
+export class TypstCompileError extends Error {
+	diagnostics: TypstDiagnostic[];
+	constructor(message: string, diagnostics: TypstDiagnostic[]) {
+		super(message);
+		this.name = 'TypstCompileError';
+		this.diagnostics = diagnostics;
+	}
+}
+
 export type CompileOptions = {
 	assets?: TypstAssets;
 	// Abort the caller's promise. The underlying worker job still runs to
@@ -56,7 +68,7 @@ export function createTypstClient(): TypstClient {
 		pending.delete(msg.id);
 		entry.detach();
 		if (msg.ok) entry.resolve(msg);
-		else entry.reject(new Error(msg.error));
+		else entry.reject(new TypstCompileError(msg.error, msg.diagnostics));
 	});
 
 	function send(req: Omit<TypstRequest, 'id'>, signal?: AbortSignal): Promise<TypstResponse> {

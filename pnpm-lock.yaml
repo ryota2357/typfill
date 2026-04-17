@@ -17,6 +17,9 @@ importers:
       '@myriaddreamin/typst.ts':
         specifier: 0.7.0-rc2
         version: 0.7.0-rc2(@myriaddreamin/typst-ts-renderer@0.7.0-rc2)(@myriaddreamin/typst-ts-web-compiler@0.7.0-rc2)
+      lz-string:
+        specifier: 1.5.0
+        version: 1.5.0
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: 7.0.1
@@ -602,6 +605,10 @@ packages:
 
   locate-character@3.0.0:
     resolution: {integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==}
+
+  lz-string@1.5.0:
+    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
+    hasBin: true
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -1342,6 +1349,8 @@ snapshots:
       lightningcss-win32-x64-msvc: 1.32.0
 
   locate-character@3.0.0: {}
+
+  lz-string@1.5.0: {}
 
   magic-string@0.30.21:
     dependencies:

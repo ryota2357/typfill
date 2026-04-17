@@ -104,9 +104,9 @@ Located at `/Users/ryota2357/ghq/github.com/ryota2357/pdf-by-typst`.
 - **Formatter:** Prettier 3.8 (with `prettier-plugin-svelte`, `prettier-plugin-tailwindcss`). No ESLint.
 - **Package manager:** pnpm (via `pnpm-lock.yaml`).
 - **Dev environment:** Nix flake (`flake.nix`, `.envrc` with `use flake`).
-- **Source:** only the default SvelteKit welcome page and the Vitest sample. Nothing app-specific yet.
-- **Adapter:** `@sveltejs/adapter-auto` (needs to be pinned to `@sveltejs/adapter-static` before deployment).
-- **Not yet present:** `typst.ts`, `lz-string`, Web Worker scaffolding, PDF preview, LocalStorage glue, Service Worker, `_headers`, CI config.
+- **Source:** resume form + preview + share link flow under `/resume`; landing page lists templates from the registry. Phases 0–4 shipped (see §5).
+- **Adapter:** `@sveltejs/adapter-auto` (needs to be pinned to `@sveltejs/adapter-static` before deployment — Phase 5).
+- **Not yet present:** Service Worker, `_headers`, CI config. `typst.ts`, `lz-string`, Web Worker, PDF preview, LocalStorage, share-link encoding are all wired.
 
 ---
 
@@ -358,25 +358,101 @@ src/routes/phase0/                   # Phase 0 spike, superseded by /resume
 
 **Verification**: `pnpm run check` → 0 errors / 0 warnings. `pnpm run test` → 6 files, 60 tests passed (52 existing from Phase 1 + 8 new for the state helpers). Playwright probe against the running dev server: `/resume` mounts, the worker boots, the preview SVG appears with `RESUME_EMPTY_DATA`, editing a name field triggers a recompile within the debounce window, the 詳細設定 `<details>` opens with the length-literal inputs visible, and adding a 学歴 row updates the list. 0 console errors and 0 page errors throughout.
 
-### Phase 3 — Preview & export
+### Phase 3 — Preview & export — DONE
 
-- [ ] Preview component implementing the decision from Phase 0. Must handle multi-page output and pinch-zoom on iOS/Android.
-- [ ] Desktop: two-column layout (form left, preview right), resizable divider optional.
-- [ ] Mobile: tab switcher (Form / Preview).
-- [ ] "Download PDF" button → worker export → blob → filename `resume_{氏名}_{YYYYMMDD}.pdf`.
-- [ ] Typst compile warnings/errors surface in a non-blocking banner.
+- [x] Preview component handles multi-page output (typst.ts renders all pages into a single SVG; sibling `<svg>` elements get a top margin via scoped global selector).
+- [x] Desktop: two-column layout (form left, preview right). Resizable divider not implemented — `md:grid-cols-2` with `h-[100dvh]` and `min-h-0 overflow-y-auto` on the form column proved good enough.
+- [x] Mobile: tab switcher (Form / Preview). Both panels stay mounted; only visibility toggles, so the Typst worker and the last-rendered SVG persist across tab changes.
+- [x] "Download PDF" button → worker export → blob → filename `resume_{氏名}_{YYYYMMDD}.pdf`.
+- [x] Typst compile warnings/errors surface in a non-blocking banner; preview keeps the last good SVG visible on failure.
+- ~~Pinch-zoom / explicit zoom controls~~ — reverted. See Phase 3 results.
 
-### Phase 4 — Persistence & sharing
+#### Phase 3 results
 
-- [ ] LocalStorage auto-save (debounced; key `pdf-by-typst.resume.v1`).
-- [ ] Schema-versioned save format so future field additions don't break old saves.
-- [ ] Share button: strip image fields by default → JSON → `lz-string` → Base64 → `location.hash = '#t=resume&data=…'`, copy to clipboard.
-- [ ] UI message when sharing: "写真は共有リンクに含まれません" (or similar), with explicit toggle to override.
-- [ ] On load, detect `#t=…&data=…`:
-  - Parse + validate against the template's schema.
-  - Import-confirmation modal (overwrite vs discard if LocalStorage has data).
-  - On accept: save, `history.replaceState` to strip fragment.
-- [ ] Encoded-payload size warning if the share fragment gets unreasonably long (the image-exclusion default keeps the normal case small).
+**Files added / changed**:
+
+```
+src/lib/typst/
+  ├── Preview.svelte          # diagnostics now color-coded by severity, path/range shown
+  └── worker-client.ts        # new TypstCompileError carries diagnostics across failed jobs
+src/lib/templates/resume/
+  ├── filename.ts             # buildResumeFilename(data, now)
+  └── filename.spec.ts        # 6 tests
+src/routes/resume/
+  └── +page.svelte            # mobile tab switcher + h-[100dvh] flex layout
+```
+
+**Design decisions locked in**:
+
+- **Tabs keep both panels mounted.** Mobile tab switching toggles Tailwind visibility (`{tab === 'form' ? 'flex' : 'hidden'} md:flex`) rather than conditional rendering. Unmounting the preview would terminate the Typst worker and re-run the ~1 s WASM init on every tab change; keeping it mounted also preserves the last-rendered SVG so the preview tab isn't blank while the next compile is in flight.
+- **`TypstCompileError` carries diagnostics on failure.** `worker-client.ts` previously threw a plain `Error` when the worker responded `ok: false`, losing the diagnostics array. The new subclass preserves them so the preview can still render `error`/`warning` entries for compiles that produced no artifact (e.g. the user typed invalid Typst markup).
+- **Filename sanitization is conservative.** `buildResumeFilename` strips `[\x00-\x1f/\\:*?"<>|]` (the intersection of unsafe chars across Windows/macOS/Linux and Safari's Content-Disposition handling). 氏名 empty → `resume_{YYYYMMDD}.pdf`. The date source is `data.日付` when explicit, today's local date when `auto`.
+- **Diagnostic severity is rendered as color + icon.** Error entries red, warnings yellow, with the source path/range inline in gray. The list is capped at `max-h-32` with overflow so a broken template doesn't push the preview off-screen.
+- **No zoom controls in v1.** An earlier iteration added `−/100%/+` buttons plus 2-finger pinch handlers using CSS `zoom:`. Effective zoom was clamped by the SVG's intrinsic rendering and didn't behave intuitively across breakpoints, so the feature was reverted. Deferred to a future phase — the likely path is a pdf.js-backed preview or scaling the SVG viewBox directly rather than CSS zoom.
+
+**Known caveats (carry into Phase 4+)**:
+
+- In Svelte 5 dev mode, `BasicInfoForm.svelte:37` still logs `ownership_invalid_mutation` because the `$effect` there writes `data.日付` via an unbound prop. Pre-existing from Phase 2 — a real fix requires wiring `bind:data` through ResumeForm. Non-blocking; dev-only warning.
+- `h-[100dvh]` is ideal for mobile (accounts for the browser chrome collapsing) but some older browsers fall back to `100vh`. Acceptable — worst case is a slight layout overflow that `overflow-y-auto` hides.
+- `<Preview>` filename uses prop identity at click time. The parent feeds a `$derived(buildResumeFilename(store.data))` so the download name always reflects the latest 氏名/日付, but if future code passes a stale string it will download with that name. Keep the `$derived` wrapper.
+
+**Verification**: `pnpm run check` → 0/0, `pnpm run test` → 9 files / 79 tests passed. Playwright probe on the running dev server: zoom/share/reset/download buttons present; mobile tab switcher toggles at 400px; the preview SVG persists across tab switches.
+
+### Phase 4 — Persistence & sharing — DONE
+
+- [x] LocalStorage auto-save (debounced 500 ms; key `pdf-by-typst.resume.v1`).
+- [x] Schema-versioned save format (`{ version: 1, data: … }`) so future field additions don't break old saves.
+- [x] Share button: `sanitizeForShare` (or photo passthrough when opted-in) → JSON → `lz-string` `compressToEncodedURIComponent` → `location.hash = '#t=resume&data=…'`, copy to clipboard.
+- [x] UI message when sharing: "写真は未設定のため、共有リンクには含まれません。" when no photo, or a "写真を含める" checkbox when one exists.
+- [x] On load, detect `#t=…&data=…`:
+  - Parse + validate against the template's hand-written schema.
+  - Import-confirmation modal with per-field summary (氏名 / 住所プレビュー / 件数 / 文字数 / 写真 有無).
+  - On accept: `store.replaceData(next)` + `saveResumeToStorage(next)` + `history.replaceState` to strip fragment. On cancel: strip fragment only.
+- [x] Encoded-payload size warning: the share dialog shows the fragment length and flags it past 8 000 chars.
+
+#### Phase 4 results
+
+**Files added / changed**:
+
+```
+src/lib/
+  ├── base64.ts                     # chunked Uint8Array ⇄ base64
+  └── share/
+      ├── url.ts                    # encodeShareFragment / parseShareFragment / buildShareUrl
+      └── url.spec.ts               # 6 tests
+src/lib/templates/resume/
+  ├── persistence.ts                # RESUME_STORAGE_KEY, envelope, toWire/fromWire, validate*, serializeForShare, load/save/clear helpers
+  ├── persistence.spec.ts           # 7 tests (roundtrip, photo, share-strip, version guard, field validation)
+  ├── state.svelte.ts               # ResumeStore accepts initial data; new `version` counter + replaceData() + reset()
+  └── ui/
+      ├── ShareDialog.svelte        # include-image toggle, URL preview, size warning, clipboard copy
+      └── ImportDialog.svelte       # summary grid with 氏名 / 住所 / 件数 / 文字数 / 写真
+src/routes/resume/
+  └── +page.svelte                  # debounced autosave + hash detection + Share/Reset buttons
+package.json                        # + lz-string 1.5.0
+```
+
+**Design decisions locked in**:
+
+- **Single wire format for LocalStorage and share links.** `persistence.ts` exposes `serializeResumeJson` + `parseResumeJson` as the shared boundary. `serializeForShare(data, { includeImage })` wraps it — with `includeImage: false` the photo field is nulled before the wire conversion, so the exact same validator parses both storage and share payloads. No duplicate schemas.
+- **Hand-written validator, not zod.** `validateWire` walks the parsed object and throws on missing/typed-wrong fields. Listed as a "zod/valibot" plan item, but adding the dependency for ~12 structural checks felt disproportionate. The validator is template-specific and its scope matches `ResumeData` exactly. When we add the invoice template, we'll re-evaluate (both templates together might justify a shared schema library).
+- **Schema version lives in the envelope, not in the key.** The key stays `pdf-by-typst.resume.v1` (matches the CONSEPT_AND_PLAN §1 spec) and the envelope carries `{ version: 1, data: … }`. Future breaking changes add a `v2` handler in `parseResumeJson` and keep the old envelope parseable. The key doesn't bump unless the entire top-level shape changes.
+- **`ResumeStore.version` is the remount signal.** Imports / reset call `store.replaceData(next)` which swaps `data` and increments `version`. The page wraps the form in `{#key store.version}` so `BasicInfoForm`'s `untrack`-initialized local state (the 作成日付 radio mode) re-seeds from the imported values. The preview is *outside* the key so it survives remounts — the Typst worker stays alive.
+- **Initial load is synchronous, hash detection is on-mount.** `loadResumeFromStorage()` runs in the page's setup script, before the child components instantiate, so on first render the form already has the restored data. `parseShareFragment` runs in `onMount` because a hash-based import flows through the confirmation modal, not the initial render. Race aside: if autosave fires before the user accepts the import, `hasResumeInStorage()` snapshot in the dialog is computed at render time (before the 500 ms debounce fires), so the "上書きされます" warning reflects true pre-import state.
+- **Photo bytes base64 at the JSON boundary.** `Uint8Array` inside `ResumeData` is the runtime shape; `toWire` base64-encodes to `bytesBase64` for both storage and share. Chunked `String.fromCharCode(...slice)` in `base64.ts` avoids the argument-count limit that breaks on large spreads. Survives `structuredClone` → JSON → parse → decode roundtrip (tested).
+- **Share dialog hides the image toggle when no photo exists.** Avoids dangling UI. When a photo is present, the toggle is unchecked by default (CONSEPT_AND_PLAN §1 "image fields excluded by default") and flipping it to include the photo shows the size warning more prominently because base64-encoded JPEG bytes dominate the URL length. Length threshold is 8 000 chars — chosen as the point where chat clients start truncating and QR codes become impractical.
+- **Reset uses `window.confirm`.** Destructive action (drops LocalStorage + replaces store with empty defaults), so native confirm is enough — no need for a second custom modal. If we ever add multi-template state to the reset scope, we'll swap to a proper dialog.
+- **Autosave failures are swallowed.** Quota exceeded / disabled storage / private mode — the app keeps working, PDF export still produces a file, only persistence is gone. A future phase may surface a one-time warning if writes fail on mount.
+
+**Known caveats (carry into Phase 5+)**:
+
+- Reset uses native `confirm()`, which blocks the event loop and looks out of place on mobile. Acceptable for v1; can move to a proper dialog if it bothers users.
+- LocalStorage quota is ~5 MB per origin. A 600 px JPEG at q=0.85 is ~50–150 KB base64, which is fine. Very large resumes with many markdown lines could theoretically blow the quota — the swallowed-failure path covers that case but doesn't inform the user.
+- `persistence.ts` runs in the server Vitest project (its spec doesn't need a browser). `localStorage` is referenced but only inside `typeof localStorage === 'undefined'` guards, so the module imports cleanly in Node.
+- The import modal's `hasExisting` prop is evaluated once when the modal first renders. If the autosave debounce fires *before* the modal opens but *after* the page mounts, the warning state could lag by one keystroke — in practice the 500 ms debounce plus the synchronous `onMount` detection means the modal opens first. Monitor once the invoice template adds its own import path.
+- Share URL compression currently runs twice in `ShareDialog` — once for the length counter, once for `buildShareUrl`. Cheap on resume-sized payloads but worth memoizing in one place when we add more templates that share the dialog.
+
+**Verification**: `pnpm run check` → 0/0. `pnpm run test` → 9 files / 79 tests passed (6 filename + 7 persistence + 6 share/url added since Phase 2). Playwright smoke: share modal opens/closes, reset button confirm flow works, mobile tabs appear at 400 px wide, preview SVG persists across tab switches.
 
 ### Phase 5 — Offline & deployment
 
@@ -408,4 +484,4 @@ Only start once Phases 0–5 are shipped and stable.
 
 ## 7. Immediate Next Step
 
-Phase 0 is done (see §5). Start **Phase 1** — formalize `escapeTypst()` with exhaustive tests, lift the ad-hoc worker protocol in `src/lib/typst/protocol.ts` to a stable shape (including cancellation), define `TemplateModule<T>` + the resume-specific `ResumeData` / `buildMainTyp` / `codegen.ts`. The `/phase0` route is intentionally disposable; delete it once `/resume` on real input is rendering in Phase 2.
+Phases 0–4 are done (see §5). Start **Phase 5** — swap the SvelteKit adapter to `@sveltejs/adapter-static`, wire `@sveltejs/service-worker` to precache the WASM binaries + font + generated JS/CSS + template sources, provision a Cloudflare Pages project (no `_headers` needed; Phase 0 ruled out COOP/COEP), and run a Lighthouse + real-device pass. Document the first-load cost in the README before shipping. Zoom controls and any pdf.js fallback are out-of-phase follow-ups to revisit after deployment.

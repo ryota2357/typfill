@@ -10,7 +10,7 @@
 
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import type { TypstClient } from './worker-client';
+	import { TypstCompileError, type TypstClient } from './worker-client';
 
 	let {
 		inputs,
@@ -40,8 +40,6 @@
 	});
 
 	$effect(() => {
-		// Track the upstream prop identity. The parent feeds this from a $derived
-		// that returns a new object whenever any form field changes.
 		void inputs;
 		if (!client) return;
 		if (debounceTimer) clearTimeout(debounceTimer);
@@ -51,7 +49,6 @@
 	async function runCompile() {
 		const c = client;
 		if (!c) return;
-		// Cancel any in-flight compile so its late SVG can't overwrite a newer one.
 		activeAbort?.abort();
 		const ctl = new AbortController();
 		activeAbort = ctl;
@@ -68,7 +65,9 @@
 			status = 'ready';
 		} catch (e) {
 			if ((e as { name?: string }).name === 'AbortError') return;
-			diagnostics = [];
+			// Preserve diagnostics from failed compiles so the user sees which
+			// line the error came from. Keep the stale SVG visible.
+			diagnostics = e instanceof TypstCompileError ? e.diagnostics : [];
 			error = e instanceof Error ? e.message : String(e);
 			status = 'failed';
 		}
@@ -101,7 +100,7 @@
 </script>
 
 <div class="flex h-full flex-col gap-2">
-	<div class="flex items-center justify-between gap-2 text-sm">
+	<div class="flex flex-wrap items-center justify-between gap-2 text-sm">
 		<span class="text-gray-500">プレビュー: {status}</span>
 		<button
 			type="button"
@@ -118,14 +117,22 @@
 	{/if}
 
 	{#if diagnostics.length > 0}
-		<ul class="rounded bg-yellow-50 p-2 text-xs text-yellow-900">
+		<ul class="max-h-32 space-y-0.5 overflow-y-auto rounded border border-gray-200 bg-white p-2 text-xs">
 			{#each diagnostics as d, i (i)}
-				<li><strong>{d.severity}</strong>: {d.message}</li>
+				{@const isError = d.severity === 'error'}
+				<li class={isError ? 'text-red-800' : 'text-yellow-900'}>
+					<strong class={isError ? 'text-red-900' : 'text-yellow-900'}>
+						{d.severity}
+					</strong>
+					{#if d.path}<span class="text-gray-500">[{d.path}{d.range ? `:${d.range}` : ''}]</span
+						>{/if}
+					: {d.message}
+				</li>
 			{/each}
 		</ul>
 	{/if}
 
-	<div class="preview min-h-[600px] flex-1 overflow-auto rounded border border-gray-200 bg-white">
+	<div class="preview min-h-[600px] flex-1 overflow-auto rounded border border-gray-200 bg-gray-50">
 		{#if status === 'booting'}
 			<p class="p-4 text-gray-500">ワーカーを起動中…</p>
 		{:else if svg}
@@ -143,5 +150,10 @@
 		max-width: 100%;
 		height: auto;
 		margin: 0 auto;
+		background: white;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	}
+	.preview :global(svg + svg) {
+		margin-top: 0.75rem;
 	}
 </style>

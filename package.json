@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@myriaddreamin/typst-ts-renderer": "0.7.0-rc2",
 		"@myriaddreamin/typst-ts-web-compiler": "0.7.0-rc2",
-		"@myriaddreamin/typst.ts": "0.7.0-rc2"
+		"@myriaddreamin/typst.ts": "0.7.0-rc2",
+		"lz-string": "1.5.0"
 	}
 }
