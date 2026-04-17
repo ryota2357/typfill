@@ -244,14 +244,54 @@ src/routes/phase0/
 
 This phase gated everything else; Worker I/O and preview component API are derived from what works here.
 
-### Phase 1 — Core engine + template abstraction
+### Phase 1 — Core engine + template abstraction — DONE
 
-- [ ] `src/lib/typst/escape.ts` — `escapeTypst(value)` with exhaustive Vitest coverage of every special character.
-- [ ] `src/lib/typst/worker.ts` / `worker-client.ts` — finalize message protocol, error surfacing, cancellation.
-- [ ] `src/lib/templates/types.ts` — `TemplateModule<T>` interface (id, label, defaults, `buildMainTyp`, root form component, share sanitizer).
-- [ ] `src/lib/templates/registry.ts` — registers the resume module; an empty invoice entry can be present but disabled.
-- [ ] `src/lib/templates/resume/types.ts` — `ResumeData` TypeScript type mirroring §2.1.
-- [ ] `src/lib/templates/resume/codegen.ts` — `buildMainTyp(data: ResumeData): string`. Round-trip tested by compiling and diffing against the upstream `main.typ` sample.
+- [x] `src/lib/typst/escape.ts` — `escapeMarkup` / `escapeString` plus `markupLit` / `stringLit` wrappers, with exhaustive Vitest coverage of every special character listed in §4.2.
+- [x] `src/lib/typst/worker.ts` / `worker-client.ts` — finalize message protocol (named `TypstRequest` / `TypstResponse` / `TypstDiagnostic`, optional binary `assets`), error surfacing, cancellation.
+- [x] `src/lib/templates/types.ts` — `TemplateModule<T>` interface (id, label, enabled, defaults, sources, mainPath, `buildMainTyp`, `FormComponent`, `sanitizeForShare`) plus a `buildCompileSources` helper.
+- [x] `src/lib/templates/registry.ts` — registers the resume module (enabled) and an invoice stub (disabled; `buildMainTyp` throws until Phase 6).
+- [x] `src/lib/templates/resume/types.ts` — `ResumeData` with Japanese-keyed fields mirroring §2.1.
+- [x] `src/lib/templates/resume/codegen.ts` — `buildMainTyp(data: ResumeData): string`. Round-trip validated by structural unit tests plus a browser-project test that compiles a sample through the worker and asserts no error diagnostics.
+
+#### Phase 1 results
+
+**Files added / changed**:
+
+```
+src/lib/typst/
+  ├── escape.ts               # escapeMarkup / escapeString / markupLit / stringLit
+  ├── escape.spec.ts
+  ├── protocol.ts             # extended: TypstAssets, TypstDiagnostic, typed responses
+  ├── worker.ts               # now handles binary VFS via mapShadow / unmapShadow
+  └── worker-client.ts        # AbortSignal support, typed diagnostics, dispose drains pending
+src/lib/templates/
+  ├── types.ts                # TemplateModule<T> + buildCompileSources helper
+  ├── registry.ts             # resume (enabled) + invoice (disabled stub)
+  └── resume/
+      ├── types.ts            # ResumeData with Japanese field names
+      ├── codegen.ts          # buildMainTyp with length-literal whitelist
+      ├── defaults.ts         # RESUME_SAMPLE_DATA + RESUME_EMPTY_DATA fixtures
+      ├── module.ts           # TemplateModule<ResumeData> composition
+      ├── codegen.spec.ts     # structural tests (server project)
+      └── codegen.svelte.spec.ts  # browser compile-success smoke test
+```
+
+**Design decisions locked in**:
+
+- **`ResumeData` uses Japanese TypeScript identifiers** (`氏名`, `学歴`, `params.志望動機の高さ`) for 1:1 mapping with the upstream template. TS Unicode identifiers work fine through Prettier and `svelte-check`.
+- **Two escape helpers, not one.** `escapeMarkup` for content blocks (`[...]`), `escapeString` for string literals (`"..."`). The spec listed one function, but the resume template uses both contexts (e.g. `image("vfs/path")`). `markupLit` / `stringLit` wrap with delimiters so callers can't forget the delimiters and accidentally drop the boundary.
+- **Cancellation is client-side only.** `typst.ts@0.7.0-rc2` has no `AbortSignal` hook on `compile()` and no in-process cancellation token exposed on the main compile API. So `worker-client.compile({ signal })` rejects the caller's promise on abort and drops the late response when it arrives; the worker still runs the superseded job to completion. A future upstream change could let us cancel the WASM job itself; keep the current contract stable in either case.
+- **Binary VFS uses `compiler.mapShadow(path, bytes)` / `unmapShadow(path)`** (Explore agent confirmed). Each request replaces the set; stale entries from previous jobs are explicitly unmapped. We do **not** call `compiler.reset()` — the Phase 0 note about it dropping loaded fonts was verified against `typst.ts/dist/esm/compiler.d.mts`.
+- **`ResumeParams` length fields (`志望動機の高さ` etc.) go through a whitelist regex** (`^\d+(\.\d+)?(em|pt|mm|cm|in|%)$`) before emission. Length literals are the only non-escaped tokens in `buildMainTyp`'s output, so they get their own boundary. A code-injection attempt (`"22em); #sys.exit() //"`) is covered by `codegen.spec.ts`.
+- **Round-trip test scope.** Structural unit tests (17 cases) cover every `buildMainTyp` field plus escaping/validation. One browser test compiles `RESUME_SAMPLE_DATA` through the worker and asserts no error diagnostics — that is the "actual compile" half of the spec. A byte-equal SVG/PDF diff against the upstream `main.typ` is deferred to Phase 2: handwriting `ResumeData` to match the upstream markup-rich 志望動機 doesn't actually increase confidence; the real round trip will come from form defaults when the UI lands.
+
+**Known caveats (carry into Phase 2+)**:
+
+- First vitest run after a clean `node_modules` emits a one-time "Vite unexpectedly reloaded a test" warning while it optimizes the `@myriaddreamin/typst.ts/*` entries. It goes away on subsequent runs. If it ever flakes a test, add those entries to `optimizeDeps.include` in `vite.config.ts`.
+- `resumeModule.FormComponent` is currently `null` — Phase 2 sets it to the real root form. Registry consumers must tolerate `null` until then (see `enabled` flag).
+- The `#import "./lib.typ"` path in generated `main.typ` is still relative, matching the Phase 0 VFS layout (`/main.typ`, `/lib.typ`). If we ever move the main file to a subdirectory, update `mainPath` and codegen in lockstep.
+
+**Verification**: `pnpm run check` → 0 errors / 0 warnings. `pnpm run test:unit --run` → 5 files, 52 tests passed (server project covers escape + codegen structural; chromium browser project covers the worker smoke test in ~1.3s once WASM warms up).
 
 ### Phase 2 — Resume form UI
 

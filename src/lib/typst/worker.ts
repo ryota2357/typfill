@@ -7,7 +7,7 @@ import { loadFonts } from '@myriaddreamin/typst.ts/options.init';
 import compilerWasmUrl from '@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url';
 import rendererWasmUrl from '@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url';
 
-import type { TypstRequest, TypstResponse } from './protocol.ts';
+import type { TypstAssets, TypstRequest, TypstResponse, TypstSources } from './protocol';
 
 const fontUrl = '/fonts/HaranoAjiMincho-Regular.otf';
 
@@ -28,11 +28,15 @@ const ready = (async () => {
 	});
 })();
 
-function postOk(msg: TypstResponse, transfer: Transferable[] = []) {
+// Paths of binary assets currently installed in the VFS via `mapShadow`. Each
+// request replaces this set so stale entries do not leak across jobs.
+const mappedAssetPaths = new Set<string>();
+
+function post(msg: TypstResponse, transfer: Transferable[] = []) {
 	scope.postMessage(msg, transfer);
 }
 
-function loadSources(sources: Record<string, string>, mainPath: string) {
+function installSources(sources: TypstSources, mainPath: string) {
 	for (const [path, content] of Object.entries(sources)) {
 		compiler.addSource(path, content);
 	}
@@ -41,11 +45,26 @@ function loadSources(sources: Record<string, string>, mainPath: string) {
 	}
 }
 
+function installAssets(assets: TypstAssets | undefined) {
+	const next = new Set(Object.keys(assets ?? {}));
+	for (const path of mappedAssetPaths) {
+		if (!next.has(path)) {
+			compiler.unmapShadow(path);
+			mappedAssetPaths.delete(path);
+		}
+	}
+	for (const [path, bytes] of Object.entries(assets ?? {})) {
+		compiler.mapShadow(path, bytes);
+		mappedAssetPaths.add(path);
+	}
+}
+
 scope.addEventListener('message', async (e: MessageEvent<TypstRequest>) => {
 	const req = e.data;
 	try {
 		await ready;
-		loadSources(req.sources, req.mainPath);
+		installSources(req.sources, req.mainPath);
+		installAssets(req.assets);
 
 		if (req.type === 'compile') {
 			const { result, diagnostics } = await compiler.compile({
@@ -54,7 +73,7 @@ scope.addEventListener('message', async (e: MessageEvent<TypstRequest>) => {
 				diagnostics: 'full'
 			});
 			if (!result) {
-				postOk({
+				post({
 					id: req.id,
 					ok: false,
 					error: 'compilation produced no artifact',
@@ -63,7 +82,7 @@ scope.addEventListener('message', async (e: MessageEvent<TypstRequest>) => {
 				return;
 			}
 			const svg = await renderer.renderSvg({ format: 'vector', artifactContent: result });
-			postOk({ id: req.id, ok: true, type: 'compile', svg, diagnostics: diagnostics ?? [] });
+			post({ id: req.id, ok: true, type: 'compile', svg, diagnostics: diagnostics ?? [] });
 			return;
 		}
 
@@ -74,7 +93,7 @@ scope.addEventListener('message', async (e: MessageEvent<TypstRequest>) => {
 				diagnostics: 'full'
 			});
 			if (!result) {
-				postOk({
+				post({
 					id: req.id,
 					ok: false,
 					error: 'pdf export produced no artifact',
@@ -82,14 +101,14 @@ scope.addEventListener('message', async (e: MessageEvent<TypstRequest>) => {
 				});
 				return;
 			}
-			postOk(
+			post(
 				{ id: req.id, ok: true, type: 'export-pdf', pdf: result, diagnostics: diagnostics ?? [] },
 				[result.buffer]
 			);
 			return;
 		}
 	} catch (err) {
-		postOk({
+		post({
 			id: (req as { id: number }).id,
 			ok: false,
 			error: err instanceof Error ? `${err.name}: ${err.message}` : String(err),
