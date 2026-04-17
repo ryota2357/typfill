@@ -17,6 +17,7 @@
       in
       {
         devShells.default = pkgs.mkShellNoCC {
+          env.PLAYWRIGHT_BROWSERS_PATH = "0";
           packages = with pkgs; [
             nodejs-slim_24
             pnpm

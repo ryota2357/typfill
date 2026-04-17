@@ -191,18 +191,58 @@ Decided. We go Cloudflare Pages, not GitHub Pages, so we can ship a `_headers` f
 
 Phases mirror the chat log but are rewritten with concrete exit criteria. v1 = Phases 0–5 for the resume. Invoice comes after.
 
-### Phase 0 — Feasibility spike (mandatory first)
+### Phase 0 — Feasibility spike (mandatory first) — DONE
 
 **Exit criteria:** we can write a hard-coded `.typ` string in the browser, compile it in a Web Worker, render its SVG into the DOM, and download the same document as a PDF.
 
-- [ ] Add `typst.ts` to the project; confirm which package exports we need (`@myriaddreamin/typst.ts` or current equivalent).
-- [ ] Create `src/lib/typst/worker.ts` with a minimal compile/export API.
-- [ ] Load `Harano Aji Mincho` from `static/fonts/` and inject into the Typst VFS.
-- [ ] Copy `typst-resume-template` into `src/lib/templates/resume/template/` and compile `main.typ` from this copy.
-- [ ] Decide preview rendering: SVG (preferred) vs pdf.js vs iframe blob. Measure on a real mobile browser.
-- [ ] Decide whether multithreaded `typst.ts` is needed. If yes, commit to `_headers` for COOP/COEP.
+- [x] Add `typst.ts` to the project; confirm which package exports we need (`@myriaddreamin/typst.ts` or current equivalent).
+- [x] Create `src/lib/typst/worker.ts` with a minimal compile/export API.
+- [x] Load `Harano Aji Mincho` from `static/fonts/` and inject into the Typst VFS.
+- [x] Copy `typst-resume-template` into `src/lib/templates/resume/template/` and compile `main.typ` from this copy.
+- [x] Decide preview rendering: SVG (preferred) vs pdf.js vs iframe blob. ~~Measure on a real mobile browser.~~ → mobile measurement deferred to Phase 3.
+- [x] Decide whether multithreaded `typst.ts` is needed. If yes, commit to `_headers` for COOP/COEP.
 
-This phase gates everything else; Worker I/O and preview component API are derived from what works here.
+#### Phase 0 results
+
+**Packages installed** (all pinned to `0.7.0-rc2` — current `latest` dist-tag; stable `0.7.0` not yet released):
+
+- `@myriaddreamin/typst.ts` (JS API)
+- `@myriaddreamin/typst-ts-web-compiler` (compiler WASM, peer dep)
+- `@myriaddreamin/typst-ts-renderer` (renderer WASM, peer dep)
+
+**Files created**:
+
+```
+static/fonts/HaranoAjiMincho-Regular.otf       # served at /fonts/…
+src/lib/templates/resume/template/
+  ├── lib.typ                                  # copied from typst-resume-template
+  └── main.typ
+src/lib/typst/
+  ├── protocol.ts                              # TypstRequest / TypstResponse message types
+  ├── worker.ts                                # Web Worker: init compiler+renderer, handle {compile, export-pdf}
+  └── worker-client.ts                         # main-thread wrapper, uses `?worker` import
+src/routes/phase0/
+  ├── +page.ts                                 # `ssr = false; prerender = false;`
+  └── +page.svelte                             # spike UI, hard-coded sources, buttons for recompile / PDF download
+```
+
+**Decisions**:
+
+- **Preview = SVG.** Compile with `CompileFormatEnum.vector`, pass the artifact `Uint8Array` to `renderer.renderSvg({ format: 'vector', artifactContent })`, inject the returned string via `{@html svg}`. Works cleanly for the resume (single A4 page, ~280 KB SVG). pdf.js / iframe-blob stays as a fallback if Phase 3 mobile testing surfaces issues.
+- **Single-threaded WASM.** `typst.ts@0.7.0-rc2` does not use `SharedArrayBuffer`; no COOP/COEP required. Drop the `_headers` line item from Phase 5 unless a future upstream change reintroduces threading.
+- **WASM URL strategy.** `?url` imports against `node_modules/@myriaddreamin/typst-ts-{web-compiler,renderer}/pkg/*.wasm` inside the worker. Vite bundles and hashes them, so no manual copy into `static/`.
+- **SSR.** `/phase0` has `ssr = false` because the worker-client imports WASM URLs at module scope. Subsequent template routes (`/resume`, `/invoice`) will need the same.
+
+**Known caveats (carry into Phase 1+)**:
+
+- WASM init logs `using deprecated parameters for the initialization function; pass a single object instead` twice at startup. Originates inside `typst.ts`'s wasm-bindgen shim (`module.default(bin)` positional arg); non-blocking, do not try to silence locally.
+- After the shared type errors: `.ts` extensions in non-relative imports (e.g. `$lib/typst/worker-client.ts`) break `svelte-check` because `rewriteRelativeImportExtensions` only rewrites relative paths. Drop the extension for `$lib/...` imports.
+- `?worker` import of `./worker.ts` works, but the worker file must not import anything that assumes `window` (e.g. don't pull from `@myriaddreamin/typst.ts/main` — it touches `window`). Use the `/compiler`, `/renderer`, `/options.init` subpath exports instead.
+- Two source files (`/main.typ`, `/lib.typ`) are registered via `compiler.addSource(path, content)` before each `compile()`; no `compiler.reset()` call, so font state is preserved across messages. If we ever need to clear sources, do it via a new compiler instance rather than `reset()` (which also drops fonts).
+
+**Verification**: headless Chromium via the project's Playwright hit `/phase0`, saw `status: ready`, confirmed one `<svg>` rendered, clicked "Download PDF" and received an 89 KB `%PDF-…` file. `pnpm run check` is clean.
+
+This phase gated everything else; Worker I/O and preview component API are derived from what works here.
 
 ### Phase 1 — Core engine + template abstraction
 
@@ -246,7 +286,7 @@ This phase gates everything else; Worker I/O and preview component API are deriv
 
 - [ ] Switch SvelteKit adapter to `@sveltejs/adapter-static`.
 - [ ] Service Worker (via `@sveltejs/service-worker`) caching: WASM binaries, font files, JS/CSS, template `lib.typ`.
-- [ ] Cloudflare Pages project + `_headers` for COOP/COEP if Phase 0 decided threaded WASM is needed.
+- [ ] Cloudflare Pages project. (`_headers` for COOP/COEP not needed — see Phase 0 results.)
 - [ ] Lighthouse / real-device perf pass.
 - [ ] README: document the first-load cost so users aren't surprised.
 
@@ -272,4 +312,4 @@ Only start once Phases 0–5 are shipped and stable.
 
 ## 7. Immediate Next Step
 
-Start **Phase 0** — install `typst.ts`, stand up the Worker skeleton, copy the resume template into `src/lib/templates/resume/template/`, and get one hard-coded compilation rendering in the browser. Everything downstream depends on the decisions made here.
+Phase 0 is done (see §5). Start **Phase 1** — formalize `escapeTypst()` with exhaustive tests, lift the ad-hoc worker protocol in `src/lib/typst/protocol.ts` to a stable shape (including cancellation), define `TemplateModule<T>` + the resume-specific `ResumeData` / `buildMainTyp` / `codegen.ts`. The `/phase0` route is intentionally disposable; delete it once `/resume` on real input is rendering in Phase 2.
