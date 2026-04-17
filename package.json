@@ -12,8 +12,6 @@
     "typecheck:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "check": "biome check './'",
     "check:write": "biome check --write './'",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "test:unit": "vitest",
     "test": "pnpm run test:unit -- --run"
   },
