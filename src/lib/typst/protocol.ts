@@ -10,45 +10,48 @@ export type TypstSources = Record<string, string>;
 export type TypstAssets = Record<string, Uint8Array>;
 
 export type TypstDiagnostic = {
-	package: string;
-	path: string;
-	severity: string;
-	range: string;
-	message: string;
+  package: string;
+  path: string;
+  severity: string;
+  range: string;
+  message: string;
 };
 
 type BaseRequest = {
-	id: number;
-	sources: TypstSources;
-	mainPath: string;
-	assets?: TypstAssets;
+  id: number;
+  sources: TypstSources;
+  mainPath: string;
+  assets?: TypstAssets;
 };
 
 export type TypstRequest =
-	| ({ type: 'compile' } & BaseRequest)
-	| ({ type: 'export-pdf' } & BaseRequest);
+  | ({ type: "compile" } & BaseRequest)
+  | ({ type: "export-pdf" } & BaseRequest);
 
 export type TypstCompileResponse = {
-	id: number;
-	ok: true;
-	type: 'compile';
-	svg: string;
-	diagnostics: TypstDiagnostic[];
+  id: number;
+  ok: true;
+  type: "compile";
+  svg: string;
+  diagnostics: TypstDiagnostic[];
 };
 
 export type TypstExportPdfResponse = {
-	id: number;
-	ok: true;
-	type: 'export-pdf';
-	pdf: Uint8Array;
-	diagnostics: TypstDiagnostic[];
+  id: number;
+  ok: true;
+  type: "export-pdf";
+  pdf: Uint8Array;
+  diagnostics: TypstDiagnostic[];
 };
 
 export type TypstErrorResponse = {
-	id: number;
-	ok: false;
-	error: string;
-	diagnostics: TypstDiagnostic[];
+  id: number;
+  ok: false;
+  error: string;
+  diagnostics: TypstDiagnostic[];
 };
 
-export type TypstResponse = TypstCompileResponse | TypstExportPdfResponse | TypstErrorResponse;
+export type TypstResponse =
+  | TypstCompileResponse
+  | TypstExportPdfResponse
+  | TypstErrorResponse;
