@@ -1,14 +1,13 @@
 /// <reference lib="webworker" />
 
 import {
-  createTypstCompiler,
   CompileFormatEnum,
+  createTypstCompiler,
 } from "@myriaddreamin/typst.ts/compiler";
-import { createTypstRenderer } from "@myriaddreamin/typst.ts/renderer";
 import { loadFonts } from "@myriaddreamin/typst.ts/options.init";
-
-import compilerWasmUrl from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
+import { createTypstRenderer } from "@myriaddreamin/typst.ts/renderer";
 import rendererWasmUrl from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
+import compilerWasmUrl from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
 
 import type {
   TypstAssets,

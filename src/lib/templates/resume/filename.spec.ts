@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildResumeFilename } from "./filename";
 import { RESUME_EMPTY_DATA, RESUME_SAMPLE_DATA } from "./defaults";
+import { buildResumeFilename } from "./filename";
 
 describe("buildResumeFilename", () => {
   const frozenNow = new Date(2026, 3, 17); // 2026-04-17, local time

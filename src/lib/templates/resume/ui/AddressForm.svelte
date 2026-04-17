@@ -15,7 +15,7 @@
         type="text"
         bind:value={value.郵便番号}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block sm:col-span-2">
       <span class="text-sm text-gray-700">住所</span>
@@ -23,7 +23,7 @@
         type="text"
         bind:value={value.住所}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block sm:col-span-2">
       <span class="text-sm text-gray-700">住所（ふりがな）</span>
@@ -31,7 +31,7 @@
         type="text"
         bind:value={value.住所ふりがな}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">電話</span>
@@ -39,7 +39,7 @@
         type="tel"
         bind:value={value.電話}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">E-mail</span>
@@ -47,7 +47,7 @@
         type="email"
         bind:value={value["E-mail"]}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
   </div>
 </section>

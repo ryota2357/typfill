@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { buildShareUrl } from "$lib/share/url";
   import { compressToEncodedURIComponent } from "lz-string";
+  import { buildShareUrl } from "$lib/share/url";
   import { serializeForShare } from "../persistence";
   import type { ResumeData } from "../types";
 
@@ -60,7 +60,8 @@
     </div>
 
     <p class="text-sm text-gray-700">
-      URL のフラグメント（<code>#…</code
+      URL のフラグメント（<code
+        >#…</code
       >）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
     </p>
 
@@ -68,7 +69,7 @@
       <label
         class="flex items-start gap-2 rounded border border-gray-200 p-2 text-sm"
       >
-        <input type="checkbox" bind:checked={includeImage} class="mt-0.5" />
+        <input type="checkbox" bind:checked={includeImage} class="mt-0.5">
         <span>
           <strong>写真を含める</strong>
           <span class="block text-xs text-gray-600">

@@ -1,5 +1,5 @@
-import type { TemplateModule } from "./types";
 import { resumeModule } from "./resume/module";
+import type { TemplateModule } from "./types";
 
 // Invoice is not implemented until Phase 6 (CONSEPT_AND_PLAN §5 Phase 6+).
 // An entry is present here so the landing page and routing can surface it as

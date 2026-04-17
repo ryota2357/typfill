@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { buildMainTyp } from "./codegen";
 import { RESUME_EMPTY_DATA, RESUME_SAMPLE_DATA } from "./defaults";
 import type { ResumeData } from "./types";

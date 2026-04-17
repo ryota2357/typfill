@@ -110,7 +110,7 @@
         type="text"
         bind:value={data.氏名.姓}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">名</span>
@@ -118,7 +118,7 @@
         type="text"
         bind:value={data.氏名.名}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">姓（ふりがな）</span>
@@ -126,7 +126,7 @@
         type="text"
         bind:value={data.氏名ふりがな.姓}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">名（ふりがな）</span>
@@ -134,7 +134,7 @@
         type="text"
         bind:value={data.氏名ふりがな.名}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">生年月日</span>
@@ -143,7 +143,7 @@
         value={birthIso}
         oninput={onBirthChange}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
     <label class="block">
       <span class="text-sm text-gray-700">性別</span>
@@ -151,7 +151,7 @@
         type="text"
         bind:value={data.性別}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      />
+      >
     </label>
   </div>
 
@@ -159,11 +159,11 @@
     <legend class="text-sm text-gray-700">作成日付</legend>
     <div class="flex flex-wrap items-center gap-3">
       <label class="flex items-center gap-1">
-        <input type="radio" bind:group={dateMode} value="auto" />
+        <input type="radio" bind:group={dateMode} value="auto">
         <span>本日（自動）</span>
       </label>
       <label class="flex items-center gap-1">
-        <input type="radio" bind:group={dateMode} value="manual" />
+        <input type="radio" bind:group={dateMode} value="manual">
         <span>指定する</span>
       </label>
       {#if dateMode === "manual"}
@@ -172,7 +172,7 @@
           value={manualIso}
           oninput={onManualDateChange}
           class="rounded border border-gray-300 px-2 py-1"
-        />
+        >
       {/if}
     </div>
   </fieldset>
@@ -185,7 +185,7 @@
           src={photoUrl}
           alt="写真プレビュー"
           class="h-32 w-24 rounded border border-gray-300 object-cover"
-        />
+        >
         <button
           type="button"
           onclick={() => clearResumePhoto(data)}
@@ -200,7 +200,7 @@
       accept="image/*"
       onchange={onPhotoSelect}
       class="block text-sm"
-    />
+    >
     {#if photoError}
       <p class="text-sm text-red-700">{photoError}</p>
     {/if}

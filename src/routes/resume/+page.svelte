@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { parseShareFragment } from "$lib/share/url";
   import { buildResumeFilename } from "$lib/templates/resume/filename";
   import {
     clearResumeStorage,
@@ -10,11 +11,10 @@
     serializeResumeJson,
   } from "$lib/templates/resume/persistence";
   import { ResumeStore } from "$lib/templates/resume/state.svelte";
+  import type { ResumeData } from "$lib/templates/resume/types";
   import ImportDialog from "$lib/templates/resume/ui/ImportDialog.svelte";
   import ResumeForm from "$lib/templates/resume/ui/ResumeForm.svelte";
   import ShareDialog from "$lib/templates/resume/ui/ShareDialog.svelte";
-  import type { ResumeData } from "$lib/templates/resume/types";
-  import { parseShareFragment } from "$lib/share/url";
   import Preview from "$lib/typst/Preview.svelte";
 
   // Restore from LocalStorage before the form mounts so BasicInfoForm's

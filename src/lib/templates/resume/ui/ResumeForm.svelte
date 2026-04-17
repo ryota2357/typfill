@@ -23,8 +23,6 @@
     <summary class="cursor-pointer text-sm font-semibold text-gray-700">
       詳細設定（レイアウト調整）
     </summary>
-    <div class="mt-3">
-      <AdvancedParamsForm params={data.params} />
-    </div>
+    <div class="mt-3"><AdvancedParamsForm params={data.params} /></div>
   </details>
 </div>

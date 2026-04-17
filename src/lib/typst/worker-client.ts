@@ -1,4 +1,3 @@
-import TypstWorker from "./worker?worker";
 import type {
   TypstAssets,
   TypstDiagnostic,
@@ -6,6 +5,7 @@ import type {
   TypstResponse,
   TypstSources,
 } from "./protocol";
+import TypstWorker from "./worker?worker";
 
 type Pending = {
   resolve: (value: TypstResponse) => void;

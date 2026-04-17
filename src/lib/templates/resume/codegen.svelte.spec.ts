@@ -1,8 +1,8 @@
-import { describe, expect, it, afterAll } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { createTypstClient, type TypstClient } from "$lib/typst/worker-client";
 import { buildCompileSources } from "../types";
-import { resumeModule } from "./module";
 import { RESUME_SAMPLE_DATA } from "./defaults";
+import { resumeModule } from "./module";
 
 // End-to-end smoke test: the codegen output must actually compile through the
 // Typst worker. This is the "ワーカーがエラーを返さない" half of the Phase 1

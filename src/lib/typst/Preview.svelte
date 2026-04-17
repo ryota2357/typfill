@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { TypstCompileError, type TypstClient } from "./worker-client";
+  import { type TypstClient, TypstCompileError } from "./worker-client";
 
   let {
     inputs,
@@ -118,7 +118,8 @@
 
   {#if error}
     <pre
-      class="rounded bg-red-50 p-2 text-xs whitespace-pre-wrap text-red-800">{error}</pre>
+      class="rounded bg-red-50 p-2 text-xs whitespace-pre-wrap text-red-800"
+    >{error}</pre>
   {/if}
 
   {#if diagnostics.length > 0}
@@ -131,9 +132,11 @@
           <strong class={isError ? "text-red-900" : "text-yellow-900"}>
             {d.severity}
           </strong>
-          {#if d.path}<span class="text-gray-500"
+          {#if d.path}
+            <span class="text-gray-500"
               >[{d.path}{d.range ? `:${d.range}` : ""}]</span
-            >{/if}
+            >
+          {/if}
           : {d.message}
         </li>
       {/each}

@@ -42,7 +42,7 @@
                 type="number"
                 bind:value={entry.year}
                 class="w-full rounded border border-gray-300 px-2 py-1"
-              />
+              >
             </label>
             <label>
               <span class="block text-xs text-gray-500">月</span>
@@ -52,7 +52,7 @@
                 max="12"
                 bind:value={entry.month}
                 class="w-full rounded border border-gray-300 px-2 py-1"
-              />
+              >
             </label>
             <label>
               <span class="block text-xs text-gray-500">内容</span>
@@ -60,7 +60,7 @@
                 type="text"
                 bind:value={entry.content}
                 class="w-full rounded border border-gray-300 px-2 py-1"
-              />
+              >
             </label>
           </div>
           <div class="mt-2 flex justify-end gap-1 text-sm">
