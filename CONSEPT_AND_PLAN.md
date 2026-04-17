@@ -37,17 +37,17 @@ Two-file layout: `lib.typ` defines the `resume` function; `main.typ` imports it 
 
 Data-input contract — **named function parameters** (not `sys.inputs`):
 
-| Field | Type | Notes |
-|---|---|---|
-| `日付` | `datetime` or `auto` | `auto` → `datetime.today()` |
-| `氏名`, `氏名ふりがな` | `([last], [first])` tuple | |
-| `生年月日` | `datetime(y, m, d)` | age auto-calculated |
-| `性別` | markup | e.g. `[男]` |
-| `写真` | image or `none` | |
-| `現住所`, `連絡先` | record `(郵便番号, 住所, 住所ふりがな, 電話, E-mail)` | |
-| `学歴`, `職歴`, `免許・資格` | **variable-length array** of `(year, month, content)` tuples | |
-| `志望動機`, `本人希望記入欄` | markup (multi-line) | |
-| `params` | layout tuning record | e.g. `学歴・職歴の最小行数: 22`, `志望動機の高さ: 22em` |
+| Field                        | Type                                                         | Notes                                                   |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- |
+| `日付`                       | `datetime` or `auto`                                         | `auto` → `datetime.today()`                             |
+| `氏名`, `氏名ふりがな`       | `([last], [first])` tuple                                    |                                                         |
+| `生年月日`                   | `datetime(y, m, d)`                                          | age auto-calculated                                     |
+| `性別`                       | markup                                                       | e.g. `[男]`                                             |
+| `写真`                       | image or `none`                                              |                                                         |
+| `現住所`, `連絡先`           | record `(郵便番号, 住所, 住所ふりがな, 電話, E-mail)`        |                                                         |
+| `学歴`, `職歴`, `免許・資格` | **variable-length array** of `(year, month, content)` tuples |                                                         |
+| `志望動機`, `本人希望記入欄` | markup (multi-line)                                          |                                                         |
+| `params`                     | layout tuning record                                         | e.g. `学歴・職歴の最小行数: 22`, `志望動機の高さ: 22em` |
 
 Helpers / quirks:
 
@@ -60,19 +60,19 @@ Helpers / quirks:
 
 **Same architectural pattern as the resume.** Two-file layout (`lib.typ` + `main.typ`), `#show: invoice.with(...)`, no external Typst packages, same font (`Harano Aji Mincho`). Data-input contract — named function parameters:
 
-| Field | Type | Notes |
-|---|---|---|
-| `title` | markup | default `[請求書]` |
-| `date` | `datetime` or `auto` | |
-| `invoice-number-series` | int | |
-| `due-date` | `datetime` | |
-| `recipient` | record `(name, postal-ccode, address)` | 宛先 |
-| `issuer` | record `(name, postal-ccode, address)` | 発行元 |
-| `account` | record `(bank, branch, type, number, holder)` | 振込先 |
-| `items` | **variable-length array** of `(name, amount, unit?, price)` | 明細 |
-| `min-item-rows` | int | default 8 |
-| `tax-rate` | float | default `0.1` (10%) |
-| `body` | markup | 備考 |
+| Field                   | Type                                                        | Notes               |
+| ----------------------- | ----------------------------------------------------------- | ------------------- |
+| `title`                 | markup                                                      | default `[請求書]`  |
+| `date`                  | `datetime` or `auto`                                        |                     |
+| `invoice-number-series` | int                                                         |                     |
+| `due-date`              | `datetime`                                                  |                     |
+| `recipient`             | record `(name, postal-ccode, address)`                      | 宛先                |
+| `issuer`                | record `(name, postal-ccode, address)`                      | 発行元              |
+| `account`               | record `(bank, branch, type, number, holder)`               | 振込先              |
+| `items`                 | **variable-length array** of `(name, amount, unit?, price)` | 明細                |
+| `min-item-rows`         | int                                                         | default 8           |
+| `tax-rate`              | float                                                       | default `0.1` (10%) |
+| `body`                  | markup                                                      | 備考                |
 
 Quirks:
 
@@ -437,7 +437,7 @@ package.json                        # + lz-string 1.5.0
 - **Single wire format for LocalStorage and share links.** `persistence.ts` exposes `serializeResumeJson` + `parseResumeJson` as the shared boundary. `serializeForShare(data, { includeImage })` wraps it — with `includeImage: false` the photo field is nulled before the wire conversion, so the exact same validator parses both storage and share payloads. No duplicate schemas.
 - **Hand-written validator, not zod.** `validateWire` walks the parsed object and throws on missing/typed-wrong fields. Listed as a "zod/valibot" plan item, but adding the dependency for ~12 structural checks felt disproportionate. The validator is template-specific and its scope matches `ResumeData` exactly. When we add the invoice template, we'll re-evaluate (both templates together might justify a shared schema library).
 - **Schema version lives in the envelope, not in the key.** The key stays `pdf-by-typst.resume.v1` (matches the CONSEPT_AND_PLAN §1 spec) and the envelope carries `{ version: 1, data: … }`. Future breaking changes add a `v2` handler in `parseResumeJson` and keep the old envelope parseable. The key doesn't bump unless the entire top-level shape changes.
-- **`ResumeStore.version` is the remount signal.** Imports / reset call `store.replaceData(next)` which swaps `data` and increments `version`. The page wraps the form in `{#key store.version}` so `BasicInfoForm`'s `untrack`-initialized local state (the 作成日付 radio mode) re-seeds from the imported values. The preview is *outside* the key so it survives remounts — the Typst worker stays alive.
+- **`ResumeStore.version` is the remount signal.** Imports / reset call `store.replaceData(next)` which swaps `data` and increments `version`. The page wraps the form in `{#key store.version}` so `BasicInfoForm`'s `untrack`-initialized local state (the 作成日付 radio mode) re-seeds from the imported values. The preview is _outside_ the key so it survives remounts — the Typst worker stays alive.
 - **Initial load is synchronous, hash detection is on-mount.** `loadResumeFromStorage()` runs in the page's setup script, before the child components instantiate, so on first render the form already has the restored data. `parseShareFragment` runs in `onMount` because a hash-based import flows through the confirmation modal, not the initial render. Race aside: if autosave fires before the user accepts the import, `hasResumeInStorage()` snapshot in the dialog is computed at render time (before the 500 ms debounce fires), so the "上書きされます" warning reflects true pre-import state.
 - **Photo bytes base64 at the JSON boundary.** `Uint8Array` inside `ResumeData` is the runtime shape; `toWire` base64-encodes to `bytesBase64` for both storage and share. Chunked `String.fromCharCode(...slice)` in `base64.ts` avoids the argument-count limit that breaks on large spreads. Survives `structuredClone` → JSON → parse → decode roundtrip (tested).
 - **Share dialog hides the image toggle when no photo exists.** Avoids dangling UI. When a photo is present, the toggle is unchecked by default (CONSEPT_AND_PLAN §1 "image fields excluded by default") and flipping it to include the photo shows the size warning more prominently because base64-encoded JPEG bytes dominate the URL length. Length threshold is 8 000 chars — chosen as the point where chat clients start truncating and QR codes become impractical.
@@ -449,7 +449,7 @@ package.json                        # + lz-string 1.5.0
 - Reset uses native `confirm()`, which blocks the event loop and looks out of place on mobile. Acceptable for v1; can move to a proper dialog if it bothers users.
 - LocalStorage quota is ~5 MB per origin. A 600 px JPEG at q=0.85 is ~50–150 KB base64, which is fine. Very large resumes with many markdown lines could theoretically blow the quota — the swallowed-failure path covers that case but doesn't inform the user.
 - `persistence.ts` runs in the server Vitest project (its spec doesn't need a browser). `localStorage` is referenced but only inside `typeof localStorage === 'undefined'` guards, so the module imports cleanly in Node.
-- The import modal's `hasExisting` prop is evaluated once when the modal first renders. If the autosave debounce fires *before* the modal opens but *after* the page mounts, the warning state could lag by one keystroke — in practice the 500 ms debounce plus the synchronous `onMount` detection means the modal opens first. Monitor once the invoice template adds its own import path.
+- The import modal's `hasExisting` prop is evaluated once when the modal first renders. If the autosave debounce fires _before_ the modal opens but _after_ the page mounts, the warning state could lag by one keystroke — in practice the 500 ms debounce plus the synchronous `onMount` detection means the modal opens first. Monitor once the invoice template adds its own import path.
 - Share URL compression currently runs twice in `ShareDialog` — once for the length counter, once for `buildShareUrl`. Cheap on resume-sized payloads but worth memoizing in one place when we add more templates that share the dialog.
 
 **Verification**: `pnpm run check` → 0/0. `pnpm run test` → 9 files / 79 tests passed (6 filename + 7 persistence + 6 share/url added since Phase 2). Playwright smoke: share modal opens/closes, reset button confirm flow works, mobile tabs appear at 400 px wide, preview SVG persists across tab switches.

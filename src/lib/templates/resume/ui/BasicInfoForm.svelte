@@ -29,7 +29,9 @@
 	// the initial value, not a reactive subscription); subsequent edits push
 	// back via $effect. Re-syncing from external mutations (e.g. a Phase 4
 	// LocalStorage import) is out of scope here.
-	let dateMode = $state<'auto' | 'manual'>(untrack(() => (data.日付 === 'auto' ? 'auto' : 'manual')));
+	let dateMode = $state<'auto' | 'manual'>(
+		untrack(() => (data.日付 === 'auto' ? 'auto' : 'manual'))
+	);
 	let manualDate = $state<ResumeDate>(
 		untrack(() => (data.日付 === 'auto' ? todayDate() : data.日付))
 	);

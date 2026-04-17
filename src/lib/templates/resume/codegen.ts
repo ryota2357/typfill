@@ -41,9 +41,7 @@ function contactLit(c: Contact, indent: string): string {
 
 function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
 	if (entries.length === 0) return '()';
-	const items = entries.map(
-		(e) => `${indent}  (${e.year}, ${e.month}, ${markupLit(e.content)})`
-	);
+	const items = entries.map((e) => `${indent}  (${e.year}, ${e.month}, ${markupLit(e.content)})`);
 	return `(\n${items.join(',\n')},\n${indent})`;
 }
 

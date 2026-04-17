@@ -13,10 +13,7 @@
 		{#each templates as t (t.id)}
 			{#if t.enabled}
 				<li>
-					<a
-						href={`/${t.id}`}
-						class="block rounded border border-gray-300 p-3 hover:bg-gray-50"
-					>
+					<a href={`/${t.id}`} class="block rounded border border-gray-300 p-3 hover:bg-gray-50">
 						{t.label} を作る →
 					</a>
 				</li>

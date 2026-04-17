@@ -1,7 +1,4 @@
-import {
-	compressToEncodedURIComponent,
-	decompressFromEncodedURIComponent
-} from 'lz-string';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 // A share link embeds the template id plus an lz-string + URL-safe-base64
 // compressed JSON payload in the URL fragment (CONSEPT_AND_PLAN §1). The

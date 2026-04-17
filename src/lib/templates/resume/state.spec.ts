@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	clearResumePhoto,
-	moveItem,
-	newTimelineEntry,
-	setResumePhoto
-} from './state.svelte';
+import { clearResumePhoto, moveItem, newTimelineEntry, setResumePhoto } from './state.svelte';
 import { RESUME_EMPTY_DATA } from './defaults';
 import type { ResumeData } from './types';
 

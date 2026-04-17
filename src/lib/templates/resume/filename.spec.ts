@@ -7,8 +7,7 @@ describe('buildResumeFilename', () => {
 
 	it('joins 姓+名 and appends today when 日付 is auto', () => {
 		expect(buildResumeFilename(RESUME_SAMPLE_DATA, frozenNow)).toBe(
-			'resume_履歴書太郎_20260417'
-				.concat('.pdf')
+			'resume_履歴書太郎_20260417'.concat('.pdf')
 		);
 	});
 

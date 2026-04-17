@@ -4,10 +4,7 @@
 	import { serializeForShare } from '../persistence';
 	import type { ResumeData } from '../types';
 
-	let {
-		data,
-		onclose
-	}: { data: ResumeData; onclose: () => void } = $props();
+	let { data, onclose }: { data: ResumeData; onclose: () => void } = $props();
 
 	let includeImage = $state(false);
 	let copyStatus = $state<'idle' | 'copied' | 'error'>('idle');
@@ -19,9 +16,7 @@
 	const encoded = $derived(compressToEncodedURIComponent(json));
 	const fragmentChars = $derived(encoded.length);
 	const shareUrl = $derived(
-		typeof location === 'undefined'
-			? ''
-			: buildShareUrl({ templateId: 'resume', json })
+		typeof location === 'undefined' ? '' : buildShareUrl({ templateId: 'resume', json })
 	);
 	const sizeWarning = $derived(fragmentChars > 8000);
 	const hasPhoto = $derived(data.写真 !== null);
@@ -63,7 +58,8 @@
 		</div>
 
 		<p class="text-sm text-gray-700">
-			URL のフラグメント（<code>#…</code>）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
+			URL のフラグメント（<code>#…</code
+			>）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
 		</p>
 
 		{#if hasPhoto}

@@ -113,11 +113,13 @@
 	</div>
 
 	{#if error}
-		<pre class="whitespace-pre-wrap rounded bg-red-50 p-2 text-xs text-red-800">{error}</pre>
+		<pre class="rounded bg-red-50 p-2 text-xs whitespace-pre-wrap text-red-800">{error}</pre>
 	{/if}
 
 	{#if diagnostics.length > 0}
-		<ul class="max-h-32 space-y-0.5 overflow-y-auto rounded border border-gray-200 bg-white p-2 text-xs">
+		<ul
+			class="max-h-32 space-y-0.5 overflow-y-auto rounded border border-gray-200 bg-white p-2 text-xs"
+		>
 			{#each diagnostics as d, i (i)}
 				{@const isError = d.severity === 'error'}
 				<li class={isError ? 'text-red-800' : 'text-yellow-900'}>

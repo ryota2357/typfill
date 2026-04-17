@@ -16,17 +16,13 @@ afterAll(() => {
 });
 
 describe('resume codegen — worker compile', () => {
-	it(
-		'compiles RESUME_SAMPLE_DATA with no error diagnostics',
-		async () => {
-			client = createTypstClient();
-			const sources = buildCompileSources(resumeModule, RESUME_SAMPLE_DATA);
-			const { svg, diagnostics } = await client.compile(sources, resumeModule.mainPath);
+	it('compiles RESUME_SAMPLE_DATA with no error diagnostics', async () => {
+		client = createTypstClient();
+		const sources = buildCompileSources(resumeModule, RESUME_SAMPLE_DATA);
+		const { svg, diagnostics } = await client.compile(sources, resumeModule.mainPath);
 
-			const errors = diagnostics.filter((d) => d.severity === 'error');
-			expect(errors).toEqual([]);
-			expect(svg).toMatch(/^<svg[\s>]/);
-		},
-		30_000
-	);
+		const errors = diagnostics.filter((d) => d.severity === 'error');
+		expect(errors).toEqual([]);
+		expect(svg).toMatch(/^<svg[\s>]/);
+	}, 30_000);
 });

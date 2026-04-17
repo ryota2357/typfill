@@ -33,9 +33,7 @@
 		return [postalPart, addrPart].filter(Boolean).join(' ');
 	}
 
-	const fullName = $derived(
-		(imported.氏名.姓 + imported.氏名.名).trim() || '（未設定）'
-	);
+	const fullName = $derived((imported.氏名.姓 + imported.氏名.名).trim() || '（未設定）');
 	const birth = $derived(
 		`${imported.生年月日.year}-${String(imported.生年月日.month).padStart(2, '0')}-${String(
 			imported.生年月日.day
@@ -54,9 +52,7 @@
 	<div class="w-full max-w-md space-y-4 rounded-lg bg-white p-5 shadow-xl">
 		<h2 id="import-title" class="text-lg font-bold">共有リンクから読み込み</h2>
 
-		<p class="text-sm text-gray-700">
-			この URL には履歴書データが含まれています。読み込みますか？
-		</p>
+		<p class="text-sm text-gray-700">この URL には履歴書データが含まれています。読み込みますか？</p>
 
 		{#if hasExisting}
 			<p class="rounded border border-orange-200 bg-orange-50 p-2 text-sm text-orange-900">
