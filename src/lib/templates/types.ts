@@ -1,5 +1,5 @@
 import type { Component } from 'svelte';
-import type { TypstSources } from '$lib/typst/protocol';
+import type { TypstAssets, TypstSources } from '$lib/typst/protocol';
 
 // Combine a template's static sources with a freshly generated `main.typ`.
 export function buildCompileSources<T>(module: TemplateModule<T>, data: T): TypstSources {
@@ -7,6 +7,12 @@ export function buildCompileSources<T>(module: TemplateModule<T>, data: T): Typs
 		...module.sources,
 		[module.mainPath]: module.buildMainTyp(data)
 	};
+}
+
+// Resolve binary VFS entries referenced by the generated `.typ` (e.g. an
+// uploaded resume photo). Returns `{}` for templates without binary inputs.
+export function buildCompileAssets<T>(module: TemplateModule<T>, data: T): TypstAssets {
+	return module.extractAssets ? module.extractAssets(data) : {};
 }
 
 // Everything the generic runtime needs to drive a template.
@@ -23,6 +29,9 @@ export type TemplateModule<T> = {
 	sources: TypstSources;
 	mainPath: string;
 	buildMainTyp: (data: T) => string;
+	// Optional: derive binary VFS entries (e.g. images) from the data. Templates
+	// with text-only fields can omit this; the runtime treats it as `{}`.
+	extractAssets?: (data: T) => TypstAssets;
 	FormComponent: Component<{ data: T }> | null;
 	// Strip fields that must never be included in a share-link payload
 	// (e.g. photos, API tokens). See CONSEPT_AND_PLAN §1 "Persistence & sharing".

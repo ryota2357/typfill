@@ -60,7 +60,7 @@ describe('buildMainTyp — 写真', () => {
 	it('emits image() with escaped VFS path when present', () => {
 		const out = buildMainTyp({
 			...clone(RESUME_SAMPLE_DATA),
-			写真: { vfsPath: '/assets/photo.jpg' }
+			写真: { vfsPath: '/assets/photo.jpg', bytes: new Uint8Array([0xff, 0xd8]) }
 		});
 		expect(out).toContain('写真: image("/assets/photo.jpg")');
 	});
@@ -68,7 +68,7 @@ describe('buildMainTyp — 写真', () => {
 	it('escapes quotes in the VFS path', () => {
 		const out = buildMainTyp({
 			...clone(RESUME_SAMPLE_DATA),
-			写真: { vfsPath: '/a"b.jpg' }
+			写真: { vfsPath: '/a"b.jpg', bytes: new Uint8Array() }
 		});
 		expect(out).toContain('写真: image("/a\\"b.jpg")');
 	});

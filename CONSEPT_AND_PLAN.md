@@ -293,14 +293,70 @@ src/lib/templates/
 
 **Verification**: `pnpm run check` → 0 errors / 0 warnings. `pnpm run test:unit --run` → 5 files, 52 tests passed (server project covers escape + codegen structural; chromium browser project covers the worker smoke test in ~1.3s once WASM warms up).
 
-### Phase 2 — Resume form UI
+### Phase 2 — Resume form UI — DONE
 
-- [ ] Svelte 5 runes store (`src/lib/templates/resume/state.svelte.ts`) holding `ResumeData` via `$state`, with `$derived` for preview input.
-- [ ] Field components under `src/lib/templates/resume/ui/`: 基本情報, 現住所, 連絡先, 学歴, 職歴, 免許・資格, 志望動機, 本人希望記入欄.
-- [ ] `学歴 / 職歴 / 免許・資格` are add/remove/reorder variable-length lists.
-- [ ] Photo upload: `<input type="file">` → crop/compress → base64 in `ResumeData`.
-- [ ] Tailwind mobile-first styling.
-- [ ] Debounced reactive pipeline: store change → `buildMainTyp` → worker → SVG → preview component.
+- [x] Svelte 5 runes store (`src/lib/templates/resume/state.svelte.ts`) holding `ResumeData` via `$state`, with `$derived` for preview input.
+- [x] Field components under `src/lib/templates/resume/ui/` covering 基本情報, 現住所, 連絡先, 学歴, 職歴, 免許・資格, 志望動機, 本人希望記入欄. Repeated patterns (現住所/連絡先, 学歴/職歴/免許・資格) collapsed into shared `AddressForm` / `TimelineForm` components rather than duplicated per section.
+- [x] `学歴 / 職歴 / 免許・資格` are add/remove/reorder variable-length lists (in-place `push` / `splice` / `moveItem`).
+- [x] Photo upload: `<input type="file">` → canvas resize (max 600px long-side) → JPEG (q=0.85) bytes embedded in `ResumeData.写真.bytes`. **Interactive crop UI is deferred** — the resize/compress alone is enough to keep the SVG fast and to avoid huge LocalStorage / share payloads later.
+- [x] Tailwind mobile-first styling — single column on mobile, side-by-side `md:grid-cols-2` (form left, preview right) on tablet+. Sticky-positioned preview column. Phase 3 will polish the layout (resizable divider on desktop, tab switcher on mobile).
+- [x] Debounced reactive pipeline: store mutation → store's `$derived` `compileInputs` → `<Preview>` `$effect` → 400 ms debounce → `TypstClient.compile` (in-flight job aborted on superseding edit) → SVG into preview.
+
+#### Phase 2 results
+
+**Files added / changed**:
+
+```
+src/lib/templates/
+  ├── types.ts                       # added optional extractAssets() + buildCompileAssets() helper
+  └── resume/
+      ├── types.ts                   # ResumePhoto now carries Uint8Array `bytes`
+      ├── module.ts                  # wired ResumeForm + extractAssets
+      ├── state.svelte.ts            # ResumeStore class ($state data + $derived compileInputs)
+      │                              #   + setResumePhoto / clearResumePhoto / newTimelineEntry / moveItem helpers
+      ├── state.spec.ts              # 8 unit tests for the helpers
+      └── ui/
+          ├── ResumeForm.svelte      # top-level composition; assigned to resumeModule.FormComponent
+          ├── BasicInfoForm.svelte   # 氏名/ふりがな/生年月日/性別/写真/作成日付
+          ├── AddressForm.svelte     # generic — used for 現住所 and 連絡先
+          ├── TimelineForm.svelte    # generic — used for 学歴/職歴/免許・資格 (add/remove/up/down)
+          ├── MarkupTextarea.svelte  # 志望動機 / 本人希望記入欄
+          └── AdvancedParamsForm.svelte # params, surfaced in a collapsed <details>
+src/lib/typst/
+  └── Preview.svelte                 # template-agnostic preview: lazy worker, debounced compile, in-flight abort, SVG render, PDF download
+src/routes/
+  ├── +page.svelte                   # landing page — lists enabled templates from the registry, marks disabled ones as "準備中"
+  ├── resume/+page.ts                # ssr=false, prerender=false (worker imports browser-only WASM URLs)
+  └── resume/+page.svelte            # /resume route: form + preview, mobile-first responsive layout
+```
+
+Removed:
+
+```
+src/routes/phase0/                   # Phase 0 spike, superseded by /resume
+```
+
+**Design decisions locked in**:
+
+- **`ResumePhoto.bytes: Uint8Array` lives inside `ResumeData`** (not in a side store). Keeps the `Component<{ data: T }>` form interface single-prop and lets a future LocalStorage layer persist the photo with the rest of the resume. `sanitizeForShare` already strips the entire `写真` field, so bytes never leak into a share link. Phase 4 will need a base64 boundary at the LocalStorage edge — Uint8Array doesn't survive `JSON.stringify`.
+- **Two new TemplateModule pieces**: optional `extractAssets(data)` for binary VFS entries, and a `buildCompileAssets()` helper that pairs with the existing `buildCompileSources()`. Templates with text-only inputs (e.g. invoice) can omit `extractAssets`; the helper returns `{}` in that case. Photo VFS path is a fixed `/assets/photo.jpg`.
+- **Generic shared components instead of one-component-per-field**. The plan listed 8 sections; in practice 現住所 and 連絡先 share the `Contact` shape, and 学歴/職歴/免許・資格 share the `TimelineEntry[]` shape. Having `AddressForm` and `TimelineForm` parameterized by `label` collapses 5 components into 2 with no loss of expressiveness.
+- **Debounce + abort live in `<Preview>`, not in the store.** The store's `$derived` `compileInputs` invalidates synchronously on every keystroke (cheap — just rebuilds the source string). `<Preview>` debounces 400 ms before sending to the worker and aborts any in-flight superseded job via `AbortController`. Per Phase 1's note, abort only resolves the caller's promise; the WASM job still runs to completion, but its late SVG is dropped. This split keeps the store template-agnostic and keeps timing knobs in the preview.
+- **`<Preview>` lives at `src/lib/typst/Preview.svelte`** (not under `templates/resume/`) and takes a generic `CompileInputs` prop. Reusable as-is for the invoice template in Phase 6.
+- **Photo pipeline is resize+compress only, no crop UI.** `createImageBitmap()` → canvas → `toBlob('image/jpeg', 0.85)`. No third-party dependency. A cropping UI is deferred to a later phase if user feedback demands one.
+- **`日付` is a radio toggle** (`本日（自動）` / `指定する`). Manual mode reveals an `<input type="date">`. Local UI state for the toggle is initialized from `data.日付` once via `untrack(() => …)` to make the "snapshot, don't subscribe" intent explicit and to silence Svelte's `state_referenced_locally` warning. A future Phase 4 LocalStorage import that overwrites `data.日付` will not re-sync the toggle — out of scope here.
+- **`params` sit inside a collapsed `<details>` "詳細設定（レイアウト調整）"**. Keeps the noisy layout-tuning fields (`学歴・職歴の最小行数` etc.) out of the default form view. Length-literal validation already lives in `codegen.ts`; the UI takes a free-text input and lets bad values surface as a Typst diagnostic in the preview banner.
+- **Initial form data is `RESUME_EMPTY_DATA`.** Phase 4 will switch to LocalStorage-restored data when present.
+- **`/phase0` was deleted** as the plan called for once `/resume` was wired (§7). The landing page now reads from `templateRegistry` and renders `enabled` templates as links plus disabled ones as "準備中" placeholders.
+
+**Known caveats (carry into Phase 3+)**:
+
+- Layout is intentionally minimal for Phase 2: a 2-column grid with a sticky preview column on `md+`, single-column stack on mobile. Phase 3 owns multi-page rendering, pinch-zoom, the resizable divider on desktop, and the form/preview tab switcher on mobile. The "Download PDF" button currently lives inside `<Preview>` and produces a fixed `resume.pdf` filename — Phase 3 should move it next to a `resume_{氏名}_{YYYYMMDD}.pdf` filename builder and the diagnostics banner.
+- The `ResumeStore.compileInputs` `$derived` returns a fresh object on each invalidation, which is what allows `<Preview>`'s `$effect` to track changes via prop identity. If we ever switch to passing `sources`/`assets` as separate props, both sides need to keep using `$derived` to preserve dependency tracking.
+- `Uint8Array` inside a `$state`-proxied object is not deeply proxied (Svelte treats typed arrays as leaves). Mutations to bytes themselves wouldn't trigger reactivity; we always swap the whole `data.写真` object, which does trigger. Phase 4's LocalStorage layer must base64-encode the bytes before serializing.
+- Vitest's "Vite unexpectedly reloaded a test" warning still appears on the very first run after a clean `node_modules` (mentioned in Phase 1 results). Unchanged behavior — leave it for now; add to `optimizeDeps.include` only if it ever makes a test flake.
+
+**Verification**: `pnpm run check` → 0 errors / 0 warnings. `pnpm run test` → 6 files, 60 tests passed (52 existing from Phase 1 + 8 new for the state helpers). Playwright probe against the running dev server: `/resume` mounts, the worker boots, the preview SVG appears with `RESUME_EMPTY_DATA`, editing a name field triggers a recompile within the debounce window, the 詳細設定 `<details>` opens with the length-literal inputs visible, and adding a 学歴 row updates the list. 0 console errors and 0 page errors throughout.
 
 ### Phase 3 — Preview & export
 

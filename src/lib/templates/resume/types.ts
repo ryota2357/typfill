@@ -29,10 +29,16 @@ export type TimelineEntry = {
 	content: string;
 };
 
-// The image bytes themselves live in the worker's `assets` map keyed by this
-// VFS path. The share payload carries only the path (and strips it by default).
+// `bytes` is the raw image payload that gets handed to the Typst VFS at
+// compile time, keyed by `vfsPath` (which `image()` references inside the
+// generated `.typ`). Bytes are kept inside `ResumeData` so the
+// `Component<{ data }>` form interface stays single-prop and so the future
+// LocalStorage layer can persist the photo with the rest of the resume.
+// `sanitizeForShare` strips the whole field before it reaches a share link
+// (CONSEPT_AND_PLAN §1).
 export type ResumePhoto = {
 	vfsPath: string;
+	bytes: Uint8Array;
 };
 
 // Typst length literals (e.g. "22em", "10mm"). Validated at codegen time.
