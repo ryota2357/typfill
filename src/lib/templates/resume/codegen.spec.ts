@@ -1,22 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { buildMainTyp } from "./codegen";
-import { RESUME_EMPTY_DATA, RESUME_SAMPLE_DATA } from "./defaults";
-import type { ResumeData } from "./types";
+import { EMPTY_FIELDS, SAMPLE_FIELDS } from "./defaults";
+import type { Fields } from "./schema";
 
-function clone(data: ResumeData): ResumeData {
+function clone(data: Fields): Fields {
   return structuredClone(data);
 }
 
 describe("buildMainTyp — structure", () => {
   it("starts with the lib import and show-rule", () => {
-    const out = buildMainTyp(RESUME_SAMPLE_DATA);
+    const out = buildMainTyp(SAMPLE_FIELDS);
     expect(out).toContain('#import "./lib.typ": resume');
     expect(out).toContain("#show: resume.with(");
     expect(out.trimEnd().endsWith(")")).toBe(true);
   });
 
   it("emits every required field for sample data", () => {
-    const out = buildMainTyp(RESUME_SAMPLE_DATA);
+    const out = buildMainTyp(SAMPLE_FIELDS);
     for (const field of [
       "氏名:",
       "氏名ふりがな:",
@@ -38,13 +38,13 @@ describe("buildMainTyp — structure", () => {
 
 describe("buildMainTyp — 日付", () => {
   it("omits 日付 when set to 'auto'", () => {
-    const out = buildMainTyp({ ...clone(RESUME_SAMPLE_DATA), 日付: "auto" });
+    const out = buildMainTyp({ ...clone(SAMPLE_FIELDS), 日付: "auto" });
     expect(out).not.toContain("日付:");
   });
 
   it("emits datetime() when 日付 is a concrete date", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_SAMPLE_DATA),
+      ...clone(SAMPLE_FIELDS),
       日付: { year: 2025, month: 6, day: 15 },
     });
     expect(out).toContain("日付: datetime(year: 2025, month: 6, day: 15)");
@@ -53,37 +53,37 @@ describe("buildMainTyp — 日付", () => {
 
 describe("buildMainTyp — 写真", () => {
   it("omits 写真 when null", () => {
-    const out = buildMainTyp({ ...clone(RESUME_SAMPLE_DATA), 写真: null });
+    const out = buildMainTyp({ ...clone(SAMPLE_FIELDS), 写真: null });
     expect(out).not.toContain("写真:");
   });
 
-  it("emits image() with escaped VFS path when present", () => {
+  it("emits the VFS path as a string when present", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_SAMPLE_DATA),
+      ...clone(SAMPLE_FIELDS),
       写真: {
         vfsPath: "/assets/photo.jpg",
         bytes: new Uint8Array([0xff, 0xd8]),
       },
     });
-    expect(out).toContain('写真: image("/assets/photo.jpg")');
+    expect(out).toContain('写真: "/assets/photo.jpg"');
   });
 
   it("escapes quotes in the VFS path", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_SAMPLE_DATA),
+      ...clone(SAMPLE_FIELDS),
       写真: { vfsPath: '/a"b.jpg', bytes: new Uint8Array() },
     });
-    expect(out).toContain('写真: image("/a\\"b.jpg")');
+    expect(out).toContain('写真: "/a\\"b.jpg"');
   });
 });
 
 describe("buildMainTyp — timeline arrays", () => {
   it("emits () for empty arrays", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_SAMPLE_DATA),
+      ...clone(SAMPLE_FIELDS),
       学歴: [],
       職歴: [],
-      免許・資格: [],
+      "免許・資格": [],
     });
     expect(out).toContain("学歴: ()");
     expect(out).toContain("職歴: ()");
@@ -92,7 +92,7 @@ describe("buildMainTyp — timeline arrays", () => {
 
   it("emits tuples (year, month, [content]) in order", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_EMPTY_DATA),
+      ...clone(EMPTY_FIELDS),
       学歴: [
         { year: 2020, month: 4, content: "入学" },
         { year: 2024, month: 3, content: "卒業" },
@@ -106,7 +106,7 @@ describe("buildMainTyp — timeline arrays", () => {
 describe("buildMainTyp — escaping", () => {
   it("escapes markup-significant characters in 氏名", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_EMPTY_DATA),
+      ...clone(EMPTY_FIELDS),
       氏名: { 姓: "#danger", 名: "[inner]" },
     });
     expect(out).toContain("氏名: ([\\#danger], [\\[inner\\]])");
@@ -114,7 +114,7 @@ describe("buildMainTyp — escaping", () => {
 
   it("escapes @ in E-mail so it cannot be parsed as a reference", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_EMPTY_DATA),
+      ...clone(EMPTY_FIELDS),
       現住所: {
         郵便番号: "",
         住所: "",
@@ -128,8 +128,8 @@ describe("buildMainTyp — escaping", () => {
 
   it("escapes markup specials in timeline content", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_EMPTY_DATA),
-      免許・資格: [{ year: 2020, month: 1, content: "*bold* not bold" }],
+      ...clone(EMPTY_FIELDS),
+      "免許・資格": [{ year: 2020, month: 1, content: "*bold* not bold" }],
     });
     expect(out).toContain("(2020, 1, [\\*bold\\* not bold])");
   });
@@ -138,11 +138,11 @@ describe("buildMainTyp — escaping", () => {
 describe("buildMainTyp — params validation", () => {
   it("passes through valid length literals", () => {
     const out = buildMainTyp({
-      ...clone(RESUME_EMPTY_DATA),
+      ...clone(EMPTY_FIELDS),
       params: {
-        学歴・職歴の最小行数: 22,
+        "学歴・職歴の最小行数": 22,
         学歴と職歴の間の空行数: 1,
-        免許・資格の最小行数: 6,
+        "免許・資格の最小行数": 6,
         志望動機の高さ: "22em",
         本人希望記入欄の高さ: "10em",
       },
@@ -154,11 +154,11 @@ describe("buildMainTyp — params validation", () => {
   it("rejects arbitrary strings as length literals", () => {
     expect(() =>
       buildMainTyp({
-        ...clone(RESUME_EMPTY_DATA),
+        ...clone(EMPTY_FIELDS),
         params: {
-          学歴・職歴の最小行数: 22,
+          "学歴・職歴の最小行数": 22,
           学歴と職歴の間の空行数: 1,
-          免許・資格の最小行数: 6,
+          "免許・資格の最小行数": 6,
           // Code-injection attempt — must not reach the Typst source.
           志望動機の高さ: "22em); #sys.exit() //",
           本人希望記入欄の高さ: "10em",

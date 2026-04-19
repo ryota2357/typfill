@@ -1,9 +1,9 @@
-import type {
-  TypstAssets,
-  TypstDiagnostic,
-  TypstRequest,
-  TypstResponse,
-  TypstSources,
+import {
+  type CompileInputs,
+  MAIN_TYP_PATH,
+  type TypstDiagnostic,
+  type TypstRequest,
+  type TypstResponse,
 } from "./protocol";
 import TypstWorker from "./worker?worker";
 
@@ -25,30 +25,23 @@ export class TypstCompileError extends Error {
   }
 }
 
-export type CompileOptions = {
-  assets?: TypstAssets;
-  // Abort the caller's promise. The underlying worker job still runs to
-  // completion (single-threaded WASM; no true interrupt), but its result is
-  // dropped once it arrives.
-  signal?: AbortSignal;
-};
-
 export type CompileResult = { svg: string; diagnostics: TypstDiagnostic[] };
 export type ExportPdfResult = {
   pdf: Uint8Array;
   diagnostics: TypstDiagnostic[];
 };
 
+// The caller's `signal` aborts the returned promise. The underlying worker job
+// still runs to completion (single-threaded WASM; no true interrupt), but its
+// result is dropped once it arrives.
 export type TypstClient = {
   compile(
-    sources: TypstSources,
-    mainPath: string,
-    options?: CompileOptions,
+    inputs: CompileInputs,
+    signal?: AbortSignal,
   ): Promise<CompileResult>;
   exportPdf(
-    sources: TypstSources,
-    mainPath: string,
-    options?: CompileOptions,
+    inputs: CompileInputs,
+    signal?: AbortSignal,
   ): Promise<ExportPdfResult>;
   dispose(): void;
 };
@@ -56,6 +49,10 @@ export type TypstClient = {
 function abortError(): Error {
   // DOMException is available in modern browsers and in Node ≥17.
   return new DOMException("Typst job aborted", "AbortError");
+}
+
+function mergeSources(inputs: CompileInputs) {
+  return { ...inputs.sources, [MAIN_TYP_PATH]: inputs.mainTyp };
 }
 
 export function createTypstClient(): TypstClient {
@@ -100,10 +97,14 @@ export function createTypstClient(): TypstClient {
   }
 
   return {
-    async compile(sources, mainPath, options = {}) {
+    async compile(inputs, signal) {
       const res = await send(
-        { type: "compile", sources, mainPath, assets: options.assets },
-        options.signal,
+        {
+          type: "compile",
+          sources: mergeSources(inputs),
+          assets: inputs.assets,
+        },
+        signal,
       );
       if (!res.ok || res.type !== "compile") {
         throw new Error(
@@ -112,10 +113,14 @@ export function createTypstClient(): TypstClient {
       }
       return { svg: res.svg, diagnostics: res.diagnostics };
     },
-    async exportPdf(sources, mainPath, options = {}) {
+    async exportPdf(inputs, signal) {
       const res = await send(
-        { type: "export-pdf", sources, mainPath, assets: options.assets },
-        options.signal,
+        {
+          type: "export-pdf",
+          sources: mergeSources(inputs),
+          assets: inputs.assets,
+        },
+        signal,
       );
       if (!res.ok || res.type !== "export-pdf") {
         throw new Error(

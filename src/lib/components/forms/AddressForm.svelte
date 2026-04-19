@@ -1,9 +1,19 @@
-<script lang="ts">
-  import type { Contact } from "../types";
+<script module lang="ts">
+  // The fixed shape this form edits. Templates whose contact-like records
+  // share these keys can pass them in directly; structurally-different
+  // records (e.g. invoice's Party) need their own form rather than being
+  // squeezed into this one.
+  export type AddressFormValue = {
+    郵便番号: string;
+    住所: string;
+    住所ふりがな: string;
+    電話: string;
+    "E-mail": string;
+  };
+</script>
 
-  // `value` is a $state proxy mutated in place; no `bind:` plumbing needed for
-  // the object as a whole, only for the primitive inputs below.
-  let { label, value }: { label: string; value: Contact } = $props();
+<script lang="ts">
+  let { label, value }: { label: string; value: AddressFormValue } = $props();
 </script>
 
 <section class="space-y-2">

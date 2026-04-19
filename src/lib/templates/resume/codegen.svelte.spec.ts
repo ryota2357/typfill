@@ -1,13 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { createTypstClient, type TypstClient } from "$lib/typst/worker-client";
-import { buildCompileSources } from "../types";
-import { RESUME_SAMPLE_DATA } from "./defaults";
-import { resumeModule } from "./module";
+import { buildCompileInputs } from "./compile";
+import { SAMPLE_FIELDS } from "./defaults";
 
 // End-to-end smoke test: the codegen output must actually compile through the
-// Typst worker. This is the "ワーカーがエラーを返さない" half of the Phase 1
-// round-trip assertion — a stricter SVG diff against an upstream-compiled
-// baseline is deferred to Phase 2 when the form supplies matching defaults.
+// Typst worker. The template's own `buildCompileInputs` is used so any drift
+// in the static sources / main.typ split is caught here.
 
 let client: TypstClient | undefined;
 
@@ -16,12 +14,10 @@ afterAll(() => {
 });
 
 describe("resume codegen — worker compile", () => {
-  it("compiles RESUME_SAMPLE_DATA with no error diagnostics", async () => {
+  it("compiles SAMPLE_FIELDS with no error diagnostics", async () => {
     client = createTypstClient();
-    const sources = buildCompileSources(resumeModule, RESUME_SAMPLE_DATA);
     const { svg, diagnostics } = await client.compile(
-      sources,
-      resumeModule.mainPath,
+      buildCompileInputs(SAMPLE_FIELDS),
     );
 
     const errors = diagnostics.filter((d) => d.severity === "error");

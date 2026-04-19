@@ -1,15 +1,6 @@
-<script lang="ts" module>
-  import type { TypstAssets, TypstDiagnostic, TypstSources } from "./protocol";
-
-  export type CompileInputs = {
-    sources: TypstSources;
-    mainPath: string;
-    assets?: TypstAssets;
-  };
-</script>
-
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import type { CompileInputs, TypstDiagnostic } from "./protocol";
   import { type TypstClient, TypstCompileError } from "./worker-client";
 
   let {
@@ -59,10 +50,7 @@
     status = "compiling";
     try {
       const snapshot = inputs;
-      const res = await c.compile(snapshot.sources, snapshot.mainPath, {
-        assets: snapshot.assets,
-        signal: ctl.signal,
-      });
+      const res = await c.compile(snapshot, ctl.signal);
       svg = res.svg;
       diagnostics = res.diagnostics;
       error = "";
@@ -83,9 +71,7 @@
     exporting = true;
     error = "";
     try {
-      const res = await c.exportPdf(inputs.sources, inputs.mainPath, {
-        assets: inputs.assets,
-      });
+      const res = await c.exportPdf(inputs);
       const blob = new Blob([res.pdf as BlobPart], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

@@ -1,13 +1,13 @@
 import { markupLit, stringLit } from "$lib/typst/escape";
-import type {
-  Contact,
-  JapaneseName,
-  ResumeData,
-  ResumeDate,
-  ResumeParams,
-  TimelineEntry,
-  TypstLength,
-} from "./types";
+import type { Contact, Fields, TimelineEntry } from "./schema";
+
+// Local helper types for codegen-only shapes (not worth a public alias).
+type DateObj = Extract<Fields["生年月日"], { year: number }>;
+type Name = Fields["氏名"];
+type Params = Fields["params"];
+
+// Typst length literals (e.g. "22em", "10mm"). Validated at codegen time.
+type TypstLength = string;
 
 // Accepts Typst length literals like `22em`, `10mm`, `1.5pt`, `80%`. Rejects
 // anything else to prevent arbitrary code injection through `params`.
@@ -20,11 +20,11 @@ function lengthLit(value: TypstLength): string {
   return value;
 }
 
-function datetimeLit(d: ResumeDate): string {
+function datetimeLit(d: DateObj): string {
   return `datetime(year: ${d.year}, month: ${d.month}, day: ${d.day})`;
 }
 
-function nameTupleLit(name: JapaneseName): string {
+function nameTupleLit(name: Name): string {
   return `(${markupLit(name.姓)}, ${markupLit(name.名)})`;
 }
 
@@ -47,7 +47,7 @@ function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
   return `(\n${items.join(",\n")},\n${indent})`;
 }
 
-function paramsLit(p: ResumeParams, indent: string): string {
+function paramsLit(p: Params, indent: string): string {
   const lines = [
     `${indent}  学歴・職歴の最小行数: ${p.学歴・職歴の最小行数}`,
     `${indent}  学歴と職歴の間の空行数: ${p.学歴と職歴の間の空行数}`,
@@ -63,7 +63,7 @@ function paramsLit(p: ResumeParams, indent: string): string {
 // `stringLit`; every numeric field is a TypeScript `number`; lengths go
 // through a whitelist regex. Adding a new field means adding a corresponding
 // escape site here.
-export function buildMainTyp(data: ResumeData): string {
+export function buildMainTyp(data: Fields): string {
   const lines: string[] = [];
   lines.push('#import "./lib.typ": resume');
   lines.push("");
@@ -77,7 +77,9 @@ export function buildMainTyp(data: ResumeData): string {
   lines.push(`  生年月日: ${datetimeLit(data.生年月日)},`);
   lines.push(`  性別: ${markupLit(data.性別)},`);
   if (data.写真) {
-    lines.push(`  写真: image(${stringLit(data.写真.vfsPath)}),`);
+    // The template calls `image(写真, ...)` on this value, so we pass the raw
+    // VFS path as a string literal rather than wrapping it in `image()` here.
+    lines.push(`  写真: ${stringLit(data.写真.vfsPath)},`);
   }
   lines.push(`  現住所: ${contactLit(data.現住所, "  ")},`);
   lines.push(`  連絡先: ${contactLit(data.連絡先, "  ")},`);

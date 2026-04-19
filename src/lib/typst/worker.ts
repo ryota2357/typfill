@@ -9,11 +9,12 @@ import { createTypstRenderer } from "@myriaddreamin/typst.ts/renderer";
 import rendererWasmUrl from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
 import compilerWasmUrl from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
 
-import type {
-  TypstAssets,
-  TypstRequest,
-  TypstResponse,
-  TypstSources,
+import {
+  MAIN_TYP_PATH,
+  type TypstAssets,
+  type TypstRequest,
+  type TypstResponse,
+  type TypstSources,
 } from "./protocol";
 
 const fontUrl = "/fonts/HaranoAjiMincho-Regular.otf";
@@ -43,12 +44,12 @@ function post(msg: TypstResponse, transfer: Transferable[] = []) {
   scope.postMessage(msg, transfer);
 }
 
-function installSources(sources: TypstSources, mainPath: string) {
+function installSources(sources: TypstSources) {
   for (const [path, content] of Object.entries(sources)) {
     compiler.addSource(path, content);
   }
-  if (!(mainPath in sources)) {
-    throw new Error(`mainPath ${mainPath} not present in sources`);
+  if (!(MAIN_TYP_PATH in sources)) {
+    throw new Error(`${MAIN_TYP_PATH} not present in sources`);
   }
 }
 
@@ -70,12 +71,12 @@ scope.addEventListener("message", async (e: MessageEvent<TypstRequest>) => {
   const req = e.data;
   try {
     await ready;
-    installSources(req.sources, req.mainPath);
+    installSources(req.sources);
     installAssets(req.assets);
 
     if (req.type === "compile") {
       const { result, diagnostics } = await compiler.compile({
-        mainFilePath: req.mainPath,
+        mainFilePath: MAIN_TYP_PATH,
         format: CompileFormatEnum.vector,
         diagnostics: "full",
       });
@@ -104,7 +105,7 @@ scope.addEventListener("message", async (e: MessageEvent<TypstRequest>) => {
 
     if (req.type === "export-pdf") {
       const { result, diagnostics } = await compiler.compile({
-        mainFilePath: req.mainPath,
+        mainFilePath: MAIN_TYP_PATH,
         format: CompileFormatEnum.pdf,
         diagnostics: "full",
       });

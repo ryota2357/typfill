@@ -12,11 +12,11 @@
     ブラウザだけで Typst テンプレートから PDF を生成します。
   </p>
   <ul class="space-y-2">
-    {#each templates as t (t.id)}
+    {#each templates as t (t.templateId)}
       {#if t.enabled}
         <li>
           <a
-            href={`/${t.id}`}
+            href={t.href}
             class="block rounded border border-gray-300 p-3 hover:bg-gray-50"
           >
             {t.label}

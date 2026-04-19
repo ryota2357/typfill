@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@core/unknownutil':
+        specifier: jsr:4.4.0-pre.1
+        version: '@jsr/core__unknownutil@4.4.0-pre.1'
       '@myriaddreamin/typst-ts-renderer':
         specifier: 0.7.0-rc2
         version: 0.7.0-rc2
@@ -159,6 +162,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@jsr/core__unknownutil@4.4.0-pre.1':
+    resolution: {integrity: sha512-al13EQTUm6z9gn13y5PyADkln1ACmPC1X+j70zLLps/6rZ5i2NBWVZw8cuh+YHbxLXXRiytrbtHS3hLeXIQvzg==, tarball: https://npm.jsr.io/~/11/@jsr/core__unknownutil/4.4.0-pre.1.tgz}
 
   '@myriaddreamin/typst-ts-renderer@0.7.0-rc2':
     resolution: {integrity: sha512-god1tcb2YJDkQfA8gLGcAmykVGBpNKorqqDkXVy3InC18KRbsverJhlrHoONurNIU9JuIHoWjJ2D1ntpjPgzbA==}
@@ -1053,6 +1059,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jsr/core__unknownutil@4.4.0-pre.1': {}
 
   '@myriaddreamin/typst-ts-renderer@0.7.0-rc2': {}
 

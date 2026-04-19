@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ResumeParams } from "../types";
+  import type { Fields } from "$lib/templates/resume";
 
-  let { params }: { params: ResumeParams } = $props();
+  let { params }: { params: Fields["params"] } = $props();
 </script>
 
 <div class="space-y-3">

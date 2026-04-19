@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Contact, ResumeData } from "../types";
+  import type { Contact, Fields } from "$lib/templates/resume";
 
   let {
     imported,
@@ -7,9 +7,9 @@
     onaccept,
     oncancel,
   }: {
-    imported: ResumeData;
+    imported: Fields;
     hasExisting: boolean;
-    onaccept: (data: ResumeData) => void;
+    onaccept: (data: Fields) => void;
     oncancel: () => void;
   } = $props();
 

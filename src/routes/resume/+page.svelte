@@ -1,174 +1,123 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { parseShareFragment } from "$lib/share/url";
-  import { buildResumeFilename } from "$lib/templates/resume/filename";
-  import {
-    clearResumeStorage,
-    hasResumeInStorage,
-    loadResumeFromStorage,
-    parseResumeJson,
-    saveResumeToStorage,
-    serializeResumeJson,
-  } from "$lib/templates/resume/persistence";
-  import { ResumeStore } from "$lib/templates/resume/state.svelte";
-  import type { ResumeData } from "$lib/templates/resume/types";
-  import ImportDialog from "$lib/templates/resume/ui/ImportDialog.svelte";
-  import ResumeForm from "$lib/templates/resume/ui/ResumeForm.svelte";
-  import ShareDialog from "$lib/templates/resume/ui/ShareDialog.svelte";
-  import Preview from "$lib/typst/Preview.svelte";
+  import AddressForm from "$lib/components/forms/AddressForm.svelte";
+  import MarkupTextarea from "$lib/components/forms/MarkupTextarea.svelte";
+  import TimelineForm from "$lib/components/forms/TimelineForm.svelte";
+  import type { TimelineField } from "$lib/components/forms/_helpers";
+  import TemplateEditor from "$lib/components/TemplateEditor.svelte";
+  import * as template from "$lib/templates/resume";
+  import AdvancedParamsForm from "./AdvancedParamsForm.svelte";
+  import BasicInfoForm from "./BasicInfoForm.svelte";
+  import { buildResumeFilename } from "./filename";
+  import ImportDialog from "./ImportDialog.svelte";
 
-  // Restore from LocalStorage before the form mounts so BasicInfoForm's
-  // `untrack`-initialized children pick up the right values on first render.
-  // Share-link hash is handled after mount via the import modal.
-  const store = new ResumeStore(loadResumeFromStorage() ?? undefined);
+  const TIMELINE_FIELDS: readonly TimelineField<template.TimelineEntry>[] = [
+    { key: "year", label: "年", type: "number", width: "5em" },
+    { key: "month", label: "月", type: "number", width: "4em", min: 1, max: 12 },
+    { key: "content", label: "内容", type: "text", width: "1fr" },
+  ];
 
-  let tab = $state<"form" | "preview">("form");
-  let shareOpen = $state(false);
-  let importPayload = $state<ResumeData | null>(null);
-  let importError = $state("");
-
-  const filename = $derived(buildResumeFilename(store.data));
-
-  // Autosave. Reading `serializeResumeJson(store.data)` here traverses every
-  // field, so `$effect` re-runs on any nested mutation. The write itself is
-  // debounced to 500 ms to avoid thrashing storage on rapid typing.
-  let saveTimer: ReturnType<typeof setTimeout> | null = null;
-  $effect(() => {
-    const json = serializeResumeJson(store.data);
-    if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      try {
-        localStorage.setItem("pdf-by-typst.resume.v1", json);
-      } catch {
-        // swallowed; see persistence.ts for rationale
-      }
-    }, 500);
-  });
-
-  // Check for a share-link fragment on mount. If valid, surface the import
-  // modal; otherwise strip the noisy hash from the URL bar.
-  onMount(() => {
-    const frag = parseShareFragment(location.hash);
-    if (!frag) return;
-    if (frag.templateId !== "resume") return;
+  function loadInitial(): template.Fields {
+    if (typeof localStorage === "undefined") return template.EMPTY_FIELDS;
+    const raw = localStorage.getItem(template.storageKey);
+    if (!raw) return template.EMPTY_FIELDS;
     try {
-      importPayload = parseResumeJson(frag.json);
-    } catch (e) {
-      importError = e instanceof Error ? e.message : String(e);
-      stripHash();
+      return template.deserialize(raw);
+    } catch {
+      return template.EMPTY_FIELDS;
     }
-  });
-
-  function stripHash() {
-    history.replaceState(null, "", location.pathname + location.search);
   }
 
-  function onImportAccept(next: ResumeData) {
-    store.replaceData(next);
-    saveResumeToStorage(next);
+  let data = $state<template.Fields>(loadInitial());
+
+  let importPayload = $state<template.Fields | null>(null);
+  let importError = $state("");
+
+  const filename = $derived(buildResumeFilename(data));
+
+  function onImport(payload: string) {
+    try {
+      importPayload = template.deserialize(payload);
+    } catch (e) {
+      importError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  function onImportAccept(next: template.Fields) {
+    data = next;
     importPayload = null;
-    stripHash();
   }
 
   function onImportCancel() {
     importPayload = null;
-    stripHash();
   }
 
-  function resetAll() {
-    if (!confirm("フォームの内容を破棄して空の状態に戻しますか？")) return;
-    store.reset();
-    clearResumeStorage();
+  function onReset() {
+    data = structuredClone(template.EMPTY_FIELDS);
+    try {
+      localStorage.removeItem(template.storageKey);
+    } catch {
+      // ignore
+    }
   }
 </script>
 
-<svelte:head><title>履歴書 - pdf-by-typst</title></svelte:head>
+<TemplateEditor
+  {data}
+  {template}
+  {filename}
+  {importError}
+  onimport={onImport}
+  onreset={onReset}
+  shareExtraNotice={photoNotice}
+>
+  <div class="space-y-6">
+    <BasicInfoForm {data} />
+    <AddressForm label="現住所" value={data.現住所} />
+    <AddressForm label="連絡先（現住所と異なる場合のみ）" value={data.連絡先} />
+    <TimelineForm
+      label="学歴"
+      items={data.学歴}
+      newEntry={template.newTimelineEntry}
+      fields={TIMELINE_FIELDS}
+    />
+    <TimelineForm
+      label="職歴"
+      items={data.職歴}
+      newEntry={template.newTimelineEntry}
+      fields={TIMELINE_FIELDS}
+    />
+    <TimelineForm
+      label="免許・資格"
+      items={data["免許・資格"]}
+      newEntry={template.newTimelineEntry}
+      fields={TIMELINE_FIELDS}
+    />
+    <MarkupTextarea label="志望動機" bind:value={data.志望動機} />
+    <MarkupTextarea label="本人希望記入欄" bind:value={data.本人希望記入欄} />
+    <details class="rounded border border-gray-200 p-3">
+      <summary class="cursor-pointer text-sm font-semibold text-gray-700">
+        詳細設定（レイアウト調整）
+      </summary>
+      <div class="mt-3"><AdvancedParamsForm params={data.params} /></div>
+    </details>
+  </div>
+</TemplateEditor>
 
-<main class="mx-auto flex h-[100dvh] max-w-7xl flex-col gap-3 p-3 md:p-4">
-  <header class="flex flex-wrap items-baseline justify-between gap-2">
-    <div class="flex items-baseline gap-3">
-      <h1 class="text-xl font-bold">履歴書</h1>
-      <a href="/" class="text-sm text-blue-600 hover:underline">← トップ</a>
-    </div>
-    <div class="flex items-center gap-2 text-sm">
-      <button
-        type="button"
-        onclick={() => (shareOpen = true)}
-        class="rounded border border-gray-300 px-3 py-1 hover:bg-gray-100"
-      >
-        共有リンク
-      </button>
-      <button
-        type="button"
-        onclick={resetAll}
-        class="rounded border border-gray-300 px-3 py-1 text-gray-600 hover:bg-gray-100"
-      >
-        リセット
-      </button>
-    </div>
-  </header>
-
-  {#if importError}
-    <p class="rounded bg-red-50 p-2 text-xs text-red-800">
-      共有リンクの読み込みに失敗: {importError}
+{#snippet photoNotice()}
+  {#if data.写真 !== null}
+    <p
+      class="rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-600"
+    >
+      共有リンクには写真は含まれません。
     </p>
   {/if}
-
-  <div
-    class="flex gap-1 rounded border border-gray-300 bg-gray-100 p-1 text-sm md:hidden"
-    role="tablist"
-    aria-label="画面切り替え"
-  >
-    <button
-      type="button"
-      role="tab"
-      aria-selected={tab === "form"}
-      onclick={() => (tab = "form")}
-      class="flex-1 rounded px-3 py-1.5 transition {tab === 'form'
-        ? 'bg-white font-semibold shadow-sm'
-        : 'text-gray-600 hover:bg-gray-200'}"
-    >
-      フォーム
-    </button>
-    <button
-      type="button"
-      role="tab"
-      aria-selected={tab === "preview"}
-      onclick={() => (tab = "preview")}
-      class="flex-1 rounded px-3 py-1.5 transition {tab === 'preview'
-        ? 'bg-white font-semibold shadow-sm'
-        : 'text-gray-600 hover:bg-gray-200'}"
-    >
-      プレビュー
-    </button>
-  </div>
-
-  <div class="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
-    <section
-      class="{tab === 'form'
-        ? 'flex'
-        : 'hidden'} min-h-0 flex-col overflow-y-auto pr-1 md:flex"
-    >
-      {#key store.version}
-        <ResumeForm data={store.data} />
-      {/key}
-    </section>
-    <section
-      class="{tab === 'preview' ? 'flex' : 'hidden'} min-h-0 flex-col md:flex"
-    >
-      <Preview inputs={store.compileInputs} downloadName={filename} />
-    </section>
-  </div>
-</main>
-
-{#if shareOpen}
-  <ShareDialog data={store.data} onclose={() => (shareOpen = false)} />
-{/if}
+{/snippet}
 
 {#if importPayload}
   <ImportDialog
     imported={importPayload}
-    hasExisting={hasResumeInStorage()}
+    hasExisting={typeof localStorage !== "undefined" &&
+      localStorage.getItem(template.storageKey) !== null}
     onaccept={onImportAccept}
     oncancel={onImportCancel}
   />

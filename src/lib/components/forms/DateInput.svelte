@@ -1,0 +1,20 @@
+<script lang="ts">
+  import type { DateRecord } from "./_helpers";
+
+  let {
+    value = $bindable(),
+    class: cls = "",
+  }: { value: DateRecord; class?: string } = $props();
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const iso = $derived(`${value.year}-${pad(value.month)}-${pad(value.day)}`);
+
+  function onChange(e: Event) {
+    const raw = (e.target as HTMLInputElement).value;
+    const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return;
+    value = { year: Number(m[1]), month: Number(m[2]), day: Number(m[3]) };
+  }
+</script>
+
+<input type="date" value={iso} oninput={onChange} class={cls}>

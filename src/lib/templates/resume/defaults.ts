@@ -1,19 +1,33 @@
-import type { ResumeData, ResumeParams } from "./types";
+import type { Fields, TimelineEntry } from "./schema";
 
-// Layout-tuning defaults match the upstream template's signature defaults.
-// See `src/lib/templates/resume/template/lib.typ`.
-const DEFAULT_PARAMS: ResumeParams = {
-  学歴・職歴の最小行数: 22,
+// Layout defaults track the upstream Typst template signature; see
+// `template/lib.typ`.
+const DEFAULT_PARAMS: Fields["params"] = {
+  "学歴・職歴の最小行数": 22,
   学歴と職歴の間の空行数: 1,
-  免許・資格の最小行数: 6,
+  "免許・資格の最小行数": 6,
   志望動機の高さ: "22em",
   本人希望記入欄の高さ: "10em",
 };
 
-// Starter data mirroring the upstream sample `main.typ`, used as the registry
-// default and as a fixture for codegen tests. Keep in sync with
-// `src/lib/templates/resume/template/main.typ`.
-export const RESUME_SAMPLE_DATA: ResumeData = {
+export const EMPTY_FIELDS: Fields = {
+  日付: "auto",
+  氏名: { 姓: "", 名: "" },
+  氏名ふりがな: { 姓: "", 名: "" },
+  生年月日: { year: 2000, month: 1, day: 1 },
+  性別: "",
+  写真: null,
+  現住所: { 郵便番号: "", 住所: "", 住所ふりがな: "", 電話: "", "E-mail": "" },
+  連絡先: { 郵便番号: "", 住所: "", 住所ふりがな: "", 電話: "", "E-mail": "" },
+  学歴: [],
+  職歴: [],
+  "免許・資格": [],
+  志望動機: "",
+  本人希望記入欄: "",
+  params: DEFAULT_PARAMS,
+};
+
+export const SAMPLE_FIELDS: Fields = {
   日付: "auto",
   氏名: { 姓: "履歴書", 名: "太郎" },
   氏名ふりがな: { 姓: "りれきしょ", 名: "たろう" },
@@ -43,7 +57,7 @@ export const RESUME_SAMPLE_DATA: ResumeData = {
     { year: 2026, month: 3, content: "◯◯大学大学院 △△研究科 修了" },
   ],
   職歴: [],
-  免許・資格: [
+  "免許・資格": [
     { year: 2019, month: 6, content: "基本情報技術者" },
     { year: 2021, month: 10, content: "普通自動車一種免許" },
   ],
@@ -52,20 +66,8 @@ export const RESUME_SAMPLE_DATA: ResumeData = {
   params: DEFAULT_PARAMS,
 };
 
-// Empty form scaffold — used when the user starts a fresh resume.
-export const RESUME_EMPTY_DATA: ResumeData = {
-  日付: "auto",
-  氏名: { 姓: "", 名: "" },
-  氏名ふりがな: { 姓: "", 名: "" },
-  生年月日: { year: 2000, month: 1, day: 1 },
-  性別: "",
-  写真: null,
-  現住所: { 郵便番号: "", 住所: "", 住所ふりがな: "", 電話: "", "E-mail": "" },
-  連絡先: { 郵便番号: "", 住所: "", 住所ふりがな: "", 電話: "", "E-mail": "" },
-  学歴: [],
-  職歴: [],
-  免許・資格: [],
-  志望動機: "",
-  本人希望記入欄: "",
-  params: DEFAULT_PARAMS,
-};
+// New timeline rows default to the current year/month so users edit forward
+// from a sensible value rather than from `0年0月`.
+export function newTimelineEntry(now: Date = new Date()): TimelineEntry {
+  return { year: now.getFullYear(), month: now.getMonth() + 1, content: "" };
+}

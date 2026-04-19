@@ -1,11 +1,22 @@
-<script lang="ts">
-  import { moveItem, newTimelineEntry } from "../state.svelte";
-  import type { TimelineEntry } from "../types";
+<script lang="ts" generics="E extends Record<string, string | number>">
+  import { moveItem, type TimelineField } from "./_helpers";
 
-  let { label, items }: { label: string; items: TimelineEntry[] } = $props();
+  let {
+    label,
+    items,
+    newEntry,
+    fields,
+  }: {
+    label: string;
+    items: E[];
+    newEntry: () => E;
+    fields: readonly TimelineField<E>[];
+  } = $props();
+
+  const gridTemplate = $derived(fields.map((f) => f.width).join(" "));
 
   function add() {
-    items.push(newTimelineEntry());
+    items.push(newEntry());
   }
   function remove(i: number) {
     items.splice(i, 1);
@@ -15,6 +26,10 @@
   }
   function moveDown(i: number) {
     moveItem(items, i, i + 1);
+  }
+  function setField(entry: E, field: TimelineField<E>, raw: string) {
+    const next = field.type === "number" ? Number(raw) : raw;
+    (entry as Record<string, string | number>)[field.key] = next;
   }
 </script>
 
@@ -35,33 +50,21 @@
     <ul class="space-y-2">
       {#each items as entry, i (i)}
         <li class="rounded border border-gray-200 p-2">
-          <div class="grid grid-cols-[5em_4em_1fr] gap-2">
-            <label>
-              <span class="block text-xs text-gray-500">年</span>
-              <input
-                type="number"
-                bind:value={entry.year}
-                class="w-full rounded border border-gray-300 px-2 py-1"
-              >
-            </label>
-            <label>
-              <span class="block text-xs text-gray-500">月</span>
-              <input
-                type="number"
-                min="1"
-                max="12"
-                bind:value={entry.month}
-                class="w-full rounded border border-gray-300 px-2 py-1"
-              >
-            </label>
-            <label>
-              <span class="block text-xs text-gray-500">内容</span>
-              <input
-                type="text"
-                bind:value={entry.content}
-                class="w-full rounded border border-gray-300 px-2 py-1"
-              >
-            </label>
+          <div class="grid gap-2" style:grid-template-columns={gridTemplate}>
+            {#each fields as field (field.key)}
+              <label>
+                <span class="block text-xs text-gray-500">{field.label}</span>
+                <input
+                  type={field.type}
+                  min={field.min}
+                  max={field.max}
+                  value={entry[field.key]}
+                  oninput={(e) =>
+                    setField(entry, field, (e.target as HTMLInputElement).value)}
+                  class="w-full rounded border border-gray-300 px-2 py-1"
+                >
+              </label>
+            {/each}
           </div>
           <div class="mt-2 flex justify-end gap-1 text-sm">
             <button
