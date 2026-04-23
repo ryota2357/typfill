@@ -1,0 +1,13 @@
+# Cloudflare Pages project manifest for pdf-by-typst.
+#
+# Deployment methods:
+#   - Git integration (dashboard): point the project at this repo, set
+#     "Build command: pnpm run build" and "Build output directory: build".
+#   - Direct CLI: `wrangler pages deploy build` after `pnpm run build`.
+#
+# No COOP/COEP headers are needed — typst.ts@0.7.0-rc2 is single-threaded
+# (see CONSEPT_AND_PLAN Phase 0 results).
+
+name = "pdf-by-typst"
+pages_build_output_dir = "build"
+compatibility_date = "2025-11-01"
