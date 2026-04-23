@@ -4,7 +4,7 @@ import { is, type PredicateType } from "@core/unknownutil";
 // so the runtime and wire representations coincide and we skip the
 // runtime/wire split that resume needs for its photo bytes.
 
-const isDateRecord = is.ObjectOf({
+const isDate = is.ObjectOf({
   year: is.Number,
   month: is.Number,
   day: is.Number,
@@ -24,7 +24,7 @@ const isAccount = is.ObjectOf({
   holder: is.String,
 });
 
-const isInvoiceItem = is.ObjectOf({
+const isItem = is.ObjectOf({
   name: is.String,
   amount: is.Number,
   unit: is.String,
@@ -33,13 +33,13 @@ const isInvoiceItem = is.ObjectOf({
 
 export const isFields = is.ObjectOf({
   title: is.String,
-  date: is.UnionOf([is.LiteralOf("auto"), isDateRecord]),
+  date: is.UnionOf([is.LiteralOf("auto"), isDate]),
   "invoice-number-series": is.Number,
-  "due-date": isDateRecord,
+  "due-date": isDate,
   recipient: isParty,
   issuer: isParty,
   account: isAccount,
-  items: is.ArrayOf(isInvoiceItem),
+  items: is.ArrayOf(isItem),
   "min-item-rows": is.Number,
   "tax-rate": is.Number,
   body: is.String,

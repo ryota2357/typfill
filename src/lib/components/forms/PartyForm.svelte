@@ -1,0 +1,44 @@
+<script module lang="ts">
+  // Party record shared by invoice's recipient (請求先) and issuer (請求元).
+  // A fixed shape by design — if a future template needs a different party
+  // structure it should ship its own form rather than inflate this one.
+  export type PartyFormValue = {
+    name: string;
+    "postal-code": string;
+    address: string;
+  };
+</script>
+
+<script lang="ts">
+  let { label, value }: { label: string; value: PartyFormValue } = $props();
+</script>
+
+<section class="space-y-2">
+  <h2 class="text-lg font-semibold">{label}</h2>
+  <div class="grid gap-2 sm:grid-cols-2">
+    <label class="block sm:col-span-2">
+      <span class="text-sm text-gray-700">名前 / 会社名</span>
+      <input
+        type="text"
+        bind:value={value.name}
+        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+      >
+    </label>
+    <label class="block">
+      <span class="text-sm text-gray-700">郵便番号</span>
+      <input
+        type="text"
+        bind:value={value["postal-code"]}
+        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+      >
+    </label>
+    <label class="block sm:col-span-2">
+      <span class="text-sm text-gray-700">住所</span>
+      <input
+        type="text"
+        bind:value={value.address}
+        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+      >
+    </label>
+  </div>
+</section>

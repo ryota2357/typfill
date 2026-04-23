@@ -1,11 +1,11 @@
 import type { CompileInputs } from "$lib/typst/protocol";
 import { buildMainTyp } from "./codegen";
 import type { Fields } from "./schema";
+import libTyp from "./template/lib.typ?raw";
 
-// TODO(phase-5+): once `./template/lib.typ` exists, load it with `?raw` and
-// include it under `/lib.typ` like resume does. Current stub codegen produces
-// a self-contained main.typ, so no static sources are needed yet.
-const STATIC_SOURCES = {} as const;
+// Static VFS entries that never change per-input. `main.typ` is generated per
+// call and provided through `mainTyp` on `CompileInputs`.
+const STATIC_SOURCES = { "/lib.typ": libTyp } as const;
 
 export function buildCompileInputs(data: Fields): CompileInputs {
   return {

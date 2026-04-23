@@ -51,9 +51,19 @@ export const SAMPLE_FIELDS: Fields = {
   ],
   "min-item-rows": 10,
   "tax-rate": 0.1,
-  body: "",
+  body: "お振込手数料は貴社にてご負担ください。",
 };
 
 export function newInvoiceItem(): InvoiceItem {
   return { name: "", amount: 1, unit: "式", price: 0 };
+}
+
+// Last day of the month *after* `now`. `new Date(y, m + 2, 0)` asks for day 0
+// of the month two ahead, which JS normalizes to the final day of the month
+// after `now` — leap-year and year-rollover cases fall out of this math for
+// free. Callers use it as a business-sensible default due-date for fresh
+// invoices.
+export function nextMonthEnd(now: Date = new Date()): Fields["due-date"] {
+  const d = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+  return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
 }

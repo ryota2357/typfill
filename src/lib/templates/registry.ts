@@ -23,7 +23,7 @@ export const catalog = [
   {
     templateId: invoice.templateId,
     label: invoice.label,
-    enabled: false,
+    enabled: true,
     href: "/invoice",
   },
 ] as const satisfies readonly CatalogEntry[];
