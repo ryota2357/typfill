@@ -1,4 +1,4 @@
-# Cloudflare Pages project manifest for pdf-by-typst.
+# Cloudflare Pages project manifest for Typfill.
 #
 # Deployment methods:
 #   - Git integration (dashboard): point the project at this repo, set
@@ -8,6 +8,6 @@
 # No COOP/COEP headers are needed — typst.ts@0.7.0-rc2 is single-threaded
 # (see CONSEPT_AND_PLAN Phase 0 results).
 
-name = "pdf-by-typst"
+name = "Typfill"
 pages_build_output_dir = "build"
 compatibility_date = "2025-11-01"

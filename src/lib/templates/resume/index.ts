@@ -7,7 +7,7 @@ import { type Fields, isFields } from "./schema";
 
 export const templateId = "resume" as const;
 export const label = "履歴書";
-export const storageKey = "pdf-by-typst.resume.v1";
+export const storageKey = "typfill.resume.v1";
 
 export { buildCompileInputs } from "./compile";
 export { EMPTY_FIELDS, newTimelineEntry, SAMPLE_FIELDS } from "./defaults";

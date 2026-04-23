@@ -75,7 +75,7 @@
   }
 </script>
 
-<svelte:head><title>{template.label} - pdf-by-typst</title></svelte:head>
+<svelte:head><title>{template.label} - Typfill</title></svelte:head>
 
 <main class="mx-auto flex h-[100dvh] max-w-7xl flex-col gap-3 p-3 md:p-4">
   <header class="flex flex-wrap items-baseline justify-between gap-2">

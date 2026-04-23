@@ -4,10 +4,10 @@
   const templates = listTemplates();
 </script>
 
-<svelte:head><title>pdf-by-typst</title></svelte:head>
+<svelte:head><title>Typfill</title></svelte:head>
 
 <main class="mx-auto max-w-md space-y-4 p-6">
-  <h1 class="text-2xl font-bold">pdf-by-typst</h1>
+  <h1 class="text-2xl font-bold">Typfill</h1>
   <p class="text-sm text-gray-600">
     ブラウザだけで Typst テンプレートから PDF を生成します。
   </p>

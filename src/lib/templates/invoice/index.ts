@@ -7,7 +7,7 @@ import { type Fields, isFields } from "./schema";
 
 export const templateId = "invoice" as const;
 export const label = "請求書";
-export const storageKey = "pdf-by-typst.invoice.v1";
+export const storageKey = "typfill.invoice.v1";
 
 export { buildCompileInputs } from "./compile";
 export {
