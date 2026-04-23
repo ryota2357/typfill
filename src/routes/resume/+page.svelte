@@ -1,8 +1,8 @@
 <script lang="ts">
+  import type { TimelineField } from "$lib/components/forms/_helpers";
   import AddressForm from "$lib/components/forms/AddressForm.svelte";
   import MarkupTextarea from "$lib/components/forms/MarkupTextarea.svelte";
   import TimelineForm from "$lib/components/forms/TimelineForm.svelte";
-  import type { TimelineField } from "$lib/components/forms/_helpers";
   import TemplateEditor from "$lib/components/TemplateEditor.svelte";
   import * as template from "$lib/templates/resume";
   import AdvancedParamsForm from "./AdvancedParamsForm.svelte";
@@ -12,7 +12,14 @@
 
   const TIMELINE_FIELDS: readonly TimelineField<template.TimelineEntry>[] = [
     { key: "year", label: "年", type: "number", width: "5em" },
-    { key: "month", label: "月", type: "number", width: "4em", min: 1, max: 12 },
+    {
+      key: "month",
+      label: "月",
+      type: "number",
+      width: "4em",
+      min: 1,
+      max: 12,
+    },
     { key: "content", label: "内容", type: "text", width: "1fr" },
   ];
 

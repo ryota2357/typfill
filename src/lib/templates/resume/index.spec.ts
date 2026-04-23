@@ -24,7 +24,7 @@ describe("resume template codec", () => {
     expect(back?.写真).not.toBeNull();
     expect(back?.写真?.vfsPath).toBe("/assets/photo.jpg");
     expect(back?.写真?.bytes).toBeInstanceOf(Uint8Array);
-    expect(Array.from(back!.写真!.bytes)).toEqual([0, 128, 255, 1, 2, 3]);
+    expect(Array.from(back?.写真?.bytes ?? [])).toEqual([0, 128, 255, 1, 2, 3]);
     expect(back?.氏名).toEqual(SAMPLE_FIELDS.氏名);
     expect(back?.学歴).toEqual(SAMPLE_FIELDS.学歴);
   });
@@ -42,7 +42,10 @@ describe("resume template codec", () => {
   });
 
   it("returns undefined for malformed payloads", () => {
-    const mangled = serialize({ ...EMPTY_FIELDS, 性別: 42 as unknown as string });
+    const mangled = serialize({
+      ...EMPTY_FIELDS,
+      性別: 42 as unknown as string,
+    });
     expect(deserialize(mangled)).toBeUndefined();
   });
 });

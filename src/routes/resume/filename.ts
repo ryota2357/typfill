@@ -3,6 +3,7 @@ import type { Fields } from "$lib/templates/resume";
 // Characters that are unsafe in filenames on at least one major OS, plus
 // control characters. Replaced with underscore so the downloaded PDF doesn't
 // break on Windows/Safari's sanitizer.
+// biome-ignore lint/suspicious/noControlCharactersInRegex: matching control characters is the point of this sanitizer
 const UNSAFE = /[\x00-\x1f/\\:*?"<>|]/g;
 
 function pad(n: number): string {

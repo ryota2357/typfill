@@ -9,14 +9,14 @@ export const templateId = "invoice" as const;
 export const label = "請求書";
 export const storageKey = "pdf-by-typst.invoice.v1";
 
-export type { Fields, InvoiceItem, Party } from "./schema";
+export { buildCompileInputs } from "./compile";
 export {
   EMPTY_FIELDS,
   newInvoiceItem,
   nextMonthEnd,
   SAMPLE_FIELDS,
 } from "./defaults";
-export { buildCompileInputs } from "./compile";
+export type { Fields, InvoiceItem, Party } from "./schema";
 
 export const { serialize, deserialize, schemaVersion } = createCodec<Fields>({
   schemaVersion: 1,

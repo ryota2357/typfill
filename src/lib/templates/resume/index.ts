@@ -9,9 +9,9 @@ export const templateId = "resume" as const;
 export const label = "履歴書";
 export const storageKey = "pdf-by-typst.resume.v1";
 
-export type { Contact, Fields, TimelineEntry } from "./schema";
-export { EMPTY_FIELDS, newTimelineEntry, SAMPLE_FIELDS } from "./defaults";
 export { buildCompileInputs } from "./compile";
+export { EMPTY_FIELDS, newTimelineEntry, SAMPLE_FIELDS } from "./defaults";
+export type { Contact, Fields, TimelineEntry } from "./schema";
 
 export const { serialize, deserialize, schemaVersion } = createCodec<Fields>({
   schemaVersion: 1,

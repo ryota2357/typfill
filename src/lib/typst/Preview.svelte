@@ -113,9 +113,10 @@
       class="max-h-32 space-y-0.5 overflow-y-auto rounded border border-gray-200 bg-white p-2 text-xs"
     >
       {#each diagnostics as d, i (i)}
-        {@const isError = d.severity === "error"}
-        <li class={isError ? "text-red-800" : "text-yellow-900"}>
-          <strong class={isError ? "text-red-900" : "text-yellow-900"}>
+        <li class={d.severity === "error" ? "text-red-800" : "text-yellow-900"}>
+          <strong
+            class={d.severity === "error" ? "text-red-900" : "text-yellow-900"}
+          >
             {d.severity}
           </strong>
           {#if d.path}

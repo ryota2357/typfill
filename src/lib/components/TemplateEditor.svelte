@@ -1,8 +1,8 @@
 <script lang="ts" generics="T">
   import { onMount, type Snippet } from "svelte";
   import { parseShareFragment } from "$lib/templates/url";
-  import type { CompileInputs } from "$lib/typst/protocol";
   import Preview from "$lib/typst/Preview.svelte";
+  import type { CompileInputs } from "$lib/typst/protocol";
   import ShareDialog from "./ShareDialog.svelte";
 
   // The editor consumes the same 3 entry points every template exposes. Kept

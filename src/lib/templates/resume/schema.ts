@@ -47,7 +47,6 @@ const isPhoto = is.ObjectOf({
   bytes: isUint8Array,
 });
 
-
 export const isFields = is.ObjectOf({
   日付: is.UnionOf([is.LiteralOf("auto"), isDate]),
   氏名: isName,

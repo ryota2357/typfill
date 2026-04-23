@@ -35,10 +35,7 @@ export type ExportPdfResult = {
 // still runs to completion (single-threaded WASM; no true interrupt), but its
 // result is dropped once it arrives.
 export type TypstClient = {
-  compile(
-    inputs: CompileInputs,
-    signal?: AbortSignal,
-  ): Promise<CompileResult>;
+  compile(inputs: CompileInputs, signal?: AbortSignal): Promise<CompileResult>;
   exportPdf(
     inputs: CompileInputs,
     signal?: AbortSignal,

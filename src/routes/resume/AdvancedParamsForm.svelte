@@ -16,7 +16,7 @@
       <input
         type="number"
         min="1"
-        bind:value={params.学歴・職歴の最小行数}
+        bind:value={params["学歴・職歴の最小行数"]}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
     </label>
@@ -34,7 +34,7 @@
       <input
         type="number"
         min="1"
-        bind:value={params.免許・資格の最小行数}
+        bind:value={params["免許・資格の最小行数"]}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
     </label>

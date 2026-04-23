@@ -49,9 +49,9 @@ function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
 
 function paramsLit(p: Params, indent: string): string {
   const lines = [
-    `${indent}  学歴・職歴の最小行数: ${p.学歴・職歴の最小行数}`,
+    `${indent}  学歴・職歴の最小行数: ${p["学歴・職歴の最小行数"]}`,
     `${indent}  学歴と職歴の間の空行数: ${p.学歴と職歴の間の空行数}`,
-    `${indent}  免許・資格の最小行数: ${p.免許・資格の最小行数}`,
+    `${indent}  免許・資格の最小行数: ${p["免許・資格の最小行数"]}`,
     `${indent}  志望動機の高さ: ${lengthLit(p.志望動機の高さ)}`,
     `${indent}  本人希望記入欄の高さ: ${lengthLit(p.本人希望記入欄の高さ)}`,
   ];
@@ -85,7 +85,7 @@ export function buildMainTyp(data: Fields): string {
   lines.push(`  連絡先: ${contactLit(data.連絡先, "  ")},`);
   lines.push(`  学歴: ${timelineArrayLit(data.学歴, "  ")},`);
   lines.push(`  職歴: ${timelineArrayLit(data.職歴, "  ")},`);
-  lines.push(`  免許・資格: ${timelineArrayLit(data.免許・資格, "  ")},`);
+  lines.push(`  免許・資格: ${timelineArrayLit(data["免許・資格"], "  ")},`);
   lines.push(`  志望動機: ${markupLit(data.志望動機)},`);
   lines.push(`  本人希望記入欄: ${markupLit(data.本人希望記入欄)},`);
   lines.push(`  params: ${paramsLit(data.params, "  ")},`);

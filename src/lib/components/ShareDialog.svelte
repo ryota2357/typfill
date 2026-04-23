@@ -14,10 +14,7 @@
     data: T;
     template: {
       templateId: string;
-      serialize: (
-        data: T,
-        options?: { for?: "share" | "storage" },
-      ) => string;
+      serialize: (data: T, options?: { for?: "share" | "storage" }) => string;
     };
     onclose: () => void;
     extraNotice?: import("svelte").Snippet;
@@ -74,7 +71,8 @@
     </div>
 
     <p class="text-sm text-gray-700">
-      URL のフラグメント（<code>#…</code
+      URL のフラグメント（<code
+        >#…</code
       >）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
     </p>
 

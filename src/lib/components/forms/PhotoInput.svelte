@@ -92,12 +92,7 @@
       </button>
     </div>
   {/if}
-  <input
-    type="file"
-    accept="image/*"
-    onchange={onSelect}
-    class="block text-sm"
-  >
+  <input type="file" accept="image/*" onchange={onSelect} class="block text-sm">
   {#if error}
     <p class="text-sm text-red-700">{error}</p>
   {/if}

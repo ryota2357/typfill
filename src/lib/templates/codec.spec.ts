@@ -72,8 +72,9 @@ describe("createCodec — ValueCodec (Uint8Array)", () => {
     };
     const back = codec.deserialize(codec.serialize(data)) as typeof data;
     expect(back.outer.list).toHaveLength(2);
-    expect(Array.from(back.outer.list[0]!.bytes)).toEqual([1]);
-    expect(Array.from(back.outer.list[1]!.bytes)).toEqual([2, 3]);
+    const [first, second] = back.outer.list;
+    expect(Array.from(first?.bytes ?? [])).toEqual([1]);
+    expect(Array.from(second?.bytes ?? [])).toEqual([2, 3]);
   });
 
   it("serialize throws UnknownValueTypeError when a ValueCodec is missing", () => {
@@ -165,7 +166,9 @@ describe("createCodec — sanitizeForShare", () => {
     expect(storageBack?.secret).toBe("top");
     expect(sanitize).not.toHaveBeenCalled();
 
-    const shareBack = codec.deserialize(codec.serialize(data, { for: "share" }));
+    const shareBack = codec.deserialize(
+      codec.serialize(data, { for: "share" }),
+    );
     expect(shareBack?.secret).toBe("");
     expect(sanitize).toHaveBeenCalledOnce();
   });

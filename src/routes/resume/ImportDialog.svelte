@@ -18,7 +18,7 @@
   }
 
   function truncate(s: string, max: number): string {
-    return s.length > max ? s.slice(0, max) + "…" : s;
+    return s.length > max ? `${s.slice(0, max)}…` : s;
   }
 
   // Compact住所 preview. Shows postal code (with 〒) plus the first 30 chars of

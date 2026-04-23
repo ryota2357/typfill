@@ -1,10 +1,10 @@
 <script lang="ts">
+  import type { TimelineField } from "$lib/components/forms/_helpers";
   import DateInput from "$lib/components/forms/DateInput.svelte";
   import DateModeRadio from "$lib/components/forms/DateModeRadio.svelte";
   import MarkupTextarea from "$lib/components/forms/MarkupTextarea.svelte";
   import PartyForm from "$lib/components/forms/PartyForm.svelte";
   import TimelineForm from "$lib/components/forms/TimelineForm.svelte";
-  import type { TimelineField } from "$lib/components/forms/_helpers";
   import TemplateEditor from "$lib/components/TemplateEditor.svelte";
   import * as template from "$lib/templates/invoice";
   import { buildInvoiceFilename } from "./filename";
