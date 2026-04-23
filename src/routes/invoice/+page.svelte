@@ -22,11 +22,7 @@
     if (typeof localStorage === "undefined") return template.EMPTY_FIELDS;
     const raw = localStorage.getItem(template.storageKey);
     if (!raw) return template.EMPTY_FIELDS;
-    try {
-      return template.deserialize(raw);
-    } catch {
-      return template.EMPTY_FIELDS;
-    }
+    return template.deserialize(raw) ?? template.EMPTY_FIELDS;
   }
 
   let data = $state<template.Fields>(loadInitial());
@@ -37,11 +33,9 @@
   const filename = $derived(buildInvoiceFilename(data));
 
   function onImport(payload: string) {
-    try {
-      importPayload = template.deserialize(payload);
-    } catch (e) {
-      importError = e instanceof Error ? e.message : String(e);
-    }
+    const next = template.deserialize(payload);
+    if (next) importPayload = next;
+    else importError = "共有リンクを読み込めませんでした";
   }
 
   function onImportAccept(next: template.Fields) {
