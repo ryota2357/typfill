@@ -1,6 +1,8 @@
-<script lang="ts">
-  import type { DateRecord } from "./_helpers";
+<script module lang="ts">
+  export type DateRecord = { year: number; month: number; day: number };
+</script>
 
+<script lang="ts">
   let {
     value = $bindable(),
     class: cls = "",

@@ -5,15 +5,15 @@
 <script lang="ts">
   let {
     value = $bindable(),
-    vfsPath = "/assets/photo.jpg",
-    maxSide = 600,
-    quality = 0.85,
+    vfsPath,
+    maxSide,
+    format,
     hint,
   }: {
     value: PhotoValue | null;
-    vfsPath?: string;
-    maxSide?: number;
-    quality?: number;
+    vfsPath: string;
+    maxSide: number;
+    format: { type: "image/jpeg"; quality: number };
     hint?: string;
   } = $props();
 
@@ -25,7 +25,7 @@
       previewUrl = null;
       return;
     }
-    const blob = new Blob([value.bytes as BlobPart], { type: "image/jpeg" });
+    const blob = new Blob([value.bytes as BlobPart], { type: format.type });
     const url = URL.createObjectURL(blob);
     previewUrl = url;
     return () => URL.revokeObjectURL(url);
@@ -37,7 +37,7 @@
     if (!file) return;
     error = "";
     try {
-      const bytes = await loadAndCompress(file, maxSide, quality);
+      const bytes = await loadAndCompress(file, maxSide, format.type, format.quality);
       value = { vfsPath, bytes };
     } catch (err) {
       error = err instanceof Error ? err.message : String(err);
@@ -54,6 +54,7 @@
   async function loadAndCompress(
     file: File,
     max: number,
+    mimeType: string,
     q: number,
   ): Promise<Uint8Array> {
     const bitmap = await createImageBitmap(file);
@@ -68,9 +69,9 @@
     ctx.drawImage(bitmap, 0, 0, w, h);
     bitmap.close();
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", q),
+      canvas.toBlob(resolve, mimeType, q),
     );
-    if (!blob) throw new Error("JPEG のエンコードに失敗しました");
+    if (!blob) throw new Error("画像のエンコードに失敗しました");
     return new Uint8Array(await blob.arrayBuffer());
   }
 </script>

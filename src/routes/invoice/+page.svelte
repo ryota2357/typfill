@@ -1,16 +1,18 @@
 <script lang="ts">
-  import type { TimelineField } from "$lib/components/forms/_helpers";
-  import DateInput from "$lib/components/forms/DateInput.svelte";
-  import DateModeRadio from "$lib/components/forms/DateModeRadio.svelte";
-  import MarkupTextarea from "$lib/components/forms/MarkupTextarea.svelte";
-  import PartyForm from "$lib/components/forms/PartyForm.svelte";
-  import TimelineForm from "$lib/components/forms/TimelineForm.svelte";
+  import {
+    DateInput,
+    DateModeRadio,
+    type EntryField,
+    EntryListForm,
+    MarkupTextarea,
+  } from "$lib/components/forms";
   import TemplateEditor from "$lib/components/TemplateEditor.svelte";
   import * as template from "$lib/templates/invoice";
   import { buildInvoiceFilename } from "./filename";
   import ImportDialog from "./ImportDialog.svelte";
+  import PartyForm from "./PartyForm.svelte";
 
-  const ITEM_FIELDS: readonly TimelineField<template.InvoiceItem>[] = [
+  const ITEM_FIELDS: readonly EntryField<template.InvoiceItem>[] = [
     { key: "name", label: "品目", type: "text", width: "1fr" },
     { key: "amount", label: "数量", type: "number", width: "6em", min: 0 },
     { key: "unit", label: "単位", type: "text", width: "6em" },
@@ -158,7 +160,7 @@
       </div>
     </section>
 
-    <TimelineForm
+    <EntryListForm
       label="項目"
       items={data.items}
       newEntry={template.newInvoiceItem}

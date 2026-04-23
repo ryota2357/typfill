@@ -1,6 +1,16 @@
-<script lang="ts" generics="E extends Record<string, string | number>">
-  import { moveItem, type TimelineField } from "./_helpers";
+<script module lang="ts">
+  // Column schema for a single editable field in the entry list.
+  export type EntryField<E> = {
+    key: keyof E & string;
+    label: string;
+    type: "number" | "text";
+    width: string;
+    min?: number;
+    max?: number;
+  };
+</script>
 
+<script lang="ts" generics="E extends Record<string, string | number>">
   let {
     label,
     items,
@@ -10,7 +20,7 @@
     label: string;
     items: E[];
     newEntry: () => E;
-    fields: readonly TimelineField<E>[];
+    fields: readonly EntryField<E>[];
   } = $props();
 
   const gridTemplate = $derived(fields.map((f) => f.width).join(" "));
@@ -21,13 +31,20 @@
   function remove(i: number) {
     items.splice(i, 1);
   }
+  // Out-of-range target is a no-op so callers can naively pass i±1 without
+  // bounds-checking.
+  function swap(from: number, to: number) {
+    if (to < 0 || to >= items.length) return;
+    const [item] = items.splice(from, 1);
+    items.splice(to, 0, item);
+  }
   function moveUp(i: number) {
-    moveItem(items, i, i - 1);
+    swap(i, i - 1);
   }
   function moveDown(i: number) {
-    moveItem(items, i, i + 1);
+    swap(i, i + 1);
   }
-  function setField(entry: E, field: TimelineField<E>, raw: string) {
+  function setField(entry: E, field: EntryField<E>, raw: string) {
     const next = field.type === "number" ? Number(raw) : raw;
     (entry as Record<string, string | number>)[field.key] = next;
   }

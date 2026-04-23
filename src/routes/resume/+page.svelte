@@ -1,16 +1,20 @@
 <script lang="ts">
-  import type { TimelineField } from "$lib/components/forms/_helpers";
-  import AddressForm from "$lib/components/forms/AddressForm.svelte";
-  import MarkupTextarea from "$lib/components/forms/MarkupTextarea.svelte";
-  import TimelineForm from "$lib/components/forms/TimelineForm.svelte";
+  import {
+    type EntryField,
+    EntryListForm,
+    MarkupTextarea,
+  } from "$lib/components/forms";
   import TemplateEditor from "$lib/components/TemplateEditor.svelte";
   import * as template from "$lib/templates/resume";
+  import AddressForm from "./AddressForm.svelte";
   import AdvancedParamsForm from "./AdvancedParamsForm.svelte";
-  import BasicInfoForm from "./BasicInfoForm.svelte";
+  import DocumentDateForm from "./DocumentDateForm.svelte";
   import { buildResumeFilename } from "./filename";
   import ImportDialog from "./ImportDialog.svelte";
+  import PersonalInfoForm from "./PersonalInfoForm.svelte";
+  import PhotoUploadForm from "./PhotoUploadForm.svelte";
 
-  const TIMELINE_FIELDS: readonly TimelineField<template.TimelineEntry>[] = [
+  const TIMELINE_FIELDS: readonly EntryField<template.TimelineEntry>[] = [
     { key: "year", label: "年", type: "number", width: "5em" },
     {
       key: "month",
@@ -72,22 +76,24 @@
   shareExtraNotice={photoNotice}
 >
   <div class="space-y-6">
-    <BasicInfoForm {data} />
+    <PersonalInfoForm {data} />
+    <DocumentDateForm bind:value={data.日付} />
+    <PhotoUploadForm bind:value={data.写真} />
     <AddressForm label="現住所" value={data.現住所} />
     <AddressForm label="連絡先（現住所と異なる場合のみ）" value={data.連絡先} />
-    <TimelineForm
+    <EntryListForm
       label="学歴"
       items={data.学歴}
       newEntry={template.newTimelineEntry}
       fields={TIMELINE_FIELDS}
     />
-    <TimelineForm
+    <EntryListForm
       label="職歴"
       items={data.職歴}
       newEntry={template.newTimelineEntry}
       fields={TIMELINE_FIELDS}
     />
-    <TimelineForm
+    <EntryListForm
       label="免許・資格"
       items={data["免許・資格"]}
       newEntry={template.newTimelineEntry}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DateRecord } from "./_helpers";
+  import type { DateRecord } from "./DateInput.svelte";
 
   // Bridges the data model `"auto" | DateRecord` to a two-radio UX. The local
   // `manualDate` preserves the last-edited date across auto/manual toggles so

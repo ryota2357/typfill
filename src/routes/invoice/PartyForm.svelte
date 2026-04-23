@@ -1,16 +1,7 @@
-<script module lang="ts">
-  // Party record shared by invoice's recipient (請求先) and issuer (請求元).
-  // A fixed shape by design — if a future template needs a different party
-  // structure it should ship its own form rather than inflate this one.
-  export type PartyFormValue = {
-    name: string;
-    "postal-code": string;
-    address: string;
-  };
-</script>
-
 <script lang="ts">
-  let { label, value }: { label: string; value: PartyFormValue } = $props();
+  import type { Party } from "$lib/templates/invoice";
+
+  let { label, value }: { label: string; value: Party } = $props();
 </script>
 
 <section class="space-y-2">

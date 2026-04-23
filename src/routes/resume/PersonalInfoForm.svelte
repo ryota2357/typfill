@@ -1,15 +1,12 @@
 <script lang="ts">
-  import DateInput from "$lib/components/forms/DateInput.svelte";
-  import DateModeRadio from "$lib/components/forms/DateModeRadio.svelte";
-  import PhotoInput from "$lib/components/forms/PhotoInput.svelte";
+  import { DateInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
   let { data }: { data: Fields } = $props();
 </script>
 
 <section class="space-y-3">
-  <h2 class="text-lg font-semibold">基本情報</h2>
-
+  <h2 class="text-lg font-semibold">個人情報</h2>
   <div class="grid gap-2 sm:grid-cols-2">
     <label class="block">
       <span class="text-sm text-gray-700">姓</span>
@@ -59,17 +56,4 @@
       >
     </label>
   </div>
-
-  <fieldset class="space-y-2">
-    <legend class="text-sm text-gray-700">作成日付</legend>
-    <DateModeRadio bind:value={data.日付} />
-  </fieldset>
-
-  <fieldset class="space-y-2">
-    <legend class="text-sm text-gray-700">写真</legend>
-    <PhotoInput
-      bind:value={data.写真}
-      hint="長辺 600px までリサイズし、JPEG（品質 85）として埋め込みます。共有リンクには含まれません。"
-    />
-  </fieldset>
 </section>

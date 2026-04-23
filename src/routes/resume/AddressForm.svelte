@@ -1,19 +1,7 @@
-<script module lang="ts">
-  // The fixed shape this form edits. Templates whose contact-like records
-  // share these keys can pass them in directly; structurally-different
-  // records (e.g. invoice's Party) need their own form rather than being
-  // squeezed into this one.
-  export type AddressFormValue = {
-    郵便番号: string;
-    住所: string;
-    住所ふりがな: string;
-    電話: string;
-    "E-mail": string;
-  };
-</script>
-
 <script lang="ts">
-  let { label, value }: { label: string; value: AddressFormValue } = $props();
+  import type { Contact } from "$lib/templates/resume";
+
+  let { label, value }: { label: string; value: Contact } = $props();
 </script>
 
 <section class="space-y-2">
