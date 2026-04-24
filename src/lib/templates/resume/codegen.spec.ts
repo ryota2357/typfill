@@ -103,7 +103,7 @@ describe("buildMainTyp — timeline arrays", () => {
   });
 });
 
-describe("buildMainTyp — escaping", () => {
+describe("buildMainTyp — data-field escaping (plainMarkupLit)", () => {
   it("escapes markup-significant characters in 氏名", () => {
     const out = buildMainTyp({
       ...clone(EMPTY_FIELDS),
@@ -132,6 +132,73 @@ describe("buildMainTyp — escaping", () => {
       "免許・資格": [{ year: 2020, month: 1, content: "*bold* not bold" }],
     });
     expect(out).toContain("(2020, 1, [\\*bold\\* not bold])");
+  });
+
+  it("escapes heading markers in data fields (previously leaked)", () => {
+    // Regression: `==` used to survive the old markupLit escape set, so a
+    // name like "== リンク" would render as a section heading inside the PDF.
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      氏名: { 姓: "== 大きく", 名: "" },
+    });
+    expect(out).toContain("氏名: ([\\=\\= 大きく], [])");
+  });
+
+  it("escapes list markers in data fields (previously leaked)", () => {
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      氏名: { 姓: "- item", 名: "+ num" },
+    });
+    expect(out).toContain("氏名: ([\\- item], [\\+ num])");
+  });
+});
+
+describe("buildMainTyp — opt-in markup fields (rawMarkupLit)", () => {
+  it("wraps 志望動機 in eval(..., mode: markup)", () => {
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      志望動機: "hello",
+    });
+    expect(out).toContain('志望動機: eval("hello", mode: "markup")');
+  });
+
+  it("passes Typst function calls through 志望動機 untouched", () => {
+    const src = '#link("https://example.com")[link]';
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      志望動機: src,
+    });
+    // Inside the string literal quotes and backslashes are escaped, but the
+    // Typst syntax itself (`#link`, `[...]`) remains verbatim — it will be
+    // parsed by `eval` at compile time.
+    expect(out).toContain(
+      'eval("#link(\\"https://example.com\\")[link]", mode: "markup")',
+    );
+  });
+
+  it("contains adversarial brackets without unbalancing the outer Typst", () => {
+    // A lone `]` inside the user's content would unbalance a `[...]` wrapper,
+    // but `rawMarkupLit` emits `eval(string, …)` so the content is opaque to
+    // the outer parser.
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      志望動機: "]",
+      本人希望記入欄: "`unclosed",
+    });
+    expect(out).toContain('志望動機: eval("]", mode: "markup")');
+    expect(out).toContain(
+      '本人希望記入欄: eval("`unclosed", mode: "markup")',
+    );
+  });
+
+  it("also applies rawMarkupLit to 本人希望記入欄", () => {
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      本人希望記入欄: "== 見出し\n- 箇条",
+    });
+    expect(out).toContain(
+      '本人希望記入欄: eval("== 見出し\\n- 箇条", mode: "markup")',
+    );
   });
 });
 

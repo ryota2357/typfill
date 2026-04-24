@@ -1,13 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { escapeMarkup, escapeString, markupLit, stringLit } from "./escape";
+import {
+  escapePlainMarkup,
+  escapeString,
+  plainMarkupLit,
+  rawMarkupLit,
+  stringLit,
+} from "./escape";
 
-describe("escapeMarkup", () => {
+describe("escapePlainMarkup", () => {
   it("returns empty string unchanged", () => {
-    expect(escapeMarkup("")).toBe("");
+    expect(escapePlainMarkup("")).toBe("");
   });
 
   it("leaves plain ASCII and Japanese text untouched", () => {
-    expect(escapeMarkup("山田 太郎 Hello 123")).toBe("山田 太郎 Hello 123");
+    expect(escapePlainMarkup("山田 太郎 Hello 123")).toBe(
+      "山田 太郎 Hello 123",
+    );
   });
 
   it.each([
@@ -22,53 +30,109 @@ describe("escapeMarkup", () => {
     ["dollar", "$", "\\$"],
     ["asterisk", "*", "\\*"],
     ["underscore", "_", "\\_"],
+    ["equals", "=", "\\="],
+    ["plus", "+", "\\+"],
+    ["hyphen", "-", "\\-"],
+    ["slash", "/", "\\/"],
+    ["tilde", "~", "\\~"],
   ])("escapes %s", (_name, input, expected) => {
-    expect(escapeMarkup(input)).toBe(expected);
+    expect(escapePlainMarkup(input)).toBe(expected);
   });
 
   it("escapes each occurrence in a mixed string", () => {
-    expect(escapeMarkup("a#b*c_d")).toBe("a\\#b\\*c\\_d");
+    expect(escapePlainMarkup("a#b*c_d")).toBe("a\\#b\\*c\\_d");
   });
 
   it("escapes adjacent duplicates", () => {
-    expect(escapeMarkup("##")).toBe("\\#\\#");
-    expect(escapeMarkup("[[]]")).toBe("\\[\\[\\]\\]");
+    expect(escapePlainMarkup("##")).toBe("\\#\\#");
+    expect(escapePlainMarkup("[[]]")).toBe("\\[\\[\\]\\]");
+  });
+
+  it("escapes heading and list markers that used to leak", () => {
+    // Regression: `==`, `-`, `+`, `/` previously passed through the old
+    // escapeMarkup unchanged, so plain-text fields rendered as headings /
+    // lists / term-list items. The strict set closes those leaks.
+    expect(escapePlainMarkup("== リンク")).toBe("\\=\\= リンク");
+    expect(escapePlainMarkup("- item")).toBe("\\- item");
+    expect(escapePlainMarkup("+ num")).toBe("\\+ num");
+    expect(escapePlainMarkup("/ term")).toBe("\\/ term");
   });
 
   it("escapes the whole special set at once", () => {
-    expect(escapeMarkup("\\[]#<>`@$*_")).toBe(
-      "\\\\\\[\\]\\#\\<\\>\\`\\@\\$\\*\\_",
+    expect(escapePlainMarkup("\\[]#<>`@$*_=+-/~")).toBe(
+      "\\\\\\[\\]\\#\\<\\>\\`\\@\\$\\*\\_\\=\\+\\-\\/\\~",
     );
   });
 
   it("escapes backslash before letters without doubling escapes", () => {
     // A single backslash in input must produce exactly two backslashes —
     // global replace advances past the inserted `\`, so it is not re-matched.
-    expect(escapeMarkup("\\n")).toBe("\\\\n");
+    expect(escapePlainMarkup("\\n")).toBe("\\\\n");
   });
 
   it("preserves newlines as whitespace", () => {
     // Paragraph breaks are intentional content; do not alter them.
-    expect(escapeMarkup("line1\nline2")).toBe("line1\nline2");
+    expect(escapePlainMarkup("line1\nline2")).toBe("line1\nline2");
   });
 
   it("handles leading and trailing specials", () => {
-    expect(escapeMarkup("#abc#")).toBe("\\#abc\\#");
+    expect(escapePlainMarkup("#abc#")).toBe("\\#abc\\#");
   });
 });
 
-describe("markupLit", () => {
+describe("plainMarkupLit", () => {
   it("wraps escaped content in brackets", () => {
-    expect(markupLit("hello")).toBe("[hello]");
+    expect(plainMarkupLit("hello")).toBe("[hello]");
   });
 
   it("escapes brackets inside the payload", () => {
-    expect(markupLit("[inner]")).toBe("[\\[inner\\]]");
+    expect(plainMarkupLit("[inner]")).toBe("[\\[inner\\]]");
   });
 
   it("handles empty input", () => {
-    expect(markupLit("")).toBe("[]");
+    expect(plainMarkupLit("")).toBe("[]");
   });
+});
+
+describe("rawMarkupLit", () => {
+  it("emits eval(string, mode: markup) for safe content", () => {
+    expect(rawMarkupLit("hello")).toBe('eval("hello", mode: "markup")');
+  });
+
+  it("handles empty input", () => {
+    expect(rawMarkupLit("")).toBe('eval("", mode: "markup")');
+  });
+
+  it("preserves arbitrary Typst markup verbatim inside the string", () => {
+    expect(rawMarkupLit("#link(\"https://x\")[y]")).toBe(
+      'eval("#link(\\"https://x\\")[y]", mode: "markup")',
+    );
+  });
+
+  it("reuses the stringLit escaping for quotes, backslashes, and newlines", () => {
+    expect(rawMarkupLit('a"b')).toBe('eval("a\\"b", mode: "markup")');
+    expect(rawMarkupLit("a\\b")).toBe('eval("a\\\\b", mode: "markup")');
+    expect(rawMarkupLit("a\nb")).toBe('eval("a\\nb", mode: "markup")');
+  });
+
+  it.each([
+    ["trailing backslash", "abc\\"],
+    ["lone close bracket", "]"],
+    ["lone open bracket", "["],
+    ["unclosed raw block", "`unclosed"],
+    ["unclosed math", "$unclosed"],
+    ["nested unbalanced open", "x[y"],
+  ])(
+    "wraps adversarial input %s as a well-formed eval call",
+    (_name, input) => {
+      const wrapped = rawMarkupLit(input);
+      // The wrapper has a well-formed outer shape `eval("...", mode: "markup")`.
+      // What's inside the quotes is opaque to the Typst parser at the call site —
+      // it's an atomic string token followed by a named argument.
+      expect(wrapped.startsWith('eval("')).toBe(true);
+      expect(wrapped.endsWith('", mode: "markup")')).toBe(true);
+    },
+  );
 });
 
 describe("escapeString", () => {

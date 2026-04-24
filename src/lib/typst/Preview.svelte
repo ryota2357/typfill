@@ -50,7 +50,7 @@
     status = "compiling";
     try {
       const snapshot = inputs;
-      const res = await c.compile(snapshot, ctl.signal);
+      const res = await c.compile(snapshot, { signal: ctl.signal });
       svg = res.svg;
       diagnostics = res.diagnostics;
       error = "";
@@ -136,7 +136,9 @@
     {#if status === "booting"}
       <p class="p-4 text-gray-500">ワーカーを起動中…</p>
     {:else if svg}
-      <!-- typst.ts emits trusted SVG from sources we generated; safe to inline. -->
+      <!-- TODO: sanitize. rawMarkupLit fields let users author arbitrary
+           Typst, so the output can contain attacker-controlled content
+           (javascript: link targets, foreignObject HTML). -->
       {@html svg}
     {:else if status === "compiling"}
       <p class="p-4 text-gray-500">コンパイル中…</p>

@@ -14,6 +14,7 @@
     class="w-full rounded border border-gray-300 px-2 py-1 font-mono text-sm"
   ></textarea>
   <p class="text-xs text-gray-500">
-    {hint ?? "Typst 記法が使えます: *太字*、#h(1em)、改行は行末に \\ など。"}
+    {hint ??
+      "Typst 記法が使えます: 見出し == / 箇条書き - / 強調 *太字* / リンク #link(\"https://…\")[text] / 行末 \\ で改行。共有リンクから取り込んだ内容は記載どおりにコンパイルされます。"}
   </p>
 </section>

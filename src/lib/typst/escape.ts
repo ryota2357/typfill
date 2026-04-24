@@ -1,21 +1,49 @@
-// Escape helpers for embedding user-supplied strings into Typst source.
+// Helpers for embedding user-supplied strings into generated Typst source.
 //
-// Security boundary: any user input that flows into generated `.typ` must pass
-// through these helpers. Unescaped input here means arbitrary Typst code
-// execution at compile time.
+// Three flavors with distinct purposes — pick the right one per field:
+//
+//   plainMarkupLit  — treats the input as literal text. Escapes every
+//                     character that Typst markup mode interprets so no
+//                     formatting leaks through. Use for data fields such as
+//                     name, address, phone number.
+//
+//   rawMarkupLit    — passes the input through as Typst markup (headings,
+//                     lists, `#link(...)`, math, raw blocks, etc.). Emitted
+//                     as `eval("...", mode: "markup")` so the string is
+//                     opaque to our wrapper: any balance of brackets,
+//                     backticks, or dollar signs stays contained. Use for
+//                     opt-in free-text fields whose textarea hint promises
+//                     Typst support.
+//
+//   stringLit       — produces a Typst `"..."` double-quoted string literal.
+//                     Use for non-markup slots like VFS paths.
+//
+// `rawMarkupLit` intentionally allows Typst code (`#` expressions). XSS from
+// compiled SVG is mitigated separately: `Preview.svelte` renders output via
+// `<img src=blob:...>`, which disables scripts / event handlers / foreign
+// objects inside the SVG. Any new rendering path must preserve that sandbox.
 
-const MARKUP_SPECIAL = /[\\[\]#<>`@$*_]/g;
+// Every character that carries meaning in Typst markup mode. Escaping all of
+// these turns the input into literal text with no formatting.
+const PLAIN_MARKUP_SPECIAL = /[\\[\]#<>`@$*_=+\-/~]/g;
 
-// Escape characters that are significant inside a Typst content block (`[...]`).
-// Covers the set listed in CONSEPT_AND_PLAN §4.2: # < > ` @ $ * _ \ plus
-// balanced brackets.
-export function escapeMarkup(value: string): string {
-  return value.replace(MARKUP_SPECIAL, (ch) => `\\${ch}`);
+export function escapePlainMarkup(value: string): string {
+  return value.replace(PLAIN_MARKUP_SPECIAL, (ch) => `\\${ch}`);
 }
 
-// Wrap a user string as a Typst markup literal: `[escaped]`.
-export function markupLit(value: string): string {
-  return `[${escapeMarkup(value)}]`;
+// Wrap a user string as a Typst content block whose contents render as
+// literal text.
+export function plainMarkupLit(value: string): string {
+  return `[${escapePlainMarkup(value)}]`;
+}
+
+// Emit a Typst expression that evaluates the given string as markup.
+// `eval(..., mode: "markup")` sidesteps every bracket-balance concern: the
+// string is opaque data to the outer compiler and is parsed independently
+// once evaluated. Standard-library functions (`link`, `image`, headings,
+// lists, …) are in scope inside the evaluated markup.
+export function rawMarkupLit(value: string): string {
+  return `eval(${stringLit(value)}, mode: "markup")`;
 }
 
 const STRING_SPECIAL = /[\\"]/g;

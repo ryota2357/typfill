@@ -92,7 +92,9 @@ describe("buildMainTyp — recipient / issuer / account", () => {
       },
     });
     expect(out).toContain("name: [◯◯株式会社]");
-    expect(out).toContain("postal-code: [100-0001]");
+    // Plain markup escapes `-` so a postal code reads as plain digits, not
+    // a bullet list.
+    expect(out).toContain("postal-code: [100\\-0001]");
     expect(out).not.toContain("postal-ccode");
   });
 
@@ -115,26 +117,40 @@ describe("buildMainTyp — recipient / issuer / account", () => {
   });
 });
 
-describe("buildMainTyp — body", () => {
-  it("appends body after the show-rule as escaped markup", () => {
+describe("buildMainTyp — body (rawMarkupLit)", () => {
+  it("appends body as a #eval expression after the show-rule", () => {
     const out = buildMainTyp({
       ...clone(EMPTY_FIELDS),
       body: "お振込手数料は貴社にてご負担ください。",
     });
-    const afterShow = out.split(")\n").slice(-1)[0] ?? "";
-    expect(afterShow).toContain("お振込手数料は貴社にてご負担ください。");
+    expect(out).toContain(
+      '#eval("お振込手数料は貴社にてご負担ください。", mode: "markup")',
+    );
+    // And the body eval lives after the closing paren of the show-rule, not
+    // inside it.
+    const showEnd = out.indexOf("#show: invoice.with(");
+    const evalStart = out.indexOf("#eval(");
+    expect(showEnd).toBeGreaterThanOrEqual(0);
+    expect(evalStart).toBeGreaterThan(showEnd);
   });
 
-  it("escapes markup-significant characters in body", () => {
+  it("lets Typst markup pass through the body verbatim (inside the eval string)", () => {
     const out = buildMainTyp({
       ...clone(EMPTY_FIELDS),
-      body: "# not a heading *not bold*",
+      body: "== 見出し\n- 箇条",
     });
-    expect(out).toContain("\\# not a heading \\*not bold\\*");
+    expect(out).toContain('#eval("== 見出し\\n- 箇条", mode: "markup")');
+  });
+
+  it("keeps adversarial brackets/backticks contained inside the string", () => {
+    // `]` and unclosed backtick would break a `[...]` wrapper, but eval's
+    // string argument is opaque to the outer parser.
+    const out = buildMainTyp({ ...clone(EMPTY_FIELDS), body: "]`unclosed" });
+    expect(out).toContain('#eval("]`unclosed", mode: "markup")');
   });
 });
 
-describe("buildMainTyp — escaping", () => {
+describe("buildMainTyp — data-field escaping (plainMarkupLit)", () => {
   it("escapes markup specials in title", () => {
     const out = buildMainTyp({ ...clone(EMPTY_FIELDS), title: "[請求書]" });
     expect(out).toContain("title: [\\[請求書\\]]");
@@ -146,6 +162,27 @@ describe("buildMainTyp — escaping", () => {
       items: [{ name: "*品名*", amount: 1, unit: "", price: 100 }],
     });
     expect(out).toContain("name: [\\*品名\\*]");
+  });
+
+  it("escapes heading markers that previously leaked", () => {
+    // Regression: `==` used to pass through unchanged — the old markupLit
+    // escape set did not cover it.
+    const out = buildMainTyp({ ...clone(EMPTY_FIELDS), title: "== タイトル" });
+    expect(out).toContain("title: [\\=\\= タイトル]");
+  });
+
+  it("escapes code-injection attempts in issuer name", () => {
+    const out = buildMainTyp({
+      ...clone(EMPTY_FIELDS),
+      issuer: {
+        name: "#sys.call()",
+        "postal-code": "",
+        address: "",
+      },
+    });
+    // Parens are not markup-significant in Typst, so they pass through; only
+    // `#` is escaped to prevent the expression from switching to code mode.
+    expect(out).toContain("name: [\\#sys.call()]");
   });
 });
 

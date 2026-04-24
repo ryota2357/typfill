@@ -1,4 +1,4 @@
-import { markupLit, stringLit } from "$lib/typst/escape";
+import { plainMarkupLit, rawMarkupLit, stringLit } from "$lib/typst/escape";
 import type { Contact, Fields, TimelineEntry } from "./schema";
 
 // Local helper types for codegen-only shapes (not worth a public alias).
@@ -25,16 +25,16 @@ function datetimeLit(d: DateObj): string {
 }
 
 function nameTupleLit(name: Name): string {
-  return `(${markupLit(name.姓)}, ${markupLit(name.名)})`;
+  return `(${plainMarkupLit(name.姓)}, ${plainMarkupLit(name.名)})`;
 }
 
 function contactLit(c: Contact, indent: string): string {
   const lines = [
-    `${indent}  郵便番号: ${markupLit(c.郵便番号)}`,
-    `${indent}  住所: ${markupLit(c.住所)}`,
-    `${indent}  住所ふりがな: ${markupLit(c.住所ふりがな)}`,
-    `${indent}  電話: ${markupLit(c.電話)}`,
-    `${indent}  E-mail: ${markupLit(c["E-mail"])}`,
+    `${indent}  郵便番号: ${plainMarkupLit(c.郵便番号)}`,
+    `${indent}  住所: ${plainMarkupLit(c.住所)}`,
+    `${indent}  住所ふりがな: ${plainMarkupLit(c.住所ふりがな)}`,
+    `${indent}  電話: ${plainMarkupLit(c.電話)}`,
+    `${indent}  E-mail: ${plainMarkupLit(c["E-mail"])}`,
   ];
   return `(\n${lines.join(",\n")},\n${indent})`;
 }
@@ -42,7 +42,7 @@ function contactLit(c: Contact, indent: string): string {
 function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
   if (entries.length === 0) return "()";
   const items = entries.map(
-    (e) => `${indent}  (${e.year}, ${e.month}, ${markupLit(e.content)})`,
+    (e) => `${indent}  (${e.year}, ${e.month}, ${plainMarkupLit(e.content)})`,
   );
   return `(\n${items.join(",\n")},\n${indent})`;
 }
@@ -59,10 +59,13 @@ function paramsLit(p: Params, indent: string): string {
 }
 
 // Build a `main.typ` source that imports the resume template and applies it
-// with user data. Every user-supplied string flows through `markupLit` or
-// `stringLit`; every numeric field is a TypeScript `number`; lengths go
-// through a whitelist regex. Adding a new field means adding a corresponding
-// escape site here.
+// with user data. Data-value fields flow through `plainMarkupLit` (strict
+// escaping — no Typst markup leaks through); opt-in free-text fields
+// (志望動機 / 本人希望記入欄) flow through `rawMarkupLit`, which lets the
+// user write full Typst markup including `#link(...)`, headings, lists, etc.
+// VFS paths use `stringLit`; numeric fields stay as TypeScript numbers;
+// lengths go through a whitelist regex. Adding a new field means classifying
+// it (data vs opt-in markup) and picking the matching helper.
 export function buildMainTyp(data: Fields): string {
   const lines: string[] = [];
   lines.push('#import "./lib.typ": resume');
@@ -75,7 +78,7 @@ export function buildMainTyp(data: Fields): string {
   lines.push(`  氏名: ${nameTupleLit(data.氏名)},`);
   lines.push(`  氏名ふりがな: ${nameTupleLit(data.氏名ふりがな)},`);
   lines.push(`  生年月日: ${datetimeLit(data.生年月日)},`);
-  lines.push(`  性別: ${markupLit(data.性別)},`);
+  lines.push(`  性別: ${plainMarkupLit(data.性別)},`);
   if (data.写真) {
     // The template calls `image(写真, ...)` on this value, so we pass the raw
     // VFS path as a string literal rather than wrapping it in `image()` here.
@@ -86,8 +89,8 @@ export function buildMainTyp(data: Fields): string {
   lines.push(`  学歴: ${timelineArrayLit(data.学歴, "  ")},`);
   lines.push(`  職歴: ${timelineArrayLit(data.職歴, "  ")},`);
   lines.push(`  免許・資格: ${timelineArrayLit(data["免許・資格"], "  ")},`);
-  lines.push(`  志望動機: ${markupLit(data.志望動機)},`);
-  lines.push(`  本人希望記入欄: ${markupLit(data.本人希望記入欄)},`);
+  lines.push(`  志望動機: ${rawMarkupLit(data.志望動機)},`);
+  lines.push(`  本人希望記入欄: ${rawMarkupLit(data.本人希望記入欄)},`);
   lines.push(`  params: ${paramsLit(data.params, "  ")},`);
   lines.push(")");
   lines.push("");

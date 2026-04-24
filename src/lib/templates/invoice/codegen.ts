@@ -1,4 +1,4 @@
-import { escapeMarkup, markupLit } from "$lib/typst/escape";
+import { plainMarkupLit, rawMarkupLit } from "$lib/typst/escape";
 import type { Fields, InvoiceItem, Party } from "./schema";
 
 type Account = Fields["account"];
@@ -10,34 +10,34 @@ function datetimeLit(d: DateRecord): string {
 
 function partyLit(p: Party, indent: string): string {
   const lines = [
-    `${indent}  name: ${markupLit(p.name)}`,
-    `${indent}  postal-code: ${markupLit(p["postal-code"])}`,
-    `${indent}  address: ${markupLit(p.address)}`,
+    `${indent}  name: ${plainMarkupLit(p.name)}`,
+    `${indent}  postal-code: ${plainMarkupLit(p["postal-code"])}`,
+    `${indent}  address: ${plainMarkupLit(p.address)}`,
   ];
   return `(\n${lines.join(",\n")},\n${indent})`;
 }
 
 function accountLit(a: Account, indent: string): string {
   const lines = [
-    `${indent}  bank: ${markupLit(a.bank)}`,
-    `${indent}  branch: ${markupLit(a.branch)}`,
-    `${indent}  type: ${markupLit(a.type)}`,
-    `${indent}  number: ${markupLit(a.number)}`,
-    `${indent}  holder: ${markupLit(a.holder)}`,
+    `${indent}  bank: ${plainMarkupLit(a.bank)}`,
+    `${indent}  branch: ${plainMarkupLit(a.branch)}`,
+    `${indent}  type: ${plainMarkupLit(a.type)}`,
+    `${indent}  number: ${plainMarkupLit(a.number)}`,
+    `${indent}  holder: ${plainMarkupLit(a.holder)}`,
   ];
   return `(\n${lines.join(",\n")},\n${indent})`;
 }
 
 function itemLit(it: InvoiceItem, indent: string): string {
   const fields = [
-    `${indent}    name: ${markupLit(it.name)}`,
+    `${indent}    name: ${plainMarkupLit(it.name)}`,
     `${indent}    amount: ${it.amount}`,
   ];
   // Upstream template uses `item.at("unit", default: none)`; omitting the field
   // when the user left it blank keeps the rendered amount column tidy
   // (no dangling trailing space).
   if (it.unit !== "") {
-    fields.push(`${indent}    unit: ${markupLit(it.unit)}`);
+    fields.push(`${indent}    unit: ${plainMarkupLit(it.unit)}`);
   }
   fields.push(`${indent}    price: ${it.price}`);
   return `(\n${fields.join(",\n")},\n${indent}  )`;
@@ -50,15 +50,18 @@ function itemsArrayLit(items: InvoiceItem[], indent: string): string {
 }
 
 // Build a `main.typ` source that imports the invoice template and applies it
-// with user data. Named parameters go inside `#show: invoice.with(...)`; the
-// `body` parameter (備考欄) is the document content that follows.
+// with user data. Data-value fields flow through `plainMarkupLit` (strict
+// escaping); the `body` (備考) field uses `rawMarkupLit` so users can write
+// full Typst markup (headings, lists, `#link(...)`, math) in the memo area.
+// The body is emitted as a `#eval(...)` expression at the document top so
+// its output joins the main markup flow.
 export function buildMainTyp(data: Fields): string {
   const lines: string[] = [];
   lines.push('#import "./lib.typ": invoice');
   lines.push("");
   lines.push("#show: invoice.with(");
 
-  lines.push(`  title: ${markupLit(data.title)},`);
+  lines.push(`  title: ${plainMarkupLit(data.title)},`);
   if (data.date !== "auto") {
     lines.push(`  date: ${datetimeLit(data.date)},`);
   }
@@ -74,9 +77,13 @@ export function buildMainTyp(data: Fields): string {
   lines.push("");
 
   // `body` is taken from the document content after the `#show:` rule. The
-  // document top-level is itself markup context, so we emit escaped text
-  // directly rather than wrapping it in a `[...]` content block.
-  lines.push(escapeMarkup(data.body));
+  // document top-level is itself markup context, so we emit a `#`-prefixed
+  // code expression that evaluates the user string as markup. The resulting
+  // content is spliced into the document flow exactly as if the user had
+  // typed the markup at this position (modulo eval's fresh-scope rule, which
+  // only matters for user-defined symbols — standard library functions stay
+  // available).
+  lines.push(`#${rawMarkupLit(data.body)}`);
   lines.push("");
 
   return lines.join("\n");
