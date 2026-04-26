@@ -37,7 +37,12 @@
     if (!file) return;
     error = "";
     try {
-      const bytes = await loadAndCompress(file, maxSide, format.type, format.quality);
+      const bytes = await loadAndCompress(
+        file,
+        maxSide,
+        format.type,
+        format.quality,
+      );
       value = { vfsPath, bytes };
     } catch (err) {
       error = err instanceof Error ? err.message : String(err);

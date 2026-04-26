@@ -4,6 +4,9 @@
 
 export { default as DateInput } from "./DateInput.svelte";
 export { default as DateModeRadio } from "./DateModeRadio.svelte";
-export { default as EntryListForm, type EntryField } from "./EntryListForm.svelte";
+export {
+  default as EntryListForm,
+  type EntryField,
+} from "./EntryListForm.svelte";
 export { default as MarkupTextarea } from "./MarkupTextarea.svelte";
 export { default as PhotoInput } from "./PhotoInput.svelte";

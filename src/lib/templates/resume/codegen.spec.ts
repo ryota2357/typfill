@@ -186,9 +186,7 @@ describe("buildMainTyp — opt-in markup fields (rawMarkupLit)", () => {
       本人希望記入欄: "`unclosed",
     });
     expect(out).toContain('志望動機: eval("]", mode: "markup")');
-    expect(out).toContain(
-      '本人希望記入欄: eval("`unclosed", mode: "markup")',
-    );
+    expect(out).toContain('本人希望記入欄: eval("`unclosed", mode: "markup")');
   });
 
   it("also applies rawMarkupLit to 本人希望記入欄", () => {

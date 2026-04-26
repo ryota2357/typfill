@@ -46,7 +46,10 @@ export type CompileOptions = {
 // malicious share URL) is to kill the worker process. A fresh worker is
 // created lazily on the next request.
 export type TypstClient = {
-  compile(inputs: CompileInputs, options?: CompileOptions): Promise<CompileResult>;
+  compile(
+    inputs: CompileInputs,
+    options?: CompileOptions,
+  ): Promise<CompileResult>;
   exportPdf(
     inputs: CompileInputs,
     options?: CompileOptions,

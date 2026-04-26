@@ -44,12 +44,12 @@
       const w =
         Number.parseFloat(tag.match(/\bwidth="([\d.]+)/)?.[1] ?? "") ||
         Number.parseFloat(
-          tag.match(/\bviewBox="[\d.\s\-]*?\s([\d.]+)\s+[\d.]+"/)?.[1] ?? "",
+          tag.match(/\bviewBox="[\d.\s-]*?\s([\d.]+)\s+[\d.]+"/)?.[1] ?? "",
         );
       const h =
         Number.parseFloat(tag.match(/\bheight="([\d.]+)/)?.[1] ?? "") ||
         Number.parseFloat(
-          tag.match(/\bviewBox="[\d.\s\-]*?\s([\d.]+)"/)?.[1] ?? "",
+          tag.match(/\bviewBox="[\d.\s-]*?\s([\d.]+)"/)?.[1] ?? "",
         );
       if (!w || !h) continue;
       if (!pageWidth) pageWidth = w;
