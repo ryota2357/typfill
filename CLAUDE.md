@@ -12,9 +12,10 @@ Package manager is **pnpm** (npm is not on PATH).
 
 - `pnpm dev` — Vite dev server.
 - `pnpm build` — production build (output: `build/`, consumed by Cloudflare Pages via `wrangler.toml`).
-- `pnpm typecheck` — `svelte-check`. Prefer this for verification: `pnpm check` (biome) has a parser bug on `・` identifiers (e.g. `免許・資格`).
+- `pnpm typecheck` — `svelte-check`.
+- `pnpm check` — biome format & lint check.
 - `pnpm test` — vitest (both browser + node projects, single run). `pnpm test:unit` for watch.
-- `pnpm check:write` — biome format & lint fix (use sparingly, see typecheck note above).
+- `pnpm check:write` — biome format & lint fix.
 
 Single test: `pnpm vitest run path/to/file.spec.ts` (or `.svelte.spec.ts` for the browser project).
 
@@ -40,9 +41,9 @@ Each template lives in `src/lib/templates/<name>/` with a stable public surface:
 - `schema.ts` — `is*` predicates via `@core/unknownutil`; `Fields` type is `PredicateType<typeof isFields>` (no parallel type/predicate definitions).
 - `codegen.ts` — builds `main.typ` from data.
 - `compile.ts` — wires the per-call generated `mainTyp` together with `?raw`-imported `template/lib.typ` and any binary assets into `CompileInputs`.
-- `template/*.typ` — the actual Typst sources.
+- `template/` — the actual Typst sources. Pulled in as a git submodule from `ryota2357/typst-<name>-template`; fresh clones need `git submodule update --init`. Edits to the `.typ` files belong upstream — the typfill side just bumps the submodule pointer (and updates `codegen.ts`/`schema.ts` if the call surface changed).
 
-Adding a new template = add a directory matching this shape, append it to `src/lib/templates/registry.ts`, and add a `src/routes/<name>/` page that imports it and renders `<TemplateEditor>`.
+Adding a new template = add the upstream Typst repo as a submodule at `src/lib/templates/<name>/template`, fill in the surrounding `index.ts`/`schema.ts`/`codegen.ts`/`compile.ts`/`defaults.ts`, append it to `src/lib/templates/registry.ts`, and add a `src/routes/<name>/` page that imports it and renders `<TemplateEditor>`.
 
 ### Codec (`src/lib/templates/codec.ts`)
 
