@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { CompileInputs, TypstDiagnostic } from "./protocol";
+  import SandboxedSvg from "./SandboxedSvg.svelte";
   import { type TypstClient, TypstCompileError } from "./worker-client";
 
   let {
@@ -131,31 +132,14 @@
   {/if}
 
   <div
-    class="preview min-h-[600px] flex-1 overflow-auto rounded border border-gray-200 bg-gray-50"
+    class="min-h-[600px] flex-1 overflow-auto rounded border border-gray-200 bg-gray-50"
   >
     {#if status === "booting"}
       <p class="p-4 text-gray-500">ワーカーを起動中…</p>
     {:else if svg}
-      <!-- TODO: sanitize. rawMarkupLit fields let users author arbitrary
-           Typst, so the output can contain attacker-controlled content
-           (javascript: link targets, foreignObject HTML). -->
-      {@html svg}
+      <SandboxedSvg {svg} />
     {:else if status === "compiling"}
       <p class="p-4 text-gray-500">コンパイル中…</p>
     {/if}
   </div>
 </div>
-
-<style>
-  .preview :global(svg) {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  .preview :global(svg + svg) {
-    margin-top: 0.75rem;
-  }
-</style>

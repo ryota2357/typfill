@@ -54,9 +54,9 @@ Single shared serializer used for both `localStorage` autosave and share-URL fra
 
 Single-threaded — no COOP/COEP headers required, which is what lets the app deploy to plain static hosting.
 
-### Preview (`src/lib/typst/Preview.svelte`)
+### Preview (`src/lib/typst/Preview.svelte` + `SandboxedSvg.svelte`)
 
-Typst SVG output is inlined via `{@html}`. TODO: sanitize — now that `rawMarkupLit` fields accept arbitrary Typst from end users (and share URLs), the output can carry `javascript:` link targets or HTML-in-`<foreignObject>` that reach the DOM unfiltered.
+`Preview.svelte` orchestrates compile-debounce, diagnostics, and PDF export. The compiled SVG is handed to `SandboxedSvg.svelte`, which renders it inside `<iframe srcdoc sandbox="allow-popups allow-popups-to-escape-sandbox">`. Without `allow-scripts` or `allow-same-origin`, attacker-controlled SVG (typst.ts's bundled `<script>`, `<a href="javascript:...">`, `<foreignObject>` HTML reachable from `rawMarkupLit` share-URL content) is inert and can't read the parent origin's localStorage. External `<a target="_blank">` links still work via `allow-popups`. Iframes don't auto-size, so the component derives height from typst.ts's per-page `<svg>` width/height plus a ResizeObserver on its own width.
 
 ### Editor shell (`src/lib/components/TemplateEditor.svelte`)
 
@@ -76,7 +76,7 @@ Generic `<TemplateEditor>` is the shared frame: 2-column form/preview layout, mo
 
 Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`. Adding a new field means classifying it (data-value vs markup-opt-in) and picking the matching helper, or it becomes a code-execution vector at compile time or a UX leak where formatting accidentally renders.
 
-`rawMarkupLit`'s security model relies on the Typst WASM compiler being sandboxed — no file-system or network access beyond the controlled VFS. Preview still inlines the compiled SVG unsanitized (see TODO in `Preview.svelte`), which remains an open XSS vector for content authored by third parties via share URLs; sanitize before treating that path as closed.
+`rawMarkupLit`'s security model relies on two sandboxes layered together: the Typst WASM compiler (no file-system or network access beyond the controlled VFS), and the `<iframe sandbox>` in `SandboxedSvg.svelte` (no `allow-scripts`, no `allow-same-origin`). Together: Typst can run arbitrary `eval` markup but can only emit SVG that the iframe neutralizes — script tags, `javascript:` link targets, and foreignObject HTML all stay inside an origin-isolated frame. Any new SVG-rendering path must preserve that iframe boundary, otherwise share-URL authors regain XSS into the parent origin.
 
 ## Conventions
 

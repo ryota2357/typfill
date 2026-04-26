@@ -19,9 +19,11 @@
 //                     Use for non-markup slots like VFS paths.
 //
 // `rawMarkupLit` intentionally allows Typst code (`#` expressions). XSS from
-// compiled SVG is mitigated separately: `Preview.svelte` renders output via
-// `<img src=blob:...>`, which disables scripts / event handlers / foreign
-// objects inside the SVG. Any new rendering path must preserve that sandbox.
+// compiled SVG is mitigated separately: `SandboxedSvg.svelte` renders the
+// SVG inside a sandboxed `<iframe>` (no `allow-scripts`, no
+// `allow-same-origin`), so even attacker-authored `<script>`,
+// `<a href="javascript:...">`, or `<foreignObject>` payloads cannot execute
+// in our origin. Any new rendering path must preserve that sandbox.
 
 // Every character that carries meaning in Typst markup mode. Escaping all of
 // these turns the input into literal text with no formatting.
