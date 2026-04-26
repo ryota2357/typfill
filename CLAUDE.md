@@ -55,6 +55,14 @@ Single shared serializer used for both `localStorage` autosave and share-URL fra
 
 Single-threaded — no COOP/COEP headers required, which is what lets the app deploy to plain static hosting.
 
+### External binary assets (R2)
+
+The compiler/renderer wasm and the bundled font are **not** shipped in the Workers static-assets payload — the typst compiler wasm alone is ~28 MiB, past the 25 MiB per-file limit. They live in a Cloudflare R2 public bucket and the worker fetches them at runtime.
+
+- `scripts/external-assets.mjs` is the shared manifest. It hashes each source file (sha256/16 hex chars) into the published filename, e.g. `typst_ts_web_compiler_bg-<hash>.wasm`. Both `vite.config.ts` (build-time URL injection) and `scripts/upload-assets.mjs` (CI uploader) consume it, so the URLs the worker references and the object keys CI puts to R2 cannot drift.
+- `vite.config.ts` injects three URLs via `define`: `__TYPST_COMPILER_WASM_URL__`, `__TYPST_RENDERER_WASM_URL__`, `__FONT_URL__`. They resolve to `${PUBLIC_ASSETS_BASE_URL}/<hashed-filename>` in production builds and to `/_external/<hashed-filename>` in dev — a Vite serve-only middleware streams the same files out of `node_modules` / `cdn-assets/` so contributors don't need any R2 access to run the app.
+- Adding a new external asset = append it to `sources` in `external-assets.mjs`, add a matching `__*_URL__` define in `vite.config.ts`, and `declare const` + use it in `worker.ts`. The CI uploader picks it up automatically.
+
 ### Preview (`src/lib/typst/Preview.svelte` + `SandboxedSvg.svelte`)
 
 `Preview.svelte` orchestrates compile-debounce, diagnostics, and PDF export. The compiled SVG is handed to `SandboxedSvg.svelte`, which renders it inside `<iframe srcdoc sandbox="allow-popups allow-popups-to-escape-sandbox">`. Without `allow-scripts` or `allow-same-origin`, attacker-controlled SVG (typst.ts's bundled `<script>`, `<a href="javascript:...">`, `<foreignObject>` HTML reachable from `rawMarkupLit` share-URL content) is inert and can't read the parent origin's localStorage. External `<a target="_blank">` links still work via `allow-popups`. Iframes don't auto-size, so the component derives height from typst.ts's per-page `<svg>` width/height plus a ResizeObserver on its own width.

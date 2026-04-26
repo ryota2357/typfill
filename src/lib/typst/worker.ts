@@ -6,8 +6,6 @@ import {
 } from "@myriaddreamin/typst.ts/compiler";
 import { loadFonts } from "@myriaddreamin/typst.ts/options.init";
 import { createTypstRenderer } from "@myriaddreamin/typst.ts/renderer";
-import rendererWasmUrl from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
-import compilerWasmUrl from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
 
 import {
   MAIN_TYP_PATH,
@@ -17,7 +15,18 @@ import {
   type TypstSources,
 } from "./protocol";
 
-const fontUrl = "/fonts/HaranoAjiMincho-Regular.otf";
+// URLs are injected via Vite `define` (see vite.config.ts). In production
+// they point at the R2 public bucket; in dev they resolve to /_external/...
+// served by the dev middleware. We deliberately avoid `?url` imports for
+// the wasm files so they are NOT bundled into the Workers static-assets
+// payload — the compiler wasm alone exceeds the 25 MiB per-file limit.
+declare const __TYPST_COMPILER_WASM_URL__: string;
+declare const __TYPST_RENDERER_WASM_URL__: string;
+declare const __FONT_URL__: string;
+
+const compilerWasmUrl = __TYPST_COMPILER_WASM_URL__;
+const rendererWasmUrl = __TYPST_RENDERER_WASM_URL__;
+const fontUrl = __FONT_URL__;
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 
