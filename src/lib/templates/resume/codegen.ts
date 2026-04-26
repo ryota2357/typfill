@@ -83,7 +83,9 @@ export function buildMainTyp(data: Fields): string {
   lines.push(`  学歴と職歴の間の空行数: ${data.学歴と職歴の間の空行数},`);
   lines.push(`  免許・資格の最小行数: ${data["免許・資格の最小行数"]},`);
   lines.push(`  志望動機の高さ: ${lengthLit(data.志望動機の高さ)},`);
-  lines.push(`  本人希望記入欄の高さ: ${lengthLit(data.本人希望記入欄の高さ)},`);
+  lines.push(
+    `  本人希望記入欄の高さ: ${lengthLit(data.本人希望記入欄の高さ)},`,
+  );
   lines.push(")");
   lines.push("");
 
