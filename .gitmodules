@@ -1,0 +1,6 @@
+[submodule "src/lib/templates/invoice/template"]
+	path = src/lib/templates/invoice/template
+	url = https://github.com/ryota2357/typst-invoice-template.git
+[submodule "src/lib/templates/resume/template"]
+	path = src/lib/templates/resume/template
+	url = https://github.com/ryota2357/typst-resume-template.git

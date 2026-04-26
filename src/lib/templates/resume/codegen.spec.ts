@@ -29,7 +29,11 @@ describe("buildMainTyp — structure", () => {
       "免許・資格:",
       "志望動機:",
       "本人希望記入欄:",
-      "params:",
+      "学歴・職歴の最小行数:",
+      "学歴と職歴の間の空行数:",
+      "免許・資格の最小行数:",
+      "志望動機の高さ:",
+      "本人希望記入欄の高さ:",
     ]) {
       expect(out).toContain(field);
     }
@@ -200,17 +204,12 @@ describe("buildMainTyp — opt-in markup fields (rawMarkupLit)", () => {
   });
 });
 
-describe("buildMainTyp — params validation", () => {
+describe("buildMainTyp — layout fields", () => {
   it("passes through valid length literals", () => {
     const out = buildMainTyp({
       ...clone(EMPTY_FIELDS),
-      params: {
-        "学歴・職歴の最小行数": 22,
-        学歴と職歴の間の空行数: 1,
-        "免許・資格の最小行数": 6,
-        志望動機の高さ: "22em",
-        本人希望記入欄の高さ: "10em",
-      },
+      志望動機の高さ: "22em",
+      本人希望記入欄の高さ: "10em",
     });
     expect(out).toContain("志望動機の高さ: 22em");
     expect(out).toContain("本人希望記入欄の高さ: 10em");
@@ -220,14 +219,8 @@ describe("buildMainTyp — params validation", () => {
     expect(() =>
       buildMainTyp({
         ...clone(EMPTY_FIELDS),
-        params: {
-          "学歴・職歴の最小行数": 22,
-          学歴と職歴の間の空行数: 1,
-          "免許・資格の最小行数": 6,
-          // Code-injection attempt — must not reach the Typst source.
-          志望動機の高さ: "22em); #sys.exit() //",
-          本人希望記入欄の高さ: "10em",
-        },
+        // Code-injection attempt — must not reach the Typst source.
+        志望動機の高さ: "22em); #sys.exit() //",
       }),
     ).toThrow(/Invalid Typst length/);
   });

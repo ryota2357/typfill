@@ -4,13 +4,12 @@ import type { Contact, Fields, TimelineEntry } from "./schema";
 // Local helper types for codegen-only shapes (not worth a public alias).
 type DateObj = Extract<Fields["生年月日"], { year: number }>;
 type Name = Fields["氏名"];
-type Params = Fields["params"];
 
 // Typst length literals (e.g. "22em", "10mm"). Validated at codegen time.
 type TypstLength = string;
 
 // Accepts Typst length literals like `22em`, `10mm`, `1.5pt`, `80%`. Rejects
-// anything else to prevent arbitrary code injection through `params`.
+// anything else to prevent arbitrary code injection through length fields.
 const LENGTH_PATTERN = /^\d+(?:\.\d+)?(em|pt|mm|cm|in|%)$/;
 
 function lengthLit(value: TypstLength): string {
@@ -47,17 +46,6 @@ function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
   return `(\n${items.join(",\n")},\n${indent})`;
 }
 
-function paramsLit(p: Params, indent: string): string {
-  const lines = [
-    `${indent}  学歴・職歴の最小行数: ${p["学歴・職歴の最小行数"]}`,
-    `${indent}  学歴と職歴の間の空行数: ${p.学歴と職歴の間の空行数}`,
-    `${indent}  免許・資格の最小行数: ${p["免許・資格の最小行数"]}`,
-    `${indent}  志望動機の高さ: ${lengthLit(p.志望動機の高さ)}`,
-    `${indent}  本人希望記入欄の高さ: ${lengthLit(p.本人希望記入欄の高さ)}`,
-  ];
-  return `(\n${lines.join(",\n")},\n${indent})`;
-}
-
 // Build a `main.typ` source that imports the resume template and applies it
 // with user data. Data-value fields flow through `plainMarkupLit` (strict
 // escaping — no Typst markup leaks through); opt-in free-text fields
@@ -91,7 +79,11 @@ export function buildMainTyp(data: Fields): string {
   lines.push(`  免許・資格: ${timelineArrayLit(data["免許・資格"], "  ")},`);
   lines.push(`  志望動機: ${rawMarkupLit(data.志望動機)},`);
   lines.push(`  本人希望記入欄: ${rawMarkupLit(data.本人希望記入欄)},`);
-  lines.push(`  params: ${paramsLit(data.params, "  ")},`);
+  lines.push(`  学歴・職歴の最小行数: ${data["学歴・職歴の最小行数"]},`);
+  lines.push(`  学歴と職歴の間の空行数: ${data.学歴と職歴の間の空行数},`);
+  lines.push(`  免許・資格の最小行数: ${data["免許・資格の最小行数"]},`);
+  lines.push(`  志望動機の高さ: ${lengthLit(data.志望動機の高さ)},`);
+  lines.push(`  本人希望記入欄の高さ: ${lengthLit(data.本人希望記入欄の高さ)},`);
   lines.push(")");
   lines.push("");
 

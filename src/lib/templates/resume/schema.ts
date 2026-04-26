@@ -29,14 +29,6 @@ const isTimelineEntry = is.ObjectOf({
   content: is.String,
 });
 
-const isParams = is.ObjectOf({
-  "学歴・職歴の最小行数": is.Number,
-  学歴と職歴の間の空行数: is.Number,
-  "免許・資格の最小行数": is.Number,
-  志望動機の高さ: is.String,
-  本人希望記入欄の高さ: is.String,
-});
-
 // `is.InstanceOf(Uint8Array)` narrows to `Uint8Array<ArrayBuffer>`, which
 // conflicts with `new Uint8Array(n)` (`Uint8Array<ArrayBufferLike>`) produced
 // by our base64 helpers. A hand-written predicate keeps the default generic.
@@ -61,7 +53,11 @@ export const isFields = is.ObjectOf({
   "免許・資格": is.ArrayOf(isTimelineEntry),
   志望動機: is.String,
   本人希望記入欄: is.String,
-  params: isParams,
+  "学歴・職歴の最小行数": is.Number,
+  学歴と職歴の間の空行数: is.Number,
+  "免許・資格の最小行数": is.Number,
+  志望動機の高さ: is.String,
+  本人希望記入欄の高さ: is.String,
 });
 
 export type Fields = PredicateType<typeof isFields>;

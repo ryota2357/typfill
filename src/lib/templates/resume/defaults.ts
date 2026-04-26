@@ -2,13 +2,20 @@ import type { Fields } from "./schema";
 
 // Layout defaults track the upstream Typst template signature; see
 // `template/lib.typ`.
-const DEFAULT_PARAMS: Fields["params"] = {
+const LAYOUT_DEFAULTS = {
   "学歴・職歴の最小行数": 22,
   学歴と職歴の間の空行数: 1,
   "免許・資格の最小行数": 6,
   志望動機の高さ: "22em",
   本人希望記入欄の高さ: "10em",
-};
+} satisfies Pick<
+  Fields,
+  | "学歴・職歴の最小行数"
+  | "学歴と職歴の間の空行数"
+  | "免許・資格の最小行数"
+  | "志望動機の高さ"
+  | "本人希望記入欄の高さ"
+>;
 
 export const EMPTY_FIELDS: Fields = {
   日付: "auto",
@@ -24,7 +31,7 @@ export const EMPTY_FIELDS: Fields = {
   "免許・資格": [],
   志望動機: "",
   本人希望記入欄: "",
-  params: DEFAULT_PARAMS,
+  ...LAYOUT_DEFAULTS,
 };
 
 export const SAMPLE_FIELDS: Fields = {
@@ -63,5 +70,5 @@ export const SAMPLE_FIELDS: Fields = {
   ],
   志望動機: "",
   本人希望記入欄: "貴社規定に従います。",
-  params: DEFAULT_PARAMS,
+  ...LAYOUT_DEFAULTS,
 };

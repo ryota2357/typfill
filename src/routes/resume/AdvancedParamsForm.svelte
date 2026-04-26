@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Fields } from "$lib/templates/resume";
 
-  let { params }: { params: Fields["params"] } = $props();
+  let { data }: { data: Fields } = $props();
 </script>
 
 <div class="space-y-3">
@@ -16,7 +16,7 @@
       <input
         type="number"
         min="1"
-        bind:value={params["学歴・職歴の最小行数"]}
+        bind:value={data["学歴・職歴の最小行数"]}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
     </label>
@@ -25,7 +25,7 @@
       <input
         type="number"
         min="0"
-        bind:value={params.学歴と職歴の間の空行数}
+        bind:value={data.学歴と職歴の間の空行数}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
     </label>
@@ -34,7 +34,7 @@
       <input
         type="number"
         min="1"
-        bind:value={params["免許・資格の最小行数"]}
+        bind:value={data["免許・資格の最小行数"]}
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
     </label>
@@ -42,7 +42,7 @@
       <span class="text-sm text-gray-700">志望動機の高さ</span>
       <input
         type="text"
-        bind:value={params.志望動機の高さ}
+        bind:value={data.志望動機の高さ}
         placeholder="22em"
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
@@ -51,7 +51,7 @@
       <span class="text-sm text-gray-700">本人希望記入欄の高さ</span>
       <input
         type="text"
-        bind:value={params.本人希望記入欄の高さ}
+        bind:value={data.本人希望記入欄の高さ}
         placeholder="10em"
         class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
       >
