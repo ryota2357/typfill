@@ -13,6 +13,16 @@ import { externalAssets } from "./scripts/external-assets.mjs";
 const ASSETS_BASE_URL = process.env.PUBLIC_ASSETS_BASE_URL ?? "";
 const DEV_PREFIX = "/_external";
 
+// Reject scheme-less values (e.g. "assets.example.com"): the worker would
+// resolve them relative to its own location and 404 against the app origin.
+if (ASSETS_BASE_URL && !/^https?:\/\//.test(ASSETS_BASE_URL)) {
+  throw new Error(
+    `PUBLIC_ASSETS_BASE_URL must be an absolute URL (got: ${JSON.stringify(
+      ASSETS_BASE_URL,
+    )}). Include the https:// scheme.`,
+  );
+}
+
 function urlFor(filename: string): string {
   return ASSETS_BASE_URL
     ? `${ASSETS_BASE_URL.replace(/\/$/, "")}/${filename}`
