@@ -1,4 +1,4 @@
-import type { Fields, TimelineEntry } from "./schema";
+import type { Fields } from "./schema";
 
 // Layout defaults track the upstream Typst template signature; see
 // `template/lib.typ`.
@@ -65,9 +65,3 @@ export const SAMPLE_FIELDS: Fields = {
   本人希望記入欄: "貴社規定に従います。",
   params: DEFAULT_PARAMS,
 };
-
-// New timeline rows default to the current year/month so users edit forward
-// from a sensible value rather than from `0年0月`.
-export function newTimelineEntry(now: Date = new Date()): TimelineEntry {
-  return { year: now.getFullYear(), month: now.getMonth() + 1, content: "" };
-}

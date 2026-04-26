@@ -41,6 +41,11 @@
 
   const filename = $derived(buildResumeFilename(data));
 
+  function newTimelineEntry(): template.TimelineEntry {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1, content: "" };
+  }
+
   function onImport(payload: string) {
     const next = template.deserialize(payload);
     if (next) importPayload = next;
@@ -84,19 +89,19 @@
     <EntryListForm
       label="学歴"
       items={data.学歴}
-      newEntry={template.newTimelineEntry}
+      newEntry={newTimelineEntry}
       fields={TIMELINE_FIELDS}
     />
     <EntryListForm
       label="職歴"
       items={data.職歴}
-      newEntry={template.newTimelineEntry}
+      newEntry={newTimelineEntry}
       fields={TIMELINE_FIELDS}
     />
     <EntryListForm
       label="免許・資格"
       items={data["免許・資格"]}
-      newEntry={template.newTimelineEntry}
+      newEntry={newTimelineEntry}
       fields={TIMELINE_FIELDS}
     />
     <MarkupTextarea label="志望動機" bind:value={data.志望動機} />

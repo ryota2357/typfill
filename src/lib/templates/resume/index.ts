@@ -10,7 +10,7 @@ export const label = "履歴書";
 export const storageKey = "typfill.resume.v1";
 
 export { buildCompileInputs } from "./compile";
-export { EMPTY_FIELDS, newTimelineEntry, SAMPLE_FIELDS } from "./defaults";
+export { EMPTY_FIELDS, SAMPLE_FIELDS } from "./defaults";
 export type { Contact, Fields, TimelineEntry } from "./schema";
 
 export const { serialize, deserialize, schemaVersion } = createCodec<Fields>({
