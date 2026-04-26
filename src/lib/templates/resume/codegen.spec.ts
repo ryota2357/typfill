@@ -229,6 +229,6 @@ describe("buildMainTyp — params validation", () => {
           本人希望記入欄の高さ: "10em",
         },
       }),
-    ).toThrowError(/Invalid Typst length/);
+    ).toThrow(/Invalid Typst length/);
   });
 });
