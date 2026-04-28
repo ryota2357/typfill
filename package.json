@@ -26,7 +26,7 @@
     "playwright": "1.59.1",
     "prettier": "3.8.3",
     "prettier-plugin-svelte": "3.5.1",
-    "prettier-plugin-tailwindcss": "0.7.3",
+    "prettier-plugin-tailwindcss": "0.8.0",
     "svelte": "5.55.5",
     "svelte-check": "4.4.6",
     "tailwindcss": "4.2.4",
@@ -34,7 +34,7 @@
     "vite": "8.0.10",
     "vitest": "4.1.5",
     "vitest-browser-svelte": "2.1.1",
-    "wrangler": "4.85.0"
+    "wrangler": "4.86.0"
   },
   "dependencies": {
     "@core/unknownutil": "jsr:4.4.0-pre.1",
