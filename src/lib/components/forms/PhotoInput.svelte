@@ -119,8 +119,8 @@
 
 <style>
   /* The diagonal-striped placeholder is too specific to live in a Tailwind
-       utility — repeating-linear-gradient + dashed border + monospace label
-       are only used here. Scoped styles keep it bound to this component. */
+     utility — repeating-linear-gradient + dashed border + monospace label
+     are only used here. Scoped styles keep it bound to this component. */
   .placeholder {
     height: 110px;
     width: 88px;

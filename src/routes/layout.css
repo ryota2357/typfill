@@ -18,7 +18,7 @@ body {
   line-height: 1.7;
 }
 
-/* Shared visual for any text-like form control. FormInput (text/number/
+/* Shared visual for any text-like form control. TextInput (text/number/
    tel/email) and DateInput render this directly; consumers shouldn't
    need to reach for it. Pulled out of the components only because date
    inputs are necessarily controlled (DateRecord ↔ iso conversion) while

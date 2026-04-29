@@ -1,7 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
   import GithubMark from "$lib/components/GithubMark.svelte";
+  import { listTemplates } from "$lib/templates/registry";
 
+  const enabledTemplates = listTemplates().filter((t) => t.enabled);
   const status = $derived(page.status);
   const pathname = $derived(page.url.pathname);
   const title = $derived(
@@ -88,32 +90,22 @@
             <span class="text-neutral-400">→</span>
           </a>
         </li>
-        <li>
-          <a
-            href="/resume"
-            class="flex items-baseline justify-between rounded-sm border border-neutral-200 px-3.5 py-3 text-inherit no-underline hover:bg-neutral-50"
-          >
-            <span class="flex items-baseline gap-2">
-              <span class="text-[14px] font-semibold">履歴書を作る</span>
-              <span class="font-mono text-[11px] text-neutral-400">Resume</span>
-            </span>
-            <span class="text-neutral-400">→</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="/invoice"
-            class="flex items-baseline justify-between rounded-sm border border-neutral-200 px-3.5 py-3 text-inherit no-underline hover:bg-neutral-50"
-          >
-            <span class="flex items-baseline gap-2">
-              <span class="text-[14px] font-semibold">請求書を作る</span>
-              <span class="font-mono text-[11px] text-neutral-400"
-                >Invoice</span
-              >
-            </span>
-            <span class="text-neutral-400">→</span>
-          </a>
-        </li>
+        {#each enabledTemplates as t (t.templateId)}
+          <li>
+            <a
+              href={t.href}
+              class="flex items-baseline justify-between rounded-sm border border-neutral-200 px-3.5 py-3 text-inherit no-underline hover:bg-neutral-50"
+            >
+              <span class="flex items-baseline gap-2">
+                <span class="text-[14px] font-semibold">{t.label}を作る</span>
+                <span class="font-mono text-[11px] text-neutral-400"
+                  >{t.sub}</span
+                >
+              </span>
+              <span class="text-neutral-400">→</span>
+            </a>
+          </li>
+        {/each}
       </ul>
     </div>
   </main>

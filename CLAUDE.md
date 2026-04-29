@@ -43,7 +43,7 @@ Each template lives in `src/lib/templates/<name>/` with a stable public surface:
 - `compile.ts` — wires the per-call generated `mainTyp` together with `?raw`-imported `template/lib.typ` and any binary assets into `CompileInputs`.
 - `template/` — the actual Typst sources. Pulled in as a git submodule from `ryota2357/typst-<name>-template`; fresh clones need `git submodule update --init`. Edits to the `.typ` files belong upstream — the typfill side just bumps the submodule pointer (and updates `codegen.ts`/`schema.ts` if the call surface changed).
 
-Adding a new template = add the upstream Typst repo as a submodule at `src/lib/templates/<name>/template`, fill in the surrounding `index.ts`/`schema.ts`/`codegen.ts`/`compile.ts`/`defaults.ts`, append it to `src/lib/templates/registry.ts`, and add a `src/routes/<name>/` page that imports it and renders `<TemplateEditor>`.
+Adding a new template = add the upstream Typst repo as a submodule at `src/lib/templates/<name>/template`, fill in the surrounding `index.ts`/`schema.ts`/`codegen.ts`/`compile.ts`/`defaults.ts`, append it to `src/lib/templates/registry.ts`, and add a `src/routes/<name>/` page that imports it and renders `<TemplateEditor>`. Each route follows the same shape: `+page.svelte` instantiates `createTemplateState(template, fresh)` (see below) and renders a flat list of section components from `src/routes/<name>/sections/`.
 
 ### Codec (`src/lib/templates/codec.ts`)
 
@@ -71,6 +71,14 @@ The compiler/renderer wasm and the bundled font are **not** shipped in the Worke
 
 Generic `<TemplateEditor>` is the shared frame: 2-column form/preview layout, mobile tab switch, debounced 500 ms `localStorage` autosave keyed by `template.storageKey`, share-URL hash detection (`parseShareFragment`), and the share dialog. Each route passes its template module + form snippet; the editor stays template-agnostic.
 
+### Template state hook (`src/lib/templates/state.svelte.ts`)
+
+`createTemplateState<T>(template, fresh)` bundles the per-route state lifecycle that both pages share — load from localStorage on mount, decode share-URL imports, accept/cancel the import, reset to a fresh snapshot. Returns a getter/setter object (`state.data`, `state.importPayload`, `state.hasStoredData`, `state.onImport`, `state.acceptImport`, `state.cancelImport`, `state.reset`); routes destructure into `<TemplateEditor>` and `<ImportDialog>` props directly. The `.svelte.ts` extension is mandatory — `$state` requires it. Autosave (`$effect`) and share-URL detection (`onMount`) stay in `TemplateEditor` because they need a component context the hook can't provide.
+
+### Form primitives (`src/lib/components/forms/`)
+
+Public surface re-exported via `forms/index.ts`: `Section` (with `cols={1|2}`), `Field`, `TextInput`, `TextArea`, `MarkupField`, `EntryList` (+ `EntryField` type), `DateInput`, `DateModeRadio`, `PhotoInput`. Per-template section components compose these — they live under `src/routes/<name>/sections/` and never inside `lib/`. The `MarkupField` is the form surface that promises Typst markup support (paired with `rawMarkupLit` in escape.ts; see Security boundary).
+
 ### Routing
 
 `src/routes/<template>/+page.ts` sets `ssr = false; prerender = true` because the worker client + WASM imports touch browser-only APIs at module scope. `adapter-static` with `fallback: "index.html"` gives every route a directly-servable file plus a SPA catch-all.
@@ -80,7 +88,7 @@ Generic `<TemplateEditor>` is the shared frame: 2-column form/preview layout, mo
 `src/lib/typst/escape.ts` is the **only** sanctioned path for embedding user strings into generated `.typ`. Pick the helper based on the field's role:
 
 - `plainMarkupLit(s)` — data-value fields (name, address, phone, title, timeline entries, …). Treats the input as literal text: every Typst markup-significant character is escaped, including `=`, `-`, `+`, `/`, `~` so a stray `== 見出し` in a name field doesn't render as a heading.
-- `rawMarkupLit(s)` — opt-in free-text fields whose form surface promises Typst support (`MarkupTextarea`). Emits `eval(string, mode: "markup")` so the user gets full Typst markup including `#link(…)[…]`, `#show`, math, raw blocks. The string is opaque to the outer parser, so unbalanced brackets/backticks in user input stay contained. This permits arbitrary Typst code execution at compile time — that is the intended capability for these fields.
+- `rawMarkupLit(s)` — opt-in free-text fields whose form surface promises Typst support (`MarkupField`). Emits `eval(string, mode: "markup")` so the user gets full Typst markup including `#link(…)[…]`, `#show`, math, raw blocks. The string is opaque to the outer parser, so unbalanced brackets/backticks in user input stay contained. This permits arbitrary Typst code execution at compile time — that is the intended capability for these fields.
 - `stringLit(s)` — Typst `"..."` string literals (VFS paths such as `写真: "/vfs/photo.png"`).
 
 Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`. Adding a new field means classifying it (data-value vs markup-opt-in) and picking the matching helper, or it becomes a code-execution vector at compile time or a UX leak where formatting accidentally renders.

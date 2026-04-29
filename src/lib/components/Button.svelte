@@ -4,8 +4,8 @@
   // Generic action button shared by header chrome, dialogs, and preview
   // controls. Variants encode the design's three button roles (primary,
   // default, subtle) plus a chrome-less ghost for icon-only close affords.
-  // Specialized buttons that don't fit (× delete in EntryListForm,
-  // dashed "+ 行を追加", radio/tab pills) intentionally render their own
+  // Specialized buttons that don't fit (× delete in EntryList, dashed
+  // "+ 行を追加", radio/tab pills) intentionally render their own
   // `<button>` rather than overload this with one-off variants.
   let {
     children,

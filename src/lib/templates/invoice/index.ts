@@ -12,7 +12,6 @@ export const storageKey = "typfill.invoice.v1";
 export { buildCompileInputs } from "./compile";
 export {
   EMPTY_FIELDS,
-  newInvoiceItem,
   nextMonthEnd,
   SAMPLE_FIELDS,
 } from "./defaults";

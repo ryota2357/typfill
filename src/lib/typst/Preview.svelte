@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import Button from "$lib/components/Button.svelte";
+  import StatusDot from "$lib/components/StatusDot.svelte";
   import type { CompileInputs, TypstDiagnostic } from "./protocol";
   import SandboxedSvg from "./SandboxedSvg.svelte";
   import { type TypstClient, TypstCompileError } from "./worker-client";
@@ -110,24 +111,20 @@
   <div
     class="flex flex-shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-2.5"
   >
-    <div class="flex items-center gap-2 font-mono text-[11px] text-neutral-500">
-      <span
-        class="h-1.5 w-1.5 rounded-full {status === 'ready'
-          ? 'bg-emerald-500'
-          : status === 'failed'
-            ? 'bg-red-500'
-            : 'bg-neutral-400'}"
-      ></span>
-      {#if status === "booting"}
-        ワーカー起動中…
-      {:else if status === "compiling"}
-        compiling…
-      {:else if status === "ready"}
-        compiled · {lastCompileMs} ms
-      {:else}
-        compile failed
-      {/if}
-    </div>
+    <StatusDot
+      tone={status === "ready"
+        ? "ok"
+        : status === "failed"
+          ? "error"
+          : "busy"}
+      label={status === "booting"
+        ? "ワーカー起動中…"
+        : status === "compiling"
+          ? "compiling…"
+          : status === "ready"
+            ? `compiled · ${lastCompileMs} ms`
+            : "compile failed"}
+    />
     <Button
       variant="primary"
       onclick={downloadPdf}

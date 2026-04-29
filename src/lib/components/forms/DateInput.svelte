@@ -4,7 +4,7 @@
 
 <script lang="ts">
   // Native <input type="date"> bridge for DateRecord. Uses the same
-  // `form-input` utility as FormInput (defined in layout.css) so the two
+  // `form-input` utility as TextInput (defined in layout.css) so the two
   // controls match without sharing a Svelte component — bind:value can't
   // round-trip a DateRecord through the input's iso string, so this stays
   // controlled.

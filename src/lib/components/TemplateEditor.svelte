@@ -6,6 +6,7 @@
   import type { CompileInputs } from "$lib/typst/protocol";
   import Button from "./Button.svelte";
   import ShareDialog from "./ShareDialog.svelte";
+  import StatusDot from "./StatusDot.svelte";
 
   // The editor consumes the same 3 entry points every template exposes. Kept
   // local to avoid re-importing SerializeOptions from the codec module for
@@ -107,21 +108,18 @@
     </div>
     <div class="flex items-center gap-2">
       <div class="hidden items-center gap-2 md:flex">
-        <span
-          class="flex items-center gap-1.5 font-mono text-[11px] text-neutral-500"
-        >
-          <span
-            class={[
-              "h-1.5 w-1.5 rounded-full",
-              saveState === "error" ? "bg-red-500" : "bg-neutral-400",
-            ]}
-          ></span>
-          {saveState === "saving"
+        <StatusDot
+          tone={saveState === "error"
+            ? "error"
+            : saveState === "saving"
+              ? "busy"
+              : "neutral"}
+          label={saveState === "saving"
             ? "saving…"
             : saveState === "error"
               ? "save failed"
               : "autosaved"}
-        </span>
+        />
         <div class="h-4 w-px bg-neutral-200"></div>
       </div>
       <Button onclick={() => (shareOpen = true)}>共有</Button>

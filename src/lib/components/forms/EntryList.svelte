@@ -15,8 +15,9 @@
   import ChevronUp from "@lucide/svelte/icons/chevron-up";
   import Plus from "@lucide/svelte/icons/plus";
   import X from "@lucide/svelte/icons/x";
-  import FormInput from "./FormInput.svelte";
-  import FormSection from "./FormSection.svelte";
+  import type { Component } from "svelte";
+  import Section from "./Section.svelte";
+  import TextInput from "./TextInput.svelte";
 
   let {
     label,
@@ -55,7 +56,33 @@
   }
 </script>
 
-<FormSection title={label}>
+{#snippet rowControl(
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: Biome doesn't track usage in snippet yet
+  props: {
+  ariaLabel: string;
+  icon: Component<{ size: number }>;
+  onclick: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+})}
+  <button
+    type="button"
+    onclick={props.onclick}
+    disabled={props.disabled}
+    aria-label={props.ariaLabel}
+    class={[
+      "grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white",
+      "hover:bg-neutral-50 disabled:opacity-30",
+      props.danger
+        ? "text-neutral-400 hover:text-red-700"
+        : "text-neutral-500",
+    ]}
+  >
+    <props.icon size={14} />
+  </button>
+{/snippet}
+
+<Section title={label}>
   {#if items.length === 0}
     <p class="text-[12px] text-neutral-400">（記入なし）</p>
   {:else}
@@ -68,7 +95,7 @@
           {#each fields as field (field.key)}
             <label class="flex flex-col gap-1">
               <span class="text-[11px] text-neutral-500">{field.label}</span>
-              <FormInput
+              <TextInput
                 type={field.type}
                 min={field.min}
                 max={field.max}
@@ -77,32 +104,24 @@
             </label>
           {/each}
           <div class="flex items-center gap-1">
-            <button
-              type="button"
-              onclick={() => moveUp(i)}
-              disabled={i === 0}
-              aria-label="上へ"
-              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
-            >
-              <ChevronUp size={14} />
-            </button>
-            <button
-              type="button"
-              onclick={() => moveDown(i)}
-              disabled={i === items.length - 1}
-              aria-label="下へ"
-              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
-            >
-              <ChevronDown size={14} />
-            </button>
-            <button
-              type="button"
-              onclick={() => remove(i)}
-              aria-label="削除"
-              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-400 hover:bg-neutral-50 hover:text-red-700"
-            >
-              <X size={14} />
-            </button>
+            {@render rowControl({
+              ariaLabel: "上へ",
+              icon: ChevronUp,
+              onclick: () => moveUp(i),
+              disabled: i === 0,
+            })}
+            {@render rowControl({
+              ariaLabel: "下へ",
+              icon: ChevronDown,
+              onclick: () => moveDown(i),
+              disabled: i === items.length - 1,
+            })}
+            {@render rowControl({
+              ariaLabel: "削除",
+              icon: X,
+              onclick: () => remove(i),
+              danger: true,
+            })}
           </div>
         </li>
       {/each}
@@ -116,4 +135,4 @@
     <Plus size={14} />
     行を追加
   </button>
-</FormSection>
+</Section>

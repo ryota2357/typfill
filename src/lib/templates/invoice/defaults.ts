@@ -1,4 +1,4 @@
-import type { Fields, InvoiceItem, Party } from "./schema";
+import type { Fields, Party } from "./schema";
 
 const EMPTY_PARTY: Party = { name: "", "postal-code": "", address: "" };
 const EMPTY_ACCOUNT: Fields["account"] = {
@@ -53,10 +53,6 @@ export const SAMPLE_FIELDS: Fields = {
   "tax-rate": 0.1,
   body: "お振込手数料は貴社にてご負担ください。",
 };
-
-export function newInvoiceItem(): InvoiceItem {
-  return { name: "", amount: 1, unit: "式", price: 0 };
-}
 
 // Last day of the month *after* `now`. `new Date(y, m + 2, 0)` asks for day 0
 // of the month two ahead, which JS normalizes to the final day of the month
