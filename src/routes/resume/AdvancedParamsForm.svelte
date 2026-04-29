@@ -1,60 +1,43 @@
 <script lang="ts">
+  import { FormField, FormInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
   let { data }: { data: Fields } = $props();
 </script>
 
-<div class="space-y-3">
-  <p class="text-xs text-gray-500">
+<div class="flex flex-col gap-3">
+  <p class="text-[11px] text-neutral-500">
     テンプレートのレイアウト微調整。長さ単位は
-    <code>em / pt / mm / cm / in / %</code>
+    <code class="font-mono text-[11px]">em / pt / mm / cm / in / %</code>
     が使えます。
   </p>
   <div class="grid gap-3 sm:grid-cols-2">
-    <label class="block">
-      <span class="text-sm text-gray-700">学歴・職歴の最小行数</span>
-      <input
+    <FormField label="学歴・職歴の最小行数">
+      <FormInput
         type="number"
-        min="1"
+        min={1}
         bind:value={data["学歴・職歴の最小行数"]}
-        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      >
-    </label>
-    <label class="block">
-      <span class="text-sm text-gray-700">学歴と職歴の間の空行数</span>
-      <input
+      />
+    </FormField>
+    <FormField label="学歴と職歴の間の空行数">
+      <FormInput
         type="number"
-        min="0"
+        min={0}
         bind:value={data.学歴と職歴の間の空行数}
-        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      >
-    </label>
-    <label class="block">
-      <span class="text-sm text-gray-700">免許・資格の最小行数</span>
-      <input
+      />
+    </FormField>
+    <FormField label="免許・資格の最小行数">
+      <FormInput
         type="number"
-        min="1"
+        min={1}
         bind:value={data["免許・資格の最小行数"]}
-        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      >
-    </label>
-    <label class="block">
-      <span class="text-sm text-gray-700">志望動機の高さ</span>
-      <input
-        type="text"
-        bind:value={data.志望動機の高さ}
-        placeholder="22em"
-        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      >
-    </label>
-    <label class="block">
-      <span class="text-sm text-gray-700">本人希望記入欄の高さ</span>
-      <input
-        type="text"
-        bind:value={data.本人希望記入欄の高さ}
-        placeholder="10em"
-        class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-      >
-    </label>
+      />
+    </FormField>
+    <FormField label="志望動機の高さ">
+      <FormInput placeholder="22em" bind:value={data.志望動機の高さ} />
+    </FormField>
+    <FormField label="本人希望記入欄の高さ">
+      <FormInput placeholder="10em" bind:value={data.本人希望記入欄の高さ} />
+    </FormField>
   </div>
 </div>

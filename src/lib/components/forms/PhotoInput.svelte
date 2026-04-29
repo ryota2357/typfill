@@ -3,6 +3,8 @@
 </script>
 
 <script lang="ts">
+  import Button from "../Button.svelte";
+
   let {
     value = $bindable(),
     vfsPath,
@@ -19,6 +21,7 @@
 
   let previewUrl = $state<string | null>(null);
   let error = $state("");
+  let fileInput: HTMLInputElement | undefined = $state();
 
   $effect(() => {
     if (!value) {
@@ -81,28 +84,57 @@
   }
 </script>
 
-<div class="space-y-2">
+<div class="flex flex-col items-start gap-2">
   {#if previewUrl}
-    <div class="flex items-center gap-3">
-      <img
-        src={previewUrl}
-        alt="プレビュー"
-        class="h-32 w-24 rounded border border-gray-300 object-cover"
-      >
-      <button
-        type="button"
-        onclick={clear}
-        class="rounded border border-red-300 px-2 py-1 text-sm text-red-700 hover:bg-red-50"
-      >
-        削除
-      </button>
-    </div>
+    <img
+      src={previewUrl}
+      alt="プレビュー"
+      class="h-[110px] w-[88px] rounded-xs border border-neutral-200 object-cover"
+    >
+  {:else}
+    <!-- 4×3 cm photo placeholder. The diagonal stripe pattern signals "drop
+         target" and matches the 4:3 ratio of a Japanese ID photo. -->
+    <div class="placeholder">4×3 cm</div>
   {/if}
-  <input type="file" accept="image/*" onchange={onSelect} class="block text-sm">
+  <input
+    bind:this={fileInput}
+    type="file"
+    accept="image/*"
+    onchange={onSelect}
+    class="hidden"
+  >
+  <div class="flex items-center gap-2">
+    <Button onclick={() => fileInput?.click()}>ファイルを選択</Button>
+    {#if previewUrl}
+      <Button variant="subtle" onclick={clear}>削除</Button>
+    {/if}
+  </div>
   {#if error}
-    <p class="text-sm text-red-700">{error}</p>
+    <p class="text-[12px] text-red-700">{error}</p>
   {/if}
   {#if hint}
-    <p class="text-xs text-gray-500">{hint}</p>
+    <p class="text-[11px] text-neutral-500">{hint}</p>
   {/if}
 </div>
+
+<style>
+  /* The diagonal-striped placeholder is too specific to live in a Tailwind
+       utility — repeating-linear-gradient + dashed border + monospace label
+       are only used here. Scoped styles keep it bound to this component. */
+  .placeholder {
+    height: 110px;
+    width: 88px;
+    border: 1px dashed var(--color-neutral-300);
+    border-radius: 0.125rem;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-neutral-400);
+    background: repeating-linear-gradient(
+      135deg,
+      var(--color-neutral-50) 0 8px,
+      #f4f4f4 8px 9px
+    );
+  }
+</style>

@@ -33,21 +33,21 @@
 />
 
 {#snippet previewContent()}
-  <dt class="text-gray-500">タイトル</dt>
+  <dt class="text-neutral-500">タイトル</dt>
   <dd class="break-all">{imported.title || "（未設定）"}</dd>
 
-  <dt class="text-gray-500">発行日</dt>
+  <dt class="text-neutral-500">発行日</dt>
   <dd class="tabular-nums">{dateLabel}</dd>
 
-  <dt class="text-gray-500">支払期限</dt>
+  <dt class="text-neutral-500">支払期限</dt>
   <dd class="tabular-nums">{dueLabel}</dd>
 
-  <dt class="text-gray-500">請求先</dt>
+  <dt class="text-neutral-500">請求先</dt>
   <dd class="break-all">{imported.recipient.name || "（未設定）"}</dd>
 
-  <dt class="text-gray-500">請求元</dt>
+  <dt class="text-neutral-500">請求元</dt>
   <dd class="break-all">{imported.issuer.name || "（未設定）"}</dd>
 
-  <dt class="text-gray-500">項目</dt>
+  <dt class="text-neutral-500">項目</dt>
   <dd>{imported.items.length} 件</dd>
 {/snippet}

@@ -49,33 +49,33 @@
 />
 
 {#snippet previewContent()}
-  <dt class="text-gray-500">氏名</dt>
+  <dt class="text-neutral-500">氏名</dt>
   <dd class="break-all">{fullName}</dd>
 
-  <dt class="text-gray-500">生年月日</dt>
+  <dt class="text-neutral-500">生年月日</dt>
   <dd class="tabular-nums">{birth}</dd>
 
-  <dt class="text-gray-500">現住所</dt>
+  <dt class="text-neutral-500">現住所</dt>
   <dd class="break-all">{addressPreview(imported.現住所)}</dd>
 
-  <dt class="text-gray-500">連絡先</dt>
+  <dt class="text-neutral-500">連絡先</dt>
   <dd class="break-all">{addressPreview(imported.連絡先)}</dd>
 
-  <dt class="text-gray-500">学歴</dt>
+  <dt class="text-neutral-500">学歴</dt>
   <dd>{imported.学歴.length} 件</dd>
 
-  <dt class="text-gray-500">職歴</dt>
+  <dt class="text-neutral-500">職歴</dt>
   <dd>{imported.職歴.length} 件</dd>
 
-  <dt class="text-gray-500">免許・資格</dt>
+  <dt class="text-neutral-500">免許・資格</dt>
   <dd>{imported["免許・資格"].length} 件</dd>
 
-  <dt class="text-gray-500">志望動機</dt>
+  <dt class="text-neutral-500">志望動機</dt>
   <dd>{imported.志望動機.length} 文字</dd>
 
-  <dt class="text-gray-500">本人希望記入欄</dt>
+  <dt class="text-neutral-500">本人希望記入欄</dt>
   <dd>{imported.本人希望記入欄.length} 文字</dd>
 
-  <dt class="text-gray-500">写真</dt>
+  <dt class="text-neutral-500">写真</dt>
   <dd>{imported.写真 ? "あり" : "なし"}</dd>
 {/snippet}

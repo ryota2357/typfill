@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/* The neutral palette already covers every gray in the design (#171717…
+   #fafafa map 1:1 to neutral-900…neutral-50). Only the lightest divider
+   #f0f0f0 falls between the steps, so it's exposed as a single utility. */
+@theme {
+  --color-divider: #f0f0f0;
+}
+
+html,
+body {
+  font-family:
+    YuGothic, "Yu Gothic", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3",
+    sans-serif;
+  background: #ffffff;
+  color: var(--color-neutral-900);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Shared visual for any text-like form control. FormInput (text/number/
+   tel/email) and DateInput render this directly; consumers shouldn't
+   need to reach for it. Pulled out of the components only because date
+   inputs are necessarily controlled (DateRecord ↔ iso conversion) while
+   most fields are bound — the two render sites share the look without
+   sharing the binding model. */
+@utility form-input {
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 0.25rem;
+  background: #ffffff;
+  padding: 0.375rem 0.5rem;
+  font-size: 13px;
+  outline: none;
+
+  &:focus {
+    border-color: var(--color-neutral-900);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

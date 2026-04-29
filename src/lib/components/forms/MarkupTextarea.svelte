@@ -1,4 +1,10 @@
 <script lang="ts">
+  import FormSection from "./FormSection.svelte";
+  import FormTextArea from "./FormTextArea.svelte";
+
+  // High-level convenience wrapper: section heading + monospace textarea +
+  // Typst markup hint. Used for free-text fields (志望動機, 備考) where
+  // share-URL imports compile their content as Typst markup.
   let {
     label,
     value = $bindable(),
@@ -6,15 +12,10 @@
   }: { label: string; value: string; hint?: string } = $props();
 </script>
 
-<section class="space-y-2">
-  <h2 class="text-lg font-semibold">{label}</h2>
-  <textarea
-    bind:value
-    rows="5"
-    class="w-full rounded border border-gray-300 px-2 py-1 font-mono text-sm"
-  ></textarea>
-  <p class="text-xs text-gray-500">
+<FormSection title={label}>
+  <FormTextArea bind:value mono />
+  <p class="font-mono text-[10px] text-neutral-400">
     {hint ??
-      "Typst 記法が使えます: 見出し == / 箇条書き - / 強調 *太字* / リンク #link(\"https://…\")[text] / 行末 \\ で改行。共有リンクから取り込んだ内容は記載どおりにコンパイルされます。"}
+      'Typst markup 可 · 見出し == / 箇条書き - / 強調 *太字* / リンク #link("https://…")[text] / 行末 \\ で改行'}
   </p>
-</section>
+</FormSection>

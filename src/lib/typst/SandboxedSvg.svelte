@@ -71,7 +71,7 @@
     return [
       "<!doctype html>",
       '<html><head><meta charset="utf-8"><style>',
-      "html,body{margin:0;padding:0;background:#f9fafb}",
+      "html,body{margin:0;padding:0;background:#fafafa}",
       `body{display:flex;flex-direction:column;align-items:center;padding:${BODY_PADDING_PX / 2}px;gap:${PAGE_GAP_PX}px}`,
       "svg{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1)}",
       "</style></head><body>",

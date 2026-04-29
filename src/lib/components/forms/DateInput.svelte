@@ -3,10 +3,12 @@
 </script>
 
 <script lang="ts">
-  let {
-    value = $bindable(),
-    class: cls = "",
-  }: { value: DateRecord; class?: string } = $props();
+  // Native <input type="date"> bridge for DateRecord. Uses the same
+  // `form-input` utility as FormInput (defined in layout.css) so the two
+  // controls match without sharing a Svelte component — bind:value can't
+  // round-trip a DateRecord through the input's iso string, so this stays
+  // controlled.
+  let { value = $bindable() }: { value: DateRecord } = $props();
 
   const pad = (n: number) => String(n).padStart(2, "0");
   const iso = $derived(`${value.year}-${pad(value.month)}-${pad(value.day)}`);
@@ -19,4 +21,4 @@
   }
 </script>
 
-<input type="date" value={iso} oninput={onChange} class={cls}>
+<input type="date" value={iso} oninput={onChange} class="form-input">

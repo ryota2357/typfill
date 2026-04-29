@@ -4,6 +4,9 @@
     DateModeRadio,
     type EntryField,
     EntryListForm,
+    FormField,
+    FormInput,
+    FormSection,
     MarkupTextarea,
   } from "$lib/components/forms";
   import TemplateEditor from "$lib/components/TemplateEditor.svelte";
@@ -76,126 +79,80 @@
   onimport={onImport}
   onreset={onReset}
 >
-  <div class="space-y-6">
-    <section class="space-y-3">
-      <h2 class="text-lg font-semibold">基本情報</h2>
-      <div class="grid gap-2 sm:grid-cols-2">
-        <label class="block sm:col-span-2">
-          <span class="text-sm text-gray-700">タイトル</span>
-          <input
-            type="text"
-            bind:value={data.title}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">請求書番号（連番）</span>
-          <input
-            type="number"
-            min="1"
-            bind:value={data["invoice-number-series"]}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">支払期限</span>
-          <DateInput
-            bind:value={data["due-date"]}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          />
-        </label>
-      </div>
-      <fieldset class="space-y-2">
-        <legend class="text-sm text-gray-700">発行日</legend>
-        <DateModeRadio bind:value={data.date} />
-      </fieldset>
-    </section>
+  <FormSection title="基本情報">
+    <div class="grid gap-3 sm:grid-cols-2">
+      <FormField label="タイトル" span="full">
+        <FormInput bind:value={data.title} />
+      </FormField>
+      <FormField label="請求書番号（連番）">
+        <FormInput
+          type="number"
+          min={1}
+          bind:value={data["invoice-number-series"]}
+        />
+      </FormField>
+      <FormField label="支払期限">
+        <DateInput bind:value={data["due-date"]} />
+      </FormField>
+    </div>
+    <fieldset class="flex flex-col gap-1.5">
+      <legend class="text-[11px] font-medium text-neutral-500">発行日</legend>
+      <DateModeRadio bind:value={data.date} />
+    </fieldset>
+  </FormSection>
 
-    <PartyForm label="請求先" value={data.recipient} />
-    <PartyForm label="請求元" value={data.issuer} />
+  <PartyForm label="請求先" value={data.recipient} />
+  <PartyForm label="請求元" value={data.issuer} />
 
-    <section class="space-y-2">
-      <h2 class="text-lg font-semibold">振込先</h2>
-      <div class="grid gap-2 sm:grid-cols-2">
-        <label class="block sm:col-span-2">
-          <span class="text-sm text-gray-700">銀行名</span>
-          <input
-            type="text"
-            bind:value={data.account.bank}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">支店名</span>
-          <input
-            type="text"
-            bind:value={data.account.branch}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">口座種別</span>
-          <input
-            type="text"
-            bind:value={data.account.type}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">口座番号</span>
-          <input
-            type="text"
-            bind:value={data.account.number}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">口座名義</span>
-          <input
-            type="text"
-            bind:value={data.account.holder}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-      </div>
-    </section>
+  <FormSection title="振込先">
+    <div class="grid gap-3 sm:grid-cols-2">
+      <FormField label="銀行名" span="full">
+        <FormInput bind:value={data.account.bank} />
+      </FormField>
+      <FormField label="支店名">
+        <FormInput bind:value={data.account.branch} />
+      </FormField>
+      <FormField label="口座種別">
+        <FormInput bind:value={data.account.type} />
+      </FormField>
+      <FormField label="口座番号">
+        <FormInput bind:value={data.account.number} />
+      </FormField>
+      <FormField label="口座名義">
+        <FormInput bind:value={data.account.holder} />
+      </FormField>
+    </div>
+  </FormSection>
 
-    <EntryListForm
-      label="項目"
-      items={data.items}
-      newEntry={template.newInvoiceItem}
-      fields={ITEM_FIELDS}
-    />
+  <EntryListForm
+    label="項目"
+    items={data.items}
+    newEntry={template.newInvoiceItem}
+    fields={ITEM_FIELDS}
+  />
 
-    <MarkupTextarea label="備考" bind:value={data.body} />
+  <MarkupTextarea label="備考" bind:value={data.body} />
 
-    <details class="rounded border border-gray-200 p-3">
-      <summary class="cursor-pointer text-sm font-semibold text-gray-700">
-        詳細設定（税率・最小行数）
-      </summary>
-      <div class="mt-3 grid gap-2 sm:grid-cols-2">
-        <label class="block">
-          <span class="text-sm text-gray-700">消費税率（0.1 = 10%）</span>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            bind:value={data["tax-rate"]}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-        <label class="block">
-          <span class="text-sm text-gray-700">項目の最小行数</span>
-          <input
-            type="number"
-            min="0"
-            bind:value={data["min-item-rows"]}
-            class="mt-1 w-full rounded border border-gray-300 px-2 py-1"
-          >
-        </label>
-      </div>
-    </details>
-  </div>
+  <details
+    class="mb-7 rounded-sm border border-neutral-200 bg-white px-3.5 py-2.5"
+  >
+    <summary class="cursor-pointer text-[12px] font-semibold text-neutral-600">
+      詳細設定（税率・最小行数）
+    </summary>
+    <div class="mt-3 grid gap-3 sm:grid-cols-2">
+      <FormField label="消費税率（0.1 = 10%）">
+        <FormInput
+          type="number"
+          step={0.01}
+          min={0}
+          bind:value={data["tax-rate"]}
+        />
+      </FormField>
+      <FormField label="項目の最小行数">
+        <FormInput type="number" min={0} bind:value={data["min-item-rows"]} />
+      </FormField>
+    </div>
+  </details>
 </TemplateEditor>
 
 {#if importPayload}

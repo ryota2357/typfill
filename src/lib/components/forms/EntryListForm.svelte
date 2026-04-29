@@ -11,6 +11,13 @@
 </script>
 
 <script lang="ts" generics="E extends Record<string, string | number>">
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import ChevronUp from "@lucide/svelte/icons/chevron-up";
+  import Plus from "@lucide/svelte/icons/plus";
+  import X from "@lucide/svelte/icons/x";
+  import FormInput from "./FormInput.svelte";
+  import FormSection from "./FormSection.svelte";
+
   let {
     label,
     items,
@@ -23,7 +30,9 @@
     fields: readonly EntryField<E>[];
   } = $props();
 
-  const gridTemplate = $derived(fields.map((f) => f.width).join(" "));
+  // Column layout: per-field widths + a fixed gutter for the row's
+  // delete/move controls so the × button always lines up.
+  const gridTemplate = $derived(`${fields.map((f) => f.width).join(" ")} auto`);
 
   function add() {
     items.push(newEntry());
@@ -44,74 +53,67 @@
   function moveDown(i: number) {
     swap(i, i + 1);
   }
-  function setField(entry: E, field: EntryField<E>, raw: string) {
-    const next = field.type === "number" ? Number(raw) : raw;
-    (entry as Record<string, string | number>)[field.key] = next;
-  }
 </script>
 
-<section class="space-y-2">
-  <div class="flex items-center justify-between">
-    <h2 class="text-lg font-semibold">{label}</h2>
-    <button
-      type="button"
-      onclick={add}
-      class="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
-    >
-      追加
-    </button>
-  </div>
+<FormSection title={label}>
   {#if items.length === 0}
-    <p class="text-sm text-gray-500">（記入なし）</p>
+    <p class="text-[12px] text-neutral-400">（記入なし）</p>
   {:else}
-    <ul class="space-y-2">
+    <ul class="flex flex-col gap-2">
       {#each items as entry, i (i)}
-        <li class="rounded border border-gray-200 p-2">
-          <div class="grid gap-2" style:grid-template-columns={gridTemplate}>
-            {#each fields as field (field.key)}
-              <label>
-                <span class="block text-xs text-gray-500">{field.label}</span>
-                <input
-                  type={field.type}
-                  min={field.min}
-                  max={field.max}
-                  value={entry[field.key]}
-                  oninput={(e) =>
-                    setField(entry, field, (e.target as HTMLInputElement).value)}
-                  class="w-full rounded border border-gray-300 px-2 py-1"
-                >
-              </label>
-            {/each}
-          </div>
-          <div class="mt-2 flex justify-end gap-1 text-sm">
+        <li
+          class="grid items-end gap-2"
+          style:grid-template-columns={gridTemplate}
+        >
+          {#each fields as field (field.key)}
+            <label class="flex flex-col gap-1">
+              <span class="text-[11px] text-neutral-500">{field.label}</span>
+              <FormInput
+                type={field.type}
+                min={field.min}
+                max={field.max}
+                bind:value={entry[field.key]}
+              />
+            </label>
+          {/each}
+          <div class="flex items-center gap-1">
             <button
               type="button"
               onclick={() => moveUp(i)}
               disabled={i === 0}
               aria-label="上へ"
-              class="rounded border border-gray-300 px-2 py-1 disabled:opacity-30"
+              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
             >
-              ↑
+              <ChevronUp size={14} />
             </button>
             <button
               type="button"
               onclick={() => moveDown(i)}
               disabled={i === items.length - 1}
               aria-label="下へ"
-              class="rounded border border-gray-300 px-2 py-1 disabled:opacity-30"
+              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
             >
-              ↓
+              <ChevronDown size={14} />
             </button>
             <button
               type="button"
               onclick={() => remove(i)}
-              class="rounded border border-red-300 px-2 py-1 text-red-700 hover:bg-red-50"
+              aria-label="削除"
+              class="grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white text-neutral-400 hover:bg-neutral-50 hover:text-red-700"
             >
-              削除
+              <X size={14} />
             </button>
           </div>
         </li>
       {/each}
     </ul>
   {/if}
-</section>
+  <button
+    type="button"
+    onclick={add}
+    class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-dashed border-neutral-300 bg-white px-3 py-1.5 text-[12px] text-neutral-500 hover:bg-neutral-50"
+  >
+    <Plus size={14} />
+    行を追加
+  </button>
+</FormSection>

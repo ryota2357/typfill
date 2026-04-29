@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@core/unknownutil": "jsr:4.4.0-pre.1",
+    "@lucide/svelte": "^1.12.0",
     "@myriaddreamin/typst-ts-renderer": "0.7.0-rc2",
     "@myriaddreamin/typst-ts-web-compiler": "0.7.0-rc2",
     "@myriaddreamin/typst.ts": "0.7.0-rc2",

@@ -8,5 +8,9 @@ export {
   default as EntryListForm,
   type EntryField,
 } from "./EntryListForm.svelte";
+export { default as FormField } from "./FormField.svelte";
+export { default as FormInput } from "./FormInput.svelte";
+export { default as FormSection } from "./FormSection.svelte";
+export { default as FormTextArea } from "./FormTextArea.svelte";
 export { default as MarkupTextarea } from "./MarkupTextarea.svelte";
 export { default as PhotoInput } from "./PhotoInput.svelte";

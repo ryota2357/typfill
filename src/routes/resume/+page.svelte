@@ -80,45 +80,45 @@
   onreset={onReset}
   shareExtraNotice={photoNotice}
 >
-  <div class="space-y-6">
-    <PersonalInfoForm {data} />
-    <DocumentDateForm bind:value={data.日付} />
-    <PhotoUploadForm bind:value={data.写真} />
-    <AddressForm label="現住所" value={data.現住所} />
-    <AddressForm label="連絡先（現住所と異なる場合のみ）" value={data.連絡先} />
-    <EntryListForm
-      label="学歴"
-      items={data.学歴}
-      newEntry={newTimelineEntry}
-      fields={TIMELINE_FIELDS}
-    />
-    <EntryListForm
-      label="職歴"
-      items={data.職歴}
-      newEntry={newTimelineEntry}
-      fields={TIMELINE_FIELDS}
-    />
-    <EntryListForm
-      label="免許・資格"
-      items={data["免許・資格"]}
-      newEntry={newTimelineEntry}
-      fields={TIMELINE_FIELDS}
-    />
-    <MarkupTextarea label="志望動機" bind:value={data.志望動機} />
-    <MarkupTextarea label="本人希望記入欄" bind:value={data.本人希望記入欄} />
-    <details class="rounded border border-gray-200 p-3">
-      <summary class="cursor-pointer text-sm font-semibold text-gray-700">
-        詳細設定（レイアウト調整）
-      </summary>
-      <div class="mt-3"><AdvancedParamsForm {data} /></div>
-    </details>
-  </div>
+  <PersonalInfoForm {data} />
+  <DocumentDateForm bind:value={data.日付} />
+  <PhotoUploadForm bind:value={data.写真} />
+  <AddressForm label="現住所" value={data.現住所} />
+  <AddressForm label="連絡先（現住所と異なる場合のみ）" value={data.連絡先} />
+  <EntryListForm
+    label="学歴"
+    items={data.学歴}
+    newEntry={newTimelineEntry}
+    fields={TIMELINE_FIELDS}
+  />
+  <EntryListForm
+    label="職歴"
+    items={data.職歴}
+    newEntry={newTimelineEntry}
+    fields={TIMELINE_FIELDS}
+  />
+  <EntryListForm
+    label="免許・資格"
+    items={data["免許・資格"]}
+    newEntry={newTimelineEntry}
+    fields={TIMELINE_FIELDS}
+  />
+  <MarkupTextarea label="志望動機" bind:value={data.志望動機} />
+  <MarkupTextarea label="本人希望記入欄" bind:value={data.本人希望記入欄} />
+  <details
+    class="mb-7 rounded-sm border border-neutral-200 bg-white px-3.5 py-2.5"
+  >
+    <summary class="cursor-pointer text-[12px] font-semibold text-neutral-600">
+      詳細設定（レイアウト調整）
+    </summary>
+    <div class="mt-3"><AdvancedParamsForm {data} /></div>
+  </details>
 </TemplateEditor>
 
 {#snippet photoNotice()}
   {#if data.写真 !== null}
     <p
-      class="rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-600"
+      class="rounded-sm border border-neutral-200 bg-neutral-50 p-2 text-[12px] text-neutral-600"
     >
       共有リンクには写真は含まれません。
     </p>

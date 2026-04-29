@@ -1,5 +1,7 @@
 <script lang="ts" generics="T">
+  import X from "@lucide/svelte/icons/x";
   import { buildShareUrl } from "$lib/templates/url";
+  import Button from "./Button.svelte";
 
   // Generic share dialog. The template ref carries the bare minimum needed to
   // produce a share URL — `templateId` for the fragment label and `serialize`
@@ -57,21 +59,18 @@
   aria-modal="true"
   aria-labelledby="share-title"
 >
-  <div class="w-full max-w-lg space-y-4 rounded-lg bg-white p-5 shadow-xl">
+  <div
+    class="flex w-full max-w-lg flex-col gap-4 rounded-md border border-neutral-200 bg-white p-5 shadow-xl"
+  >
     <div class="flex items-start justify-between gap-3">
-      <h2 id="share-title" class="text-lg font-bold">共有リンクを作成</h2>
-      <button
-        type="button"
-        onclick={onclose}
-        aria-label="閉じる"
-        class="rounded px-2 py-1 text-gray-500 hover:bg-gray-100"
-      >
-        ✕
-      </button>
+      <h2 id="share-title" class="text-[16px] font-bold">共有リンクを作成</h2>
+      <Button variant="ghost" size="icon" onclick={onclose} aria-label="閉じる">
+        <X size={16} />
+      </Button>
     </div>
 
-    <p class="text-sm text-gray-700">
-      URL のフラグメント（<code
+    <p class="text-[13px] text-neutral-700">
+      URL のフラグメント（<code class="font-mono text-[12px]"
         >#…</code
       >）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
     </p>
@@ -80,8 +79,10 @@
       {@render extraNotice()}
     {/if}
 
-    <div class="space-y-1">
-      <div class="flex items-baseline justify-between text-xs text-gray-600">
+    <div class="flex flex-col gap-1">
+      <div
+        class="flex items-baseline justify-between text-[11px] text-neutral-500"
+      >
         <span>リンクプレビュー</span>
         <span class="tabular-nums">
           約 {fragmentChars.toLocaleString()} 文字
@@ -93,23 +94,19 @@
       <textarea
         readonly
         value={shareUrl}
-        class="h-20 w-full resize-none rounded border border-gray-300 p-2 font-mono text-xs break-all"
+        class="h-20 w-full resize-none rounded-sm border border-neutral-200 bg-white p-2 font-mono text-[11px] break-all"
       ></textarea>
     </div>
 
     <div class="flex items-center justify-end gap-2">
       {#if copyStatus === "copied"}
-        <span class="text-sm text-green-700">✓ コピーしました</span>
+        <span class="text-[12px] text-emerald-700">✓ コピーしました</span>
       {:else if copyStatus === "error"}
-        <span class="text-sm text-red-700">コピーに失敗しました</span>
+        <span class="text-[12px] text-red-700">コピーに失敗しました</span>
       {/if}
-      <button
-        type="button"
-        onclick={copy}
-        class="rounded bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
-      >
+      <Button variant="primary" size="md" onclick={copy}>
         クリップボードにコピー
-      </button>
+      </Button>
     </div>
   </div>
 </div>

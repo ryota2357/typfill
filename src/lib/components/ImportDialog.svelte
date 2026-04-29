@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import Button from "./Button.svelte";
 
   let {
     dataLabel,
@@ -28,42 +29,34 @@
   aria-modal="true"
   aria-labelledby="import-title"
 >
-  <div class="w-full max-w-md space-y-4 rounded-lg bg-white p-5 shadow-xl">
-    <h2 id="import-title" class="text-lg font-bold">共有リンクから読み込み</h2>
+  <div
+    class="flex w-full max-w-md flex-col gap-4 rounded-md border border-neutral-200 bg-white p-5 shadow-xl"
+  >
+    <h2 id="import-title" class="text-[16px] font-bold">
+      共有リンクから読み込み
+    </h2>
 
-    <p class="text-sm text-gray-700">
+    <p class="text-[13px] text-neutral-700">
       この URL には{dataLabel}が含まれています。読み込みますか？
     </p>
 
     {#if hasExisting}
       <p
-        class="rounded border border-orange-200 bg-orange-50 p-2 text-sm text-orange-900"
+        class="rounded-sm border border-orange-200 bg-orange-50 p-2 text-[12px] text-orange-900"
       >
         ⚠ 現在ブラウザに保存されているデータは上書きされます。
       </p>
     {/if}
 
     <dl
-      class="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 rounded border border-gray-200 bg-gray-50 p-3 text-xs text-gray-800"
+      class="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 rounded-sm border border-neutral-200 bg-neutral-50 p-3 text-[12px] text-neutral-800"
     >
       {@render preview()}
     </dl>
 
     <div class="flex items-center justify-end gap-2">
-      <button
-        type="button"
-        onclick={oncancel}
-        class="rounded border border-gray-300 px-4 py-1.5 text-sm hover:bg-gray-100"
-      >
-        キャンセル
-      </button>
-      <button
-        type="button"
-        onclick={onaccept}
-        class="rounded bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
-      >
-        読み込む
-      </button>
+      <Button size="md" onclick={oncancel}>キャンセル</Button>
+      <Button variant="primary" size="md" onclick={onaccept}>読み込む</Button>
     </div>
   </div>
 </div>
