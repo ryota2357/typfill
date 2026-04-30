@@ -103,13 +103,15 @@
       収録テンプレートは私が作成したものは随時追加してく予定です。
     </p>
     <p class="text-pretty text-neutral-700">
-      他の方が作成した Typst テンプレートで「このテンプレートを追加してほしい」があれば、<a
+      他の方が作成した Typst
+      テンプレートで「このテンプレートを追加してほしい」があれば、<a
         href="https://github.com/ryota2357/typfill/issues"
         target="_blank"
         rel="noreferrer"
         class="underline decoration-neutral-400 hover:decoration-neutral-600"
         >GitHub の issue</a
-      > で教えてください。
+      >
+      で教えてください。
     </p>
   </section>
 
