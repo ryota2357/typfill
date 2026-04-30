@@ -11,8 +11,8 @@
   <header class="mb-14">
     <h1 class="mb-3 text-[28px] font-bold tracking-[-0.4px]">Typfill</h1>
     <p class="text-[15px] text-pretty text-neutral-600">
-      ブラウザだけで Typst テンプレートから PDF を生成します。
-      フォームを埋めるだけで、印刷可能な書類を作れます。
+      フォームを埋めるだけで Typst テンプレートから PDF を生成します。
+      入力内容はすべてブラウザ内で処理され、外部に送信されることはありません。
     </p>
   </header>
 
@@ -69,19 +69,47 @@
       How it works
     </h2>
     <p class="mb-3.5 text-pretty text-neutral-700">
-      Typfill には API もデータベースもありません。フォームに入力した内容は
-      <code class="font-mono text-[12.5px]">localStorage</code>
-      に保存され、Typst のコンパイルは
-      <code class="font-mono text-[12.5px]">typst.ts</code>
+      Typfill は SvelteKit の static アダプタでビルドされ、Cloudflare Workers
+      の静的アセット配信機能でホストされています。サーバーサイドのランタイムは存在しません。
+    </p>
+    <p class="mb-3.5 text-pretty text-neutral-700">
+      Typst のコンパイルは
+      <a
+        href="https://github.com/Myriad-Dreamin/typst.ts"
+        target="_blank"
+        rel="noreferrer"
+        class="underline decoration-neutral-400 hover:decoration-neutral-600"
+        >typst.ts</a
+      >
       の WebAssembly ビルドが Web Worker 内で実行します。生成された PDF
-      はそのままブラウザでダウンロードされ、サーバーには一切送信されません。
+      はそのままブラウザでダウンロードでき、フォームの入力内容が外部に送信されることはありません。入力内容は
+      <code class="font-mono text-[12.5px]">localStorage</code>
+      に自動保存されます。
     </p>
     <p class="text-pretty text-neutral-700">
       共有リンクは URL の fragment（<code class="font-mono text-[12.5px]"
         >#...</code
-      >）にデータを埋め込む方式なので、リンク自体もネットワークを経由しません。ホスティングは
-      Cloudflare Pages
-      で静的ファイル配信のみ、サーバーランタイムは存在しません。
+      >）にデータを埋め込む方式のため、リンク自体もネットワークを経由しません。
+    </p>
+  </section>
+
+  <section class="mb-14">
+    <h2
+      class="mb-4 text-[11px] font-semibold tracking-[1px] text-neutral-500 uppercase"
+    >
+      Request a Template
+    </h2>
+    <p class="mb-3.5 text-pretty text-neutral-700">
+      収録テンプレートは私が作成したものは随時追加してく予定です。
+    </p>
+    <p class="text-pretty text-neutral-700">
+      他の方が作成した Typst テンプレートで「このテンプレートを追加してほしい」があれば、<a
+        href="https://github.com/ryota2357/typfill/issues"
+        target="_blank"
+        rel="noreferrer"
+        class="underline decoration-neutral-400 hover:decoration-neutral-600"
+        >GitHub の issue</a
+      > で教えてください。
     </p>
   </section>
 
