@@ -1,5 +1,7 @@
 packages:
   - "."
-
-onlyBuiltDependencies:
-  - esbuild
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: false
+engineStrict: true
