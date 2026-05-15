@@ -92,8 +92,7 @@
       class="h-[110px] w-[88px] rounded-xs border border-neutral-200 object-cover"
     >
   {:else}
-    <!-- 4×3 cm photo placeholder. The diagonal stripe pattern signals "drop
-         target" and matches the 4:3 ratio of a Japanese ID photo. -->
+    <!-- 4×3 cm photo placeholder. The diagonal stripe pattern signals "drop target" and matches the 4:3 ratio of a Japanese ID photo. -->
     <div class="placeholder">4×3 cm</div>
   {/if}
   <input
@@ -118,9 +117,8 @@
 </div>
 
 <style>
-  /* The diagonal-striped placeholder is too specific to live in a Tailwind
-       utility — repeating-linear-gradient + dashed border + monospace label
-       are only used here. Scoped styles keep it bound to this component. */
+  /* The diagonal-striped placeholder is too specific to live in a Tailwind utility — repeating-linear-gradient + dashed border + monospace label are only used here. */
+  /* Scoped styles keep it bound to this component.@charset */
   .placeholder {
     height: 110px;
     width: 88px;

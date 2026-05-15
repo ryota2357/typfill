@@ -17,7 +17,12 @@
       />
     </Field>
     <Field label="項目の最小行数">
-      <TextInput type="number" min={0} bind:value={data["min-item-rows"]} />
+      <TextInput
+        type="number"
+        min={0}
+        inputmode="numeric"
+        bind:value={data["min-item-rows"]}
+      />
     </Field>
   </div>
 </AdvancedSection>

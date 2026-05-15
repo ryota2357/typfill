@@ -2,10 +2,6 @@
   import { type EntryField, EntryList } from "$lib/components/forms";
   import type { InvoiceItem } from "$lib/templates/invoice";
 
-  // The 項目 list is generic enough to live in `forms/EntryList`, but the
-  // column schema and the "what does a fresh row look like" closure are
-  // invoice-specific. This section pins them down so the page-level usage
-  // stays a single `<Items items={...} />`.
   let { items }: { items: InvoiceItem[] } = $props();
 
   const ITEM_FIELDS: readonly EntryField<InvoiceItem>[] = [

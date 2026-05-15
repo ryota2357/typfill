@@ -2,9 +2,6 @@
   import { PhotoInput, Section } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
-  // `bind:` because `value` swaps between `null` (not set) and a Photo
-  // record — the parent's `data.写真` is replaced wholesale on
-  // upload/clear.
   let { value = $bindable() }: { value: Fields["写真"] } = $props();
 </script>
 

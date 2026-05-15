@@ -8,9 +8,6 @@
   } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/invoice";
 
-  // Bundles four top-level fields (title / invoice-number-series / due-date
-  // / date) under one heading. `data` flows in whole because each field is
-  // a different shape.
   let { data }: { data: Fields } = $props();
 </script>
 

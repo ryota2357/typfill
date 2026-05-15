@@ -2,8 +2,6 @@
   import { Field, Section, TextInput } from "$lib/components/forms";
   import type { Party } from "$lib/templates/invoice";
 
-  // Used twice (請求先 / 請求元). Internal field writes flow through
-  // Svelte 5's deep proxy, so `value` is enough; no `bind:` from the parent.
   let { label, value }: { label: string; value: Party } = $props();
 </script>
 
@@ -12,7 +10,11 @@
     <TextInput bind:value={value.name} />
   </Field>
   <Field label="郵便番号">
-    <TextInput bind:value={value["postal-code"]} />
+    <TextInput
+      type="text"
+      autocomplete="postal-code"
+      bind:value={value["postal-code"]}
+    />
   </Field>
   <div class="hidden sm:block"></div>
   <Field label="住所" span="full">

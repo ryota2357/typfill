@@ -3,9 +3,6 @@
   import { Field, TextInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
-  // Five layout-tweak fields the casual user never opens. Touches multiple
-  // top-level keys, so the section receives the whole `data` rather than
-  // five separate slices.
   let { data }: { data: Fields } = $props();
 </script>
 
@@ -19,6 +16,7 @@
     <Field label="学歴・職歴の最小行数">
       <TextInput
         type="number"
+        inputmode="numeric"
         min={1}
         bind:value={data["学歴・職歴の最小行数"]}
       />
@@ -26,6 +24,7 @@
     <Field label="学歴と職歴の間の空行数">
       <TextInput
         type="number"
+        inputmode="numeric"
         min={0}
         bind:value={data.学歴と職歴の間の空行数}
       />
@@ -33,6 +32,7 @@
     <Field label="免許・資格の最小行数">
       <TextInput
         type="number"
+        inputmode="numeric"
         min={1}
         bind:value={data["免許・資格の最小行数"]}
       />
