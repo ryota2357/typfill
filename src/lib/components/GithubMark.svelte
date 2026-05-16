@@ -18,4 +18,4 @@
   alt=""
   aria-hidden="true"
   class={cls}
-/>
+>
