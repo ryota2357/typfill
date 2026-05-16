@@ -1,10 +1,8 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  // Wraps a label above an arbitrary input. Renders a `<label>` so any
-  // single child input automatically associates with it; for multi-input
-  // groups, render a non-input child (e.g. a div) and the surrounding
-  // <label> still acts as a clickable target without binding to a control.
+  // For multi-input groups, pass a non-input child (e.g. a div) — the outer
+  // <label> stays a click target without auto-binding to any one control.
   let {
     label,
     children,

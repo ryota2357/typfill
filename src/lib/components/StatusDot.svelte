@@ -1,9 +1,4 @@
 <script lang="ts">
-  // Monospace status pill: small colored dot + label. Used by both the
-  // autosave indicator (TemplateEditor) and the compile status row
-  // (Preview). The shared visual language is the point of this component
-  // — when both indicators sit in the same chrome, a viewer can tell at
-  // a glance which lifecycle just changed.
   let {
     tone,
     label,
@@ -14,8 +9,8 @@
 
   const DOT_TONE = {
     neutral: "bg-neutral-400",
-    // `busy` shares the neutral hue but pulses, so the user reads the
-    // motion ("something is happening") before the color.
+    // `busy` shares the neutral hue but pulses — the user reads the motion
+    // before the color.
     busy: "bg-neutral-400 animate-pulse",
     ok: "bg-emerald-500",
     error: "bg-red-500",

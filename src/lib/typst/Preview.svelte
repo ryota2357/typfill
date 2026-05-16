@@ -23,17 +23,15 @@
   let exporting = $state(false);
   let lastCompileMs = $state(0);
 
-  // typst.ts emits one `<svg>` root per page, so a regex-count of opening
-  // tags is enough for the footer indicator. SandboxedSvg parses the same
-  // structure for height computation; that helper isn't exported so the
-  // count is duplicated here rather than threading state across components.
+  // typst.ts emits one `<svg>` root per page; count opening tags. SandboxedSvg
+  // does the same parse internally and isn't exported, so the count is
+  // duplicated here rather than threading state across components.
   const pageCount = $derived((svg.match(/<svg\b/g) ?? []).length);
 
-  // NOTE: Zoom controls (the design's −/100%/+ cluster) are intentionally
-  // omitted. POC attempts conflicted with SandboxedSvg's ResizeObserver-
-  // driven height computation — the rescaled iframe content reported a
-  // stale height and the preview pane truncated. Revisit when the SVG
-  // sizing pipeline can carry an explicit scale factor end-to-end.
+  // Zoom controls (−/100%/+) intentionally omitted: POC scaling conflicted
+  // with SandboxedSvg's ResizeObserver-driven height — the rescaled iframe
+  // reported a stale height and the preview pane truncated. Revisit when the
+  // SVG sizing pipeline can carry an explicit scale factor end-to-end.
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let activeAbort: AbortController | null = null;
@@ -74,8 +72,8 @@
       status = "ready";
     } catch (e) {
       if ((e as { name?: string }).name === "AbortError") return;
-      // Preserve diagnostics from failed compiles so the user sees which
-      // line the error came from. Keep the stale SVG visible.
+      // Preserve diagnostics from the failed compile and keep the stale SVG
+      // visible so the user can locate the offending line.
       diagnostics = e instanceof TypstCompileError ? e.diagnostics : [];
       error = e instanceof Error ? e.message : String(e);
       status = "failed";

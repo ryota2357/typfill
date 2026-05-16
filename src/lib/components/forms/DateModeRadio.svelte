@@ -1,11 +1,8 @@
 <script lang="ts">
   import DateInput, { type DateRecord } from "./DateInput.svelte";
 
-  // Bridges the data model `"auto" | DateRecord` to a two-radio UX.
-  // `value` itself is the source of truth in manual mode — the child
-  // DateInput binds straight through it. `lastManualDate` is a write-only
-  // stash so toggling auto ↔ manual restores the user's previous entry
-  // instead of jumping back to today.
+  // `lastManualDate` is a stash so toggling auto ↔ manual restores the user's
+  // previous entry instead of jumping back to today.
   let { value = $bindable() }: { value: "auto" | DateRecord } = $props();
 
   function todayDate(): DateRecord {
@@ -18,7 +15,7 @@
   );
 
   // Keep the stash current whenever `value` holds a concrete date — covers
-  // local edits through the DateInput and external replacements (import).
+  // both local DateInput edits and external replacements (import).
   $effect(() => {
     if (value !== "auto") lastManualDate = { ...value };
   });

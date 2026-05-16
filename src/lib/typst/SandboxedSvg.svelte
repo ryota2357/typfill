@@ -1,23 +1,13 @@
 <script lang="ts">
-  // Renders compiled Typst SVG inside a sandboxed `<iframe srcdoc>` rather
-  // than inlining via `{@html}`. `rawMarkupLit` fields let share-URL authors
-  // emit arbitrary Typst, whose SVG output can include attacker-controlled
-  // `<a xlink:href="javascript:...">`, `<foreignObject>` HTML, and (typst.ts
-  // itself bundles a small `<script>` for hover/jump). Inlined into our
-  // origin those would expose form data in localStorage to the attacker.
-  // The sandbox attribute denies script execution and same-origin access at
-  // the browser level, so they become inert without any DOM-level
-  // sanitization — which also lets typst.ts's `<use>` glyph references and
-  // `<foreignObject>` text overlays survive, keeping text selection / copy
-  // / find-in-page working.
-  //
-  //   allow-popups                   : let `<a target="_blank">` open
-  //   allow-popups-to-escape-sandbox : popups load as normal pages so legit
-  //                                    external links work
-  //
-  // Notably absent: allow-scripts, allow-same-origin, allow-forms,
-  // allow-top-navigation. Without allow-scripts, `javascript:` hrefs can't
-  // evaluate even when clicked.
+  // SVG is rendered inside a sandboxed `<iframe srcdoc>` rather than inlined
+  // via `{@html}` because `rawMarkupLit` fields let share-URL authors emit
+  // arbitrary Typst — the resulting SVG can include attacker-controlled
+  // `<a xlink:href="javascript:...">`, `<foreignObject>` HTML, and typst.ts's
+  // own bundled `<script>`. Without `allow-scripts` / `allow-same-origin`
+  // those become inert at the browser level (no DOM sanitization needed),
+  // while `<use>` glyphs and `<foreignObject>` text remain selectable.
+  // `allow-popups` + `allow-popups-to-escape-sandbox` let legit external
+  // `<a target="_blank">` still open as normal pages.
   const SANDBOX = "allow-popups allow-popups-to-escape-sandbox";
 
   let { svg }: { svg: string } = $props();
@@ -31,9 +21,9 @@
     pageCount: number;
   };
 
-  // typst.ts emits one `<svg>` root per page, each with explicit `width` /
-  // `height` attributes (units like `pt` or `px`). We only need the ratio,
-  // so we strip the unit and treat the numbers as relative.
+  // typst.ts emits one `<svg>` root per page with explicit `width`/`height`
+  // (units like `pt`, `px`). Only the ratio matters here, so the unit suffix
+  // is dropped and the numbers are treated as relative.
   function parsePageDims(svgText: string): PageDims | null {
     const opens = [...svgText.matchAll(/<svg\b[^>]*>/g)];
     if (opens.length === 0) return null;
@@ -59,8 +49,8 @@
     return { pageWidth, totalHeight, pageCount: opens.length };
   }
 
-  // CSS values must stay in sync with the iframe srcdoc below — the height
-  // estimate adds these as fixed pixels independent of page scale.
+  // Must stay in sync with the iframe srcdoc CSS below — the height estimate
+  // adds these as fixed pixels independent of page scale.
   const PAGE_GAP_PX = 12;
   const BODY_PADDING_PX = 16;
 
@@ -80,11 +70,9 @@
     ].join("");
   }
 
-  // Iframes do not auto-size to their content. `sandbox` without
-  // `allow-scripts` rules out a postMessage-based resize from inside, so we
-  // compute the rendered height from the page dimensions and the iframe's
-  // own width: pages scale to fit the available width (max-width: 100%
-  // inside) and we mirror the same scale here.
+  // Iframes don't auto-size, and `sandbox` without `allow-scripts` rules out
+  // a postMessage resize from inside. Compute the height by mirroring the
+  // `max-width:100%` page scale against the iframe's own width.
   $effect(() => {
     const el = iframeEl;
     const dims = pageDims;

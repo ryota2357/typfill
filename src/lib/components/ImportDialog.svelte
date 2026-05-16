@@ -1,9 +1,4 @@
 <script module lang="ts">
-  // Visual hint for a single preview cell. Picks a CSS treatment without
-  // letting the caller leak free-form classes into the modal:
-  //   - "tabular"  → tabular-nums (dates, amounts — column digits align)
-  //   - "break-all" → break-all (PII strings that may not have spaces)
-  //   - "default"  → plain text (counts like "5 件", short labels)
   export type PreviewFormat = "tabular" | "break-all" | "default";
 
   export type PreviewItem = {
@@ -17,11 +12,6 @@
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
 
-  // Generic share-link import confirmation. Templates produce a flat
-  // `previewItems` array keyed by their own domain labels; the dialog itself
-  // never sees the underlying Fields type. The data-driven shape lets the
-  // route page choose what to surface (e.g. the resume page redacts photo
-  // bytes from the listing) without forking this component.
   let {
     dataLabel,
     hasExisting,

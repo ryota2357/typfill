@@ -1,5 +1,4 @@
 <script module lang="ts">
-  // Column schema for a single editable field in the entry list.
   export type EntryField<E> = {
     key: keyof E & string;
     label: string;
@@ -31,8 +30,8 @@
     fields: readonly EntryField<E>[];
   } = $props();
 
-  // Column layout: per-field widths + a fixed gutter for the row's
-  // delete/move controls so the × button always lines up.
+  // Trailing `auto` reserves a gutter for the row's delete/move controls so
+  // the × button always lines up across rows.
   const gridTemplate = $derived(`${fields.map((f) => f.width).join(" ")} auto`);
 
   function add() {
@@ -41,8 +40,7 @@
   function remove(i: number) {
     items.splice(i, 1);
   }
-  // Out-of-range target is a no-op so callers can naively pass i±1 without
-  // bounds-checking.
+  // Out-of-range target is a no-op so callers can pass i±1 unchecked.
   function swap(from: number, to: number) {
     if (to < 0 || to >= items.length) return;
     const [item] = items.splice(from, 1);

@@ -8,9 +8,6 @@
   import ShareDialog from "./ShareDialog.svelte";
   import StatusDot from "./StatusDot.svelte";
 
-  // The editor consumes the same 3 entry points every template exposes. Kept
-  // local to avoid re-importing SerializeOptions from the codec module for
-  // what is essentially a structural shape.
   type TemplateRef = {
     templateId: string;
     label: string;
@@ -45,11 +42,8 @@
 
   const compileInputs = $derived(template.buildCompileInputs(data));
 
-  // Autosave. `template.serialize(data)` walks every field, so this effect
-  // re-runs on any nested mutation. The write itself is debounced to 500 ms
-  // to avoid thrashing storage on rapid typing. The first mount also fires
-  // this effect once — that initial write is harmless (idempotent) and
-  // doubles as a "saved" signal for the indicator.
+  // The initial mount fires this effect once and writes the serialized payload
+  // back — idempotent, and doubles as the "saved" signal for the indicator.
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
   $effect(() => {
     const payload = template.serialize(data);
@@ -60,16 +54,15 @@
         localStorage.setItem(template.storageKey, payload);
         saveState = "saved";
       } catch {
-        // Quota exceeded or storage disabled. Surface as a status pill —
-        // we don't want to throw, but silent failure was the prior bug.
+        // Surface quota / disabled storage as a status pill — silent failure
+        // was the prior bug.
         saveState = "error";
       }
     }, 500);
   });
 
-  // URL fragment detection. The parent handles deserialize and the import
-  // dialog; we just forward the raw payload and scrub the hash so a reload
-  // doesn't re-trigger the modal.
+  // Scrub the hash after handing off the payload so a reload doesn't
+  // re-trigger the import modal.
   onMount(() => {
     const frag = parseShareFragment(location.hash);
     if (!frag) return;
@@ -135,7 +128,6 @@
     </p>
   {/if}
 
-  <!-- Mobile tab switch (pill). Hidden on md+ where both panes are visible. -->
   <div
     class="flex-shrink-0 border-b border-neutral-200 bg-white px-3 py-2 md:hidden"
     role="tablist"

@@ -1,12 +1,8 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  // Body layout picks itself from `cols`. `1` (default) stacks children
-  // vertically — the typical "label / input / label / input" rhythm. `2`
-  // switches to a 2-up grid that collapses to 1 column on small screens; used
-  // for sections where related fields read better side-by-side (姓/名,
-  // 郵便番号/住所, etc.). 3+ columns aren't supported because nothing in the
-  // current templates wants them; add a case here when one shows up.
+  // 3+ columns aren't supported because no current template needs them —
+  // extend the grid switch below if a future one does.
   let {
     title,
     children,

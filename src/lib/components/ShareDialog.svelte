@@ -4,10 +4,6 @@
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
 
-  // Generic share dialog. The template ref carries the bare minimum needed to
-  // produce a share URL — `templateId` for the fragment label and `serialize`
-  // for the payload (which already applies `sanitizeForShare` internally when
-  // called with `{ for: "share" }`).
   let {
     data,
     template,

@@ -1,11 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  // Modal frame: backdrop + centered card + Escape-to-close + ARIA wiring.
-  // The title row optionally accepts a `titleActions` snippet — used for
-  // the icon-only close affordance on ShareDialog. ImportDialog omits it
-  // and surfaces close as a "キャンセル" / "読み込む" button pair in the
-  // children body instead.
   let {
     title,
     onclose,
@@ -20,8 +15,7 @@
     children: Snippet;
   } = $props();
 
-  // Per-instance id so multiple stacked dialogs don't collide on the
-  // labelledby reference.
+  // Per-instance id so stacked dialogs don't collide on `aria-labelledby`.
   const titleId = $props.id();
 
   const FRAME_SIZE = {

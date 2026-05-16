@@ -3,11 +3,8 @@
 </script>
 
 <script lang="ts">
-  // Native <input type="date"> bridge for DateRecord. Uses the same
-  // `form-input` utility as TextInput (defined in layout.css) so the two
-  // controls match without sharing a Svelte component — bind:value can't
-  // round-trip a DateRecord through the input's iso string, so this stays
-  // controlled.
+  // `bind:value` can't round-trip a DateRecord through the input's iso
+  // string, so the input stays controlled (value + oninput).
   let { value = $bindable() }: { value: DateRecord } = $props();
 
   const pad = (n: number) => String(n).padStart(2, "0");

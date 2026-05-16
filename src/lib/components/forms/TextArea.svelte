@@ -1,8 +1,4 @@
 <script lang="ts">
-  // Bound textarea sibling to TextInput. `mono` flips the editing surface
-  // to the monospace stack — used for free-text Typst markup (志望動機,
-  // 備考) where alignment-sensitive characters (`-`, `==`, `*`, raw
-  // blocks) read better in a fixed-width font.
   let {
     value = $bindable(),
     rows = 5,

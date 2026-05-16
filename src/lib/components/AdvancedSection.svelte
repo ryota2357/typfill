@@ -1,11 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  // 「詳細設定」 disclosure panel. Both routes have one of these for layout
-  // micro-tweaks the casual user never opens — the `<details>` collapses
-  // them by default and this component just standardizes the chrome
-  // (border, padding, summary type-treatment, body spacing) so the two
-  // pages can't drift apart.
   let {
     title,
     children,
