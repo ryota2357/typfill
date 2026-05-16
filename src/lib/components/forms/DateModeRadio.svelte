@@ -1,57 +1,37 @@
 <script lang="ts">
-  import { untrack } from "svelte";
   import DateInput, { type DateRecord } from "./DateInput.svelte";
 
-  // Bridges the data model `"auto" | DateRecord` to a two-radio UX. The local
-  // `manualDate` preserves the last-edited date across auto/manual toggles so
-  // the user doesn't lose input when switching back. It seeds from the
-  // initial `value` once at instantiation; later external replacements of
-  // `value` (e.g. import) re-seed via the read-back effect below.
+  // Bridges the data model `"auto" | DateRecord` to a two-radio UX.
+  // `value` itself is the source of truth in manual mode — the child
+  // DateInput binds straight through it. `lastManualDate` is a write-only
+  // stash so toggling auto ↔ manual restores the user's previous entry
+  // instead of jumping back to today.
   let { value = $bindable() }: { value: "auto" | DateRecord } = $props();
 
   function todayDate(): DateRecord {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
   }
-  function eqDate(a: DateRecord, b: DateRecord): boolean {
-    return a.year === b.year && a.month === b.month && a.day === b.day;
-  }
 
-  let manualDate = $state<DateRecord>(
+  let lastManualDate = $state<DateRecord>(
     value === "auto" ? todayDate() : { ...value },
   );
+
+  // Keep the stash current whenever `value` holds a concrete date — covers
+  // local edits through the DateInput and external replacements (import).
+  $effect(() => {
+    if (value !== "auto") lastManualDate = { ...value };
+  });
+
   const mode = $derived<"auto" | "manual">(
     value === "auto" ? "auto" : "manual",
   );
-
-  // Pull external manual changes (import etc) into local state so the
-  // child DateInput's bind:value sees them. `manualDate` is read via
-  // `untrack` so a local edit propagating up through bind:value doesn't
-  // re-trigger this effect and revert the edit before the mirror-back
-  // effect below can sync it to `value`.
-  $effect(() => {
-    if (value === "auto") return;
-    if (
-      !eqDate(
-        value,
-        untrack(() => manualDate),
-      )
-    )
-      manualDate = { ...value };
-  });
-
-  // Mirror local edits back to parent. Equality guard prevents an effect
-  // loop with the read-back above.
-  $effect(() => {
-    if (mode !== "manual" || value === "auto") return;
-    if (!eqDate(value, manualDate)) value = { ...manualDate };
-  });
 
   function selectAuto() {
     value = "auto";
   }
   function selectManual() {
-    value = { ...manualDate };
+    value = { ...lastManualDate };
   }
 </script>
 
@@ -64,9 +44,11 @@
     <input type="radio" checked={mode === "manual"} onchange={selectManual}>
     <span>指定する</span>
   </label>
-  {#if mode === "manual"}
-    <!-- form-input itself has no width; the child input sizes to its
-         content here, which is what we want for inline placement. -->
-    <DateInput bind:value={manualDate} />
+  {#if value !== "auto"}
+    <DateInput
+      bind:value={// biome-ignore lint/complexity/noCommaOperator: Biome doesn't support svelte function bindings syntax
+      () => value as DateRecord,
+      (v) => value = v}
+    />
   {/if}
 </div>
