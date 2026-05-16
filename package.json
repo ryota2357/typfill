@@ -10,6 +10,7 @@
     "prepare": "svelte-kit sync || echo ''",
     "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "typecheck:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "biome format --write './'",
     "check": "biome check './'",
     "check:write": "biome check --write './'",
     "test:unit": "vitest",
