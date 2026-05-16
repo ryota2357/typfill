@@ -2,7 +2,11 @@
   import { Field, Section, TextInput } from "$lib/components/forms";
   import type { Party } from "$lib/templates/invoice";
 
-  let { label, value }: { label: string; value: Party } = $props();
+  interface Props {
+    label: string;
+    value: Party;
+  }
+  let { label, value }: Props = $props();
 </script>
 
 <Section title={label} cols={2}>

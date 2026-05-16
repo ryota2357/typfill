@@ -5,7 +5,10 @@
 <script lang="ts">
   // `bind:value` can't round-trip a DateRecord through the input's iso
   // string, so the input stays controlled (value + oninput).
-  let { value = $bindable() }: { value: DateRecord } = $props();
+  interface Props {
+    value: DateRecord;
+  }
+  let { value = $bindable() }: Props = $props();
 
   const pad = (n: number) => String(n).padStart(2, "0");
   const iso = $derived(`${value.year}-${pad(value.month)}-${pad(value.day)}`);

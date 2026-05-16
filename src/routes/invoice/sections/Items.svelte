@@ -2,7 +2,10 @@
   import { type EntryField, EntryList } from "$lib/components/forms";
   import type { InvoiceItem } from "$lib/templates/invoice";
 
-  let { items }: { items: InvoiceItem[] } = $props();
+  interface Props {
+    items: InvoiceItem[];
+  }
+  let { items }: Props = $props();
 
   const ITEM_FIELDS: readonly EntryField<InvoiceItem>[] = [
     { key: "name", label: "品目", type: "text", width: "1fr" },

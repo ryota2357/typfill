@@ -16,6 +16,16 @@
     buildCompileInputs: (data: T) => CompileInputs;
   };
 
+  interface Props {
+    data: T;
+    template: TemplateRef;
+    filename: string;
+    children: Snippet;
+    shareExtraNotice?: Snippet;
+    onreset?: () => void;
+    onimport?: (payload: string) => void;
+    importError?: string;
+  }
   let {
     data,
     template,
@@ -25,16 +35,7 @@
     onreset,
     onimport,
     importError,
-  }: {
-    data: T;
-    template: TemplateRef;
-    filename: string;
-    children: Snippet;
-    shareExtraNotice?: Snippet;
-    onreset?: () => void;
-    onimport?: (payload: string) => void;
-    importError?: string;
-  } = $props();
+  }: Props = $props();
 
   let tab = $state<"form" | "preview">("form");
   let shareOpen = $state(false);

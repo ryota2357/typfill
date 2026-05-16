@@ -4,12 +4,7 @@
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
 
-  let {
-    data,
-    template,
-    onclose,
-    extraNotice,
-  }: {
+  interface Props {
     data: T;
     template: {
       templateId: string;
@@ -17,7 +12,8 @@
     };
     onclose: () => void;
     extraNotice?: import("svelte").Snippet;
-  } = $props();
+  }
+  let { data, template, onclose, extraNotice }: Props = $props();
 
   let copyStatus = $state<"idle" | "copied" | "error">("idle");
 

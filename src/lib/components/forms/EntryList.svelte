@@ -18,17 +18,13 @@
   import Section from "./Section.svelte";
   import TextInput from "./TextInput.svelte";
 
-  let {
-    label,
-    items,
-    newEntry,
-    fields,
-  }: {
+  interface Props {
     label: string;
     items: E[];
     newEntry: () => E;
     fields: readonly EntryField<E>[];
-  } = $props();
+  }
+  let { label, items, newEntry, fields }: Props = $props();
 
   // Trailing `auto` reserves a gutter for the row's delete/move controls so
   // the × button always lines up across rows.

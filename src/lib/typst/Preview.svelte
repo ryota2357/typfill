@@ -5,15 +5,16 @@
   import SandboxedSvg from "./SandboxedSvg.svelte";
   import { type TypstClient, TypstCompileError } from "./worker-client";
 
+  interface Props {
+    inputs: CompileInputs;
+    debounceMs?: number;
+    downloadName?: string;
+  }
   let {
     inputs,
     debounceMs = 400,
     downloadName = "document.pdf",
-  }: {
-    inputs: CompileInputs;
-    debounceMs?: number;
-    downloadName?: string;
-  } = $props();
+  }: Props = $props();
 
   let client = $state<TypstClient | null>(null);
   let svg = $state("");

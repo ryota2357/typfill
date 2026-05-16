@@ -4,6 +4,15 @@
   // Specialized one-off buttons (× in EntryList, dashed "+ 行を追加", radio/tab
   // pills) intentionally render their own `<button>` instead of being added as
   // new variants here.
+  interface Props {
+    children: Snippet;
+    variant?: "primary" | "default" | "subtle" | "ghost";
+    size?: "sm" | "md" | "icon";
+    type?: "button" | "submit";
+    onclick?: (e: MouseEvent) => void;
+    disabled?: boolean;
+    "aria-label"?: string;
+  }
   let {
     children,
     variant = "default",
@@ -12,15 +21,7 @@
     onclick,
     disabled = false,
     "aria-label": ariaLabel,
-  }: {
-    children: Snippet;
-    variant?: "primary" | "default" | "subtle" | "ghost";
-    size?: "sm" | "md" | "icon";
-    type?: "button" | "submit";
-    onclick?: (e: MouseEvent) => void;
-    disabled?: boolean;
-    "aria-label"?: string;
-  } = $props();
+  }: Props = $props();
 
   const VARIANT = {
     primary:

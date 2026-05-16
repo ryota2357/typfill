@@ -3,7 +3,10 @@
   import { Field, TextInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
-  let { data }: { data: Fields } = $props();
+  interface Props {
+    data: Fields;
+  }
+  let { data }: Props = $props();
 </script>
 
 <AdvancedSection title="詳細設定（レイアウト調整）">

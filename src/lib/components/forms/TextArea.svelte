@@ -1,15 +1,16 @@
 <script lang="ts">
+  interface Props {
+    value: string;
+    rows?: number;
+    mono?: boolean;
+    placeholder?: string;
+  }
   let {
     value = $bindable(),
     rows = 5,
     mono = false,
     placeholder,
-  }: {
-    value: string;
-    rows?: number;
-    mono?: boolean;
-    placeholder?: string;
-  } = $props();
+  }: Props = $props();
 </script>
 
 <textarea

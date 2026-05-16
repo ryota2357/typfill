@@ -2,7 +2,11 @@
   import { Field, Section, TextInput } from "$lib/components/forms";
   import type { Contact } from "$lib/templates/resume";
 
-  let { label, value }: { label: string; value: Contact } = $props();
+  interface Props {
+    label: string;
+    value: Contact;
+  }
+  let { label, value }: Props = $props();
 </script>
 
 <Section title={label} cols={2}>

@@ -1,14 +1,12 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from "svelte/elements";
 
-  type Props = Omit<
-    HTMLInputAttributes,
-    "value" | "class" | "style" | "width"
-  > & {
+  interface Props
+    extends Omit<HTMLInputAttributes, "value" | "class" | "style" | "width"> {
     value: string | number;
     width?: number;
     mono?: boolean;
-  };
+  }
 
   let {
     value = $bindable(),

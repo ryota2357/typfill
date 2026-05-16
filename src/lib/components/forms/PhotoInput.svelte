@@ -5,19 +5,14 @@
 <script lang="ts">
   import Button from "../Button.svelte";
 
-  let {
-    value = $bindable(),
-    vfsPath,
-    maxSide,
-    format,
-    hint,
-  }: {
+  interface Props {
     value: PhotoValue | null;
     vfsPath: string;
     maxSide: number;
     format: { type: "image/jpeg"; quality: number };
     hint?: string;
-  } = $props();
+  }
+  let { value = $bindable(), vfsPath, maxSide, format, hint }: Props = $props();
 
   let previewUrl = $state<string | null>(null);
   let error = $state("");

@@ -8,7 +8,10 @@
   } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/invoice";
 
-  let { data }: { data: Fields } = $props();
+  interface Props {
+    data: Fields;
+  }
+  let { data }: Props = $props();
 </script>
 
 <Section title="基本情報">

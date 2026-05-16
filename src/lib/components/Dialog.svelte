@@ -1,19 +1,14 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  let {
-    title,
-    onclose,
-    size = "md",
-    titleActions,
-    children,
-  }: {
+  interface Props {
     title: string;
     onclose: () => void;
     size?: "md" | "lg";
     titleActions?: Snippet;
     children: Snippet;
-  } = $props();
+  }
+  let { title, onclose, size = "md", titleActions, children }: Props = $props();
 
   // Per-instance id so stacked dialogs don't collide on `aria-labelledby`.
   const titleId = $props.id();

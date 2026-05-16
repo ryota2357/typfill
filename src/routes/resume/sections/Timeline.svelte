@@ -21,7 +21,11 @@
     return { year: now.getFullYear(), month: now.getMonth() + 1, content: "" };
   }
 
-  let { label, items }: { label: string; items: TimelineEntry[] } = $props();
+  interface Props {
+    label: string;
+    items: TimelineEntry[];
+  }
+  let { label, items }: Props = $props();
 </script>
 
 <EntryList

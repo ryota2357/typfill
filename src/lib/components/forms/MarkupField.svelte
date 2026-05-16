@@ -2,11 +2,12 @@
   import Section from "./Section.svelte";
   import TextArea from "./TextArea.svelte";
 
-  let {
-    label,
-    value = $bindable(),
-    hint,
-  }: { label: string; value: string; hint?: string } = $props();
+  interface Props {
+    label: string;
+    value: string;
+    hint?: string;
+  }
+  let { label, value = $bindable(), hint }: Props = $props();
 </script>
 
 <Section title={label}>

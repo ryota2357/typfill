@@ -3,17 +3,13 @@
 
   // 3+ columns aren't supported because no current template needs them —
   // extend the grid switch below if a future one does.
-  let {
-    title,
-    children,
-    actions,
-    cols = 1,
-  }: {
+  interface Props {
     title: string;
     children: Snippet;
     actions?: Snippet;
     cols?: 1 | 2;
-  } = $props();
+  }
+  let { title, children, actions, cols = 1 }: Props = $props();
 </script>
 
 <section class="mb-7 last:mb-0">

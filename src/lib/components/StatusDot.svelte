@@ -1,11 +1,9 @@
 <script lang="ts">
-  let {
-    tone,
-    label,
-  }: {
+  interface Props {
     tone: "neutral" | "busy" | "ok" | "error";
     label: string;
-  } = $props();
+  }
+  let { tone, label }: Props = $props();
 
   const DOT_TONE = {
     neutral: "bg-neutral-400",

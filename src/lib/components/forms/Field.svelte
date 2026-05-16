@@ -3,11 +3,12 @@
 
   // For multi-input groups, pass a non-input child (e.g. a div) — the outer
   // <label> stays a click target without auto-binding to any one control.
-  let {
-    label,
-    children,
-    span,
-  }: { label: string; children: Snippet; span?: "full" } = $props();
+  interface Props {
+    label: string;
+    children: Snippet;
+    span?: "full";
+  }
+  let { label, children, span }: Props = $props();
 </script>
 
 <label class="flex flex-col gap-1 {span === 'full' ? 'sm:col-span-2' : ''}">

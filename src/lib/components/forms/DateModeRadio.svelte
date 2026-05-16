@@ -3,7 +3,10 @@
 
   // `lastManualDate` is a stash so toggling auto ↔ manual restores the user's
   // previous entry instead of jumping back to today.
-  let { value = $bindable() }: { value: "auto" | DateRecord } = $props();
+  interface Props {
+    value: "auto" | DateRecord;
+  }
+  let { value = $bindable() }: Props = $props();
 
   function todayDate(): DateRecord {
     const d = new Date();

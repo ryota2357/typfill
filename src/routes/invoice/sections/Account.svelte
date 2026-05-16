@@ -2,7 +2,10 @@
   import { Field, Section, TextInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/invoice";
 
-  let { value }: { value: Fields["account"] } = $props();
+  interface Props {
+    value: Fields["account"];
+  }
+  let { value }: Props = $props();
 </script>
 
 <Section title="振込先" cols={2}>

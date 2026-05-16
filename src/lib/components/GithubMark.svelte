@@ -4,8 +4,11 @@
   // byte-identical via <img> to foreclose the `currentColor` recoloring that
   // an inline SVG would expose. `height` is omitted so the browser preserves
   // the 98×96 intrinsic aspect ratio.
-  let { size = 14, class: cls = "" }: { size?: number; class?: string } =
-    $props();
+  interface Props {
+    size?: number;
+    class?: string;
+  }
+  let { size = 14, class: cls = "" }: Props = $props();
 </script>
 
 <img

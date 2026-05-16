@@ -2,7 +2,10 @@
   import { PhotoInput, Section } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/resume";
 
-  let { value = $bindable() }: { value: Fields["写真"] } = $props();
+  interface Props {
+    value: Fields["写真"];
+  }
+  let { value = $bindable() }: Props = $props();
 </script>
 
 <Section title="写真">

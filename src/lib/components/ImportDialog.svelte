@@ -12,19 +12,15 @@
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
 
-  let {
-    dataLabel,
-    hasExisting,
-    previewItems,
-    onaccept,
-    oncancel,
-  }: {
+  interface Props {
     dataLabel: string;
     hasExisting: boolean;
     previewItems: readonly PreviewItem[];
     onaccept: () => void;
     oncancel: () => void;
-  } = $props();
+  }
+  let { dataLabel, hasExisting, previewItems, onaccept, oncancel }: Props =
+    $props();
 
   const VALUE_FORMAT: Record<PreviewFormat, string> = {
     tabular: "tabular-nums",

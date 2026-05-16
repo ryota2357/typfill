@@ -10,7 +10,10 @@
   // `<a target="_blank">` still open as normal pages.
   const SANDBOX = "allow-popups allow-popups-to-escape-sandbox";
 
-  let { svg }: { svg: string } = $props();
+  interface Props {
+    svg: string;
+  }
+  let { svg }: Props = $props();
 
   let iframeEl: HTMLIFrameElement | undefined = $state();
   let iframeHeight = $state(0);
