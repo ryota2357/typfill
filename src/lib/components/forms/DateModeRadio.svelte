@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import DateInput, { type DateRecord } from "./DateInput.svelte";
 
   // Bridges the data model `"auto" | DateRecord` to a two-radio UX. The local
@@ -24,10 +25,19 @@
   );
 
   // Pull external manual changes (import etc) into local state so the
-  // child DateInput's bind:value sees them.
+  // child DateInput's bind:value sees them. `manualDate` is read via
+  // `untrack` so a local edit propagating up through bind:value doesn't
+  // re-trigger this effect and revert the edit before the mirror-back
+  // effect below can sync it to `value`.
   $effect(() => {
     if (value === "auto") return;
-    if (!eqDate(value, manualDate)) manualDate = { ...value };
+    if (
+      !eqDate(
+        value,
+        untrack(() => manualDate),
+      )
+    )
+      manualDate = { ...value };
   });
 
   // Mirror local edits back to parent. Equality guard prevents an effect
