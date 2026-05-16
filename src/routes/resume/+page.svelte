@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    type EntryField,
-    EntryList,
-    MarkupField,
-  } from "$lib/components/forms";
+  import { MarkupField } from "$lib/components/forms";
   import ImportDialog, {
     type PreviewItem,
   } from "$lib/components/ImportDialog.svelte";
@@ -16,24 +12,7 @@
   import DocumentDate from "./sections/DocumentDate.svelte";
   import PersonalInfo from "./sections/PersonalInfo.svelte";
   import Photo from "./sections/Photo.svelte";
-
-  const TIMELINE_FIELDS: readonly EntryField<template.TimelineEntry>[] = [
-    { key: "year", label: "年", type: "number", width: "5em" },
-    {
-      key: "month",
-      label: "月",
-      type: "number",
-      width: "4em",
-      min: 1,
-      max: 12,
-    },
-    { key: "content", label: "内容", type: "text", width: "1fr" },
-  ];
-
-  function newTimelineEntry(): template.TimelineEntry {
-    const now = new Date();
-    return { year: now.getFullYear(), month: now.getMonth() + 1, content: "" };
-  }
+  import Timeline from "./sections/Timeline.svelte";
 
   const state = createTemplateState(template, () =>
     structuredClone(template.EMPTY_FIELDS),
@@ -45,9 +24,6 @@
     return s.length > max ? `${s.slice(0, max)}…` : s;
   }
 
-  // Compact 住所 preview. Postal + first 30 chars of address — enough for the
-  // user to recognize the record without exposing full PII in a confirmation
-  // modal.
   function addressPreview(c: template.Contact): string {
     const postal = c.郵便番号.trim();
     const addr = c.住所.trim();
@@ -113,24 +89,10 @@
   <Photo bind:value={state.data.写真} />
   <Address label="現住所" value={state.data.現住所} />
   <Address label="連絡先（現住所と異なる場合のみ）" value={state.data.連絡先} />
-  <EntryList
-    label="学歴"
-    items={state.data.学歴}
-    newEntry={newTimelineEntry}
-    fields={TIMELINE_FIELDS}
-  />
-  <EntryList
-    label="職歴"
-    items={state.data.職歴}
-    newEntry={newTimelineEntry}
-    fields={TIMELINE_FIELDS}
-  />
-  <EntryList
-    label="免許・資格"
-    items={state.data["免許・資格"]}
-    newEntry={newTimelineEntry}
-    fields={TIMELINE_FIELDS}
-  />
+  <Timeline label="学歴" items={state.data.学歴} />
+  <Timeline label="学歴" items={state.data.学歴} />
+  <Timeline label="職歴" items={state.data.職歴} />
+  <Timeline label="免許・資格" items={state.data["免許・資格"]} />
   <MarkupField label="志望動機" bind:value={state.data.志望動機} />
   <MarkupField label="本人希望記入欄" bind:value={state.data.本人希望記入欄} />
   <Advanced data={state.data} />
