@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AdvancedSection from "$lib/components/AdvancedSection.svelte";
+  import { AdvancedSection } from "$lib/components";
   import { Field, TextInput } from "$lib/components/forms";
   import type { Fields } from "$lib/templates/invoice";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GithubMark from "$lib/components/GithubMark.svelte";
+  import { GithubMark } from "$lib/components";
   import { listTemplates } from "$lib/templates/registry";
 
   const templates = listTemplates();

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import Button from "$lib/components/Button.svelte";
-  import StatusDot from "$lib/components/StatusDot.svelte";
+  import { Button, StatusDot } from "$lib/components";
   import type { CompileInputs, TypstDiagnostic } from "./protocol";
   import SandboxedSvg from "./SandboxedSvg.svelte";
   import { type TypstClient, TypstCompileError } from "./worker-client";

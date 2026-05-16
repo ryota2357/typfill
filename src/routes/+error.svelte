@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import GithubMark from "$lib/components/GithubMark.svelte";
+  import { GithubMark } from "$lib/components";
   import { listTemplates } from "$lib/templates/registry";
 
   const enabledTemplates = listTemplates().filter((t) => t.enabled);

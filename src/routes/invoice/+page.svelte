@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { MarkupField } from "$lib/components/forms";
-  import ImportDialog, {
+  import {
+    ImportDialog,
     type PreviewItem,
-  } from "$lib/components/ImportDialog.svelte";
-  import TemplateEditor from "$lib/components/TemplateEditor.svelte";
+    TemplateEditor,
+  } from "$lib/components";
+  import { MarkupField } from "$lib/components/forms";
   import * as template from "$lib/templates/invoice";
   import { createTemplateState } from "$lib/templates/state.svelte";
   import { buildInvoiceFilename } from "./filename";
