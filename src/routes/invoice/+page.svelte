@@ -14,16 +14,16 @@
   import Items from "./sections/Items.svelte";
   import Party from "./sections/Party.svelte";
 
-  // Fresh state uses EMPTY_FIELDS but overrides the due-date with end of next
+  // Fresh state uses EMPTY_PROPS but overrides the due-date with end of next
   // month — a sensible business default that depends on "now". This applies
   // only when there's no saved state; saved user edits are honored as-is.
-  function freshFields(): template.Fields {
-    const fresh = structuredClone(template.EMPTY_FIELDS);
+  function freshProps(): template.TemplateProps {
+    const fresh = structuredClone(template.EMPTY_PROPS);
     fresh["due-date"] = template.nextMonthEnd();
     return fresh;
   }
 
-  const state = createTemplateState(template, freshFields);
+  const state = createTemplateState(template, freshProps);
 
   const filename = $derived(buildInvoiceFilename(state.data));
 

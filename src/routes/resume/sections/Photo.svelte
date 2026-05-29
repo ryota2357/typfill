@@ -1,9 +1,9 @@
 <script lang="ts">
   import { PhotoInput, Section } from "$lib/components/forms";
-  import type { Fields } from "$lib/templates/resume";
+  import type { Photo } from "$lib/templates/resume";
 
   interface Props {
-    value: Fields["写真"];
+    value: Photo | null;
   }
   let { value = $bindable() }: Props = $props();
 </script>

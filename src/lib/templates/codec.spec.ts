@@ -17,7 +17,7 @@ import {
 const isAny = (x: unknown): x is unknown => x !== undefined;
 
 describe("createCodec — JSON-native roundtrips", () => {
-  const codec = createCodec({ schemaVersion: 1, isFields: isAny });
+  const codec = createCodec({ schemaVersion: 1, isProps: isAny });
 
   it("roundtrips primitives, null, and booleans", () => {
     const data = {
@@ -48,7 +48,7 @@ describe("createCodec — JSON-native roundtrips", () => {
 describe("createCodec — ValueCodec (Uint8Array)", () => {
   const codec = createCodec({
     schemaVersion: 1,
-    isFields: isAny,
+    isProps: isAny,
     valueCodecs: [UINT8ARRAY_CODEC],
   });
 
@@ -80,7 +80,7 @@ describe("createCodec — ValueCodec (Uint8Array)", () => {
   it("serialize throws UnknownValueTypeError when a ValueCodec is missing", () => {
     const codecWithoutBytes = createCodec({
       schemaVersion: 1,
-      isFields: isAny,
+      isProps: isAny,
     });
     expect(() =>
       codecWithoutBytes.serialize({ bytes: new Uint8Array([1]) }),
@@ -89,7 +89,7 @@ describe("createCodec — ValueCodec (Uint8Array)", () => {
 });
 
 describe("createCodec — reserved key policy", () => {
-  const codec = createCodec({ schemaVersion: 1, isFields: isAny });
+  const codec = createCodec({ schemaVersion: 1, isProps: isAny });
 
   it("throws ReservedKeyError when user data contains __c", () => {
     expect(() => codec.serialize({ __c: "evil" })).toThrow(ReservedKeyError);
@@ -102,7 +102,7 @@ describe("createCodec — reserved key policy", () => {
 describe("createCodec — deserialize failure modes (return undefined)", () => {
   const codec = createCodec({
     schemaVersion: 1,
-    isFields: is.ObjectOf({ n: is.Number }),
+    isProps: is.ObjectOf({ n: is.Number }),
   });
 
   it("returns undefined for un-decompressable payloads", () => {
@@ -125,7 +125,7 @@ describe("createCodec — deserialize failure modes (return undefined)", () => {
     expect(codec.deserialize(payload)).toBeUndefined();
   });
 
-  it("returns undefined when isFields rejects the decoded value", () => {
+  it("returns undefined when isProps rejects the decoded value", () => {
     const bad = { version: 1, data: { n: "not-a-number" } };
     const payload = compressToEncodedURIComponent(JSON.stringify(bad));
     expect(codec.deserialize(payload)).toBeUndefined();
@@ -140,7 +140,7 @@ describe("createCodec — deserialize failure modes (return undefined)", () => {
   it("returns undefined when a value codec's decode fails", () => {
     const codecWithBytes = createCodec({
       schemaVersion: 1,
-      isFields: isAny,
+      isProps: isAny,
       valueCodecs: [UINT8ARRAY_CODEC],
     });
     const bad = {
@@ -157,7 +157,7 @@ describe("createCodec — sanitizeForShare", () => {
     const sanitize = vi.fn((d: { secret: string }) => ({ ...d, secret: "" }));
     const codec = createCodec({
       schemaVersion: 1,
-      isFields: is.ObjectOf({ secret: is.String }),
+      isProps: is.ObjectOf({ secret: is.String }),
       sanitizeForShare: sanitize,
     });
     const data = { secret: "top" };
@@ -176,7 +176,7 @@ describe("createCodec — sanitizeForShare", () => {
 
 describe("createCodec — envelope format", () => {
   it("emits { version, data } with the declared version", () => {
-    const codec = createCodec({ schemaVersion: 7, isFields: isAny });
+    const codec = createCodec({ schemaVersion: 7, isProps: isAny });
     const payload = codec.serialize({ n: 1 });
     const json = decompressFromEncodedURIComponent(payload);
     const envelope = JSON.parse(json as string);
@@ -210,7 +210,7 @@ describe("createCodec — custom ValueCodec", () => {
   it("routes non-plain-object runtime values through valueCodecs by tag", () => {
     const codec = createCodec({
       schemaVersion: 1,
-      isFields: isAny,
+      isProps: isAny,
       valueCodecs: [POINT_CODEC],
     });
     const p = Object.assign(Object.create(null) as object, { x: 1, y: 2 });

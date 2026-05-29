@@ -1,7 +1,7 @@
-import type { Fields, Party } from "./schema";
+import type { Account, Party, PlainDate, TemplateProps } from "./schema";
 
 const EMPTY_PARTY: Party = { name: "", "postal-code": "", address: "" };
-const EMPTY_ACCOUNT: Fields["account"] = {
+const EMPTY_ACCOUNT: Account = {
   bank: "",
   branch: "",
   type: "",
@@ -9,7 +9,7 @@ const EMPTY_ACCOUNT: Fields["account"] = {
   holder: "",
 };
 
-export const EMPTY_FIELDS: Fields = {
+export const EMPTY_PROPS: TemplateProps = {
   title: "請求書",
   date: "auto",
   "invoice-number-series": 1,
@@ -23,7 +23,7 @@ export const EMPTY_FIELDS: Fields = {
   body: "",
 };
 
-export const SAMPLE_FIELDS: Fields = {
+export const SAMPLE_PROPS: TemplateProps = {
   title: "請求書",
   date: "auto",
   "invoice-number-series": 1,
@@ -59,7 +59,7 @@ export const SAMPLE_FIELDS: Fields = {
 // after `now` — leap-year and year-rollover cases fall out of this math for
 // free. Callers use it as a business-sensible default due-date for fresh
 // invoices.
-export function nextMonthEnd(now: Date = new Date()): Fields["due-date"] {
+export function nextMonthEnd(now: Date = new Date()): PlainDate {
   const d = new Date(now.getFullYear(), now.getMonth() + 2, 0);
   return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
 }

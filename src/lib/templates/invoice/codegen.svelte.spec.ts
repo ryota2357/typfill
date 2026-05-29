@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { createTypstClient, type TypstClient } from "$lib/typst/worker-client";
 import { buildCompileInputs } from "./compile";
-import { SAMPLE_FIELDS } from "./defaults";
+import { SAMPLE_PROPS } from "./defaults";
 
 // End-to-end smoke test: the codegen output must actually compile through the
 // Typst worker against the real `lib.typ` we copied from upstream.
@@ -13,10 +13,10 @@ afterAll(() => {
 });
 
 describe("invoice codegen — worker compile", () => {
-  it("compiles SAMPLE_FIELDS with no error diagnostics", async () => {
+  it("compiles SAMPLE_PROPS with no error diagnostics", async () => {
     client = createTypstClient();
     const { svg, diagnostics } = await client.compile(
-      buildCompileInputs(SAMPLE_FIELDS),
+      buildCompileInputs(SAMPLE_PROPS),
     );
 
     const errors = diagnostics.filter((d) => d.severity === "error");

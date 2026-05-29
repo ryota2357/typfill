@@ -1,9 +1,9 @@
 <script lang="ts">
   import { DateModeRadio, Section } from "$lib/components/forms";
-  import type { Fields } from "$lib/templates/resume";
+  import type { PlainDate } from "$lib/templates/resume";
 
   interface Props {
-    value: Fields["日付"];
+    value: "auto" | PlainDate;
   }
   let { value = $bindable() }: Props = $props();
 </script>

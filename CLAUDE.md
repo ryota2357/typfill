@@ -27,8 +27,8 @@ Form (Svelte 5 runes)  →  codegen.ts (data → main.typ string)  →  Worker (
 ```
 
 **Templates** (`src/lib/templates/<name>/`) — each has a fixed public surface that consumers reach via `import * as template from "$lib/templates/<name>"`:
-- `index.ts` — the only public exports (`templateId`, `label`, `storageKey`, `serialize`/`deserialize`, `buildCompileInputs`, `EMPTY_FIELDS`/`SAMPLE_FIELDS`, `Fields` type).
-- `schema.ts` — `is*` predicates (`@core/unknownutil`); `Fields = PredicateType<typeof isFields>` (single source, no parallel type+predicate).
+- `index.ts` — the only public exports (`templateId`, `label`, `storageKey`, `serialize`/`deserialize`, `buildCompileInputs`, `EMPTY_PROPS`/`SAMPLE_PROPS`, `TemplateProps` type).
+- `schema.ts` — `is*` predicates (`@core/unknownutil`); `TemplateProps = PredicateType<typeof isTemplateProps>` (single source, no parallel type+predicate).
 - `codegen.ts` — builds the `main.typ` string from data.
 - `compile.ts` — assembles `mainTyp` + `?raw`-imported `template/lib.typ` + binary assets into `CompileInputs`.
 - `template/` — the actual Typst sources, a **git submodule** from `ryota2357/typst-<name>-template` (fresh clones need `git submodule update --init`). Edit `.typ` upstream; here you only bump the pointer (and `codegen.ts`/`schema.ts` if the call surface changed).

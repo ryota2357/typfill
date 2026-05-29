@@ -1,9 +1,11 @@
 import { plainMarkupLit, rawMarkupLit, stringLit } from "$lib/typst/escape";
-import type { Contact, Fields, TimelineEntry } from "./schema";
-
-// Local helper types for codegen-only shapes (not worth a public alias).
-type DateObj = Extract<Fields["生年月日"], { year: number }>;
-type Name = Fields["氏名"];
+import type {
+  Contact,
+  Name,
+  PlainDate,
+  TemplateProps,
+  TimelineEntry,
+} from "./schema";
 
 // Typst length literals (e.g. "22em", "10mm"). Validated at codegen time.
 type TypstLength = string;
@@ -19,7 +21,7 @@ function lengthLit(value: TypstLength): string {
   return value;
 }
 
-function datetimeLit(d: DateObj): string {
+function datetimeLit(d: PlainDate): string {
   return `datetime(year: ${d.year}, month: ${d.month}, day: ${d.day})`;
 }
 
@@ -54,7 +56,7 @@ function timelineArrayLit(entries: TimelineEntry[], indent: string): string {
 // VFS paths use `stringLit`; numeric fields stay as TypeScript numbers;
 // lengths go through a whitelist regex. Adding a new field means classifying
 // it (data vs opt-in markup) and picking the matching helper.
-export function buildMainTyp(data: Fields): string {
+export function buildMainTyp(data: TemplateProps): string {
   const lines: string[] = [];
   lines.push('#import "./lib.typ": resume');
   lines.push("");

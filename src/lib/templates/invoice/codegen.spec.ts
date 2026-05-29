@@ -1,21 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { buildMainTyp } from "./codegen";
-import { EMPTY_FIELDS, SAMPLE_FIELDS } from "./defaults";
-import type { Fields } from "./schema";
+import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
+import type { TemplateProps } from "./schema";
 
-function clone(data: Fields): Fields {
+function clone(data: TemplateProps): TemplateProps {
   return structuredClone(data);
 }
 
 describe("buildMainTyp — structure", () => {
   it("starts with the lib import and show-rule", () => {
-    const out = buildMainTyp(SAMPLE_FIELDS);
+    const out = buildMainTyp(SAMPLE_PROPS);
     expect(out).toContain('#import "./lib.typ": invoice');
     expect(out).toContain("#show: invoice.with(");
   });
 
   it("emits every required named argument for sample data", () => {
-    const out = buildMainTyp(SAMPLE_FIELDS);
+    const out = buildMainTyp(SAMPLE_PROPS);
     for (const arg of [
       "title:",
       "invoice-number-series:",
@@ -34,13 +34,13 @@ describe("buildMainTyp — structure", () => {
 
 describe("buildMainTyp — date", () => {
   it("omits date when set to 'auto'", () => {
-    const out = buildMainTyp({ ...clone(SAMPLE_FIELDS), date: "auto" });
+    const out = buildMainTyp({ ...clone(SAMPLE_PROPS), date: "auto" });
     expect(out).not.toMatch(/^\s*date:/m);
   });
 
   it("emits datetime() when date is a concrete record", () => {
     const out = buildMainTyp({
-      ...clone(SAMPLE_FIELDS),
+      ...clone(SAMPLE_PROPS),
       date: { year: 2025, month: 7, day: 15 },
     });
     expect(out).toContain("date: datetime(year: 2025, month: 7, day: 15)");
@@ -48,7 +48,7 @@ describe("buildMainTyp — date", () => {
 
   it("always emits due-date as a datetime()", () => {
     const out = buildMainTyp({
-      ...clone(SAMPLE_FIELDS),
+      ...clone(SAMPLE_PROPS),
       "due-date": { year: 2027, month: 12, day: 1 },
     });
     expect(out).toContain("due-date: datetime(year: 2027, month: 12, day: 1)");
@@ -57,13 +57,13 @@ describe("buildMainTyp — date", () => {
 
 describe("buildMainTyp — items array", () => {
   it("emits () for empty items", () => {
-    const out = buildMainTyp({ ...clone(SAMPLE_FIELDS), items: [] });
+    const out = buildMainTyp({ ...clone(SAMPLE_PROPS), items: [] });
     expect(out).toContain("items: ()");
   });
 
   it("emits each item as a dictionary with named keys", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       items: [{ name: "作業費", amount: 3, unit: "時間", price: 4500 }],
     });
     expect(out).toMatch(/name: \[作業費\]/);
@@ -74,7 +74,7 @@ describe("buildMainTyp — items array", () => {
 
   it("omits unit when empty so the template falls back to the no-unit branch", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       items: [{ name: "交通費", amount: 1, unit: "", price: 1200 }],
     });
     expect(out).not.toContain("unit:");
@@ -84,7 +84,7 @@ describe("buildMainTyp — items array", () => {
 describe("buildMainTyp — recipient / issuer / account", () => {
   it("emits party records with postal-code (not postal-ccode)", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       recipient: {
         name: "◯◯株式会社",
         "postal-code": "100-0001",
@@ -100,7 +100,7 @@ describe("buildMainTyp — recipient / issuer / account", () => {
 
   it("emits account record with all five fields", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       account: {
         bank: "◯◯銀行",
         branch: "△△支店",
@@ -120,7 +120,7 @@ describe("buildMainTyp — recipient / issuer / account", () => {
 describe("buildMainTyp — body (rawMarkupLit)", () => {
   it("appends body as a #eval expression after the show-rule", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       body: "お振込手数料は貴社にてご負担ください。",
     });
     expect(out).toContain(
@@ -136,7 +136,7 @@ describe("buildMainTyp — body (rawMarkupLit)", () => {
 
   it("lets Typst markup pass through the body verbatim (inside the eval string)", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       body: "== 見出し\n- 箇条",
     });
     expect(out).toContain('#eval("== 見出し\\n- 箇条", mode: "markup")');
@@ -145,20 +145,20 @@ describe("buildMainTyp — body (rawMarkupLit)", () => {
   it("keeps adversarial brackets/backticks contained inside the string", () => {
     // `]` and unclosed backtick would break a `[...]` wrapper, but eval's
     // string argument is opaque to the outer parser.
-    const out = buildMainTyp({ ...clone(EMPTY_FIELDS), body: "]`unclosed" });
+    const out = buildMainTyp({ ...clone(EMPTY_PROPS), body: "]`unclosed" });
     expect(out).toContain('#eval("]`unclosed", mode: "markup")');
   });
 });
 
 describe("buildMainTyp — data-field escaping (plainMarkupLit)", () => {
   it("escapes markup specials in title", () => {
-    const out = buildMainTyp({ ...clone(EMPTY_FIELDS), title: "[請求書]" });
+    const out = buildMainTyp({ ...clone(EMPTY_PROPS), title: "[請求書]" });
     expect(out).toContain("title: [\\[請求書\\]]");
   });
 
   it("escapes markup specials in item name", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       items: [{ name: "*品名*", amount: 1, unit: "", price: 100 }],
     });
     expect(out).toContain("name: [\\*品名\\*]");
@@ -167,13 +167,13 @@ describe("buildMainTyp — data-field escaping (plainMarkupLit)", () => {
   it("escapes heading markers that previously leaked", () => {
     // Regression: `==` used to pass through unchanged — the old markupLit
     // escape set did not cover it.
-    const out = buildMainTyp({ ...clone(EMPTY_FIELDS), title: "== タイトル" });
+    const out = buildMainTyp({ ...clone(EMPTY_PROPS), title: "== タイトル" });
     expect(out).toContain("title: [\\=\\= タイトル]");
   });
 
   it("escapes code-injection attempts in issuer name", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       issuer: {
         name: "#sys.call()",
         "postal-code": "",
@@ -189,7 +189,7 @@ describe("buildMainTyp — data-field escaping (plainMarkupLit)", () => {
 describe("buildMainTyp — numeric passthrough", () => {
   it("emits integer amounts/prices as-is", () => {
     const out = buildMainTyp({
-      ...clone(EMPTY_FIELDS),
+      ...clone(EMPTY_PROPS),
       "invoice-number-series": 42,
       "min-item-rows": 15,
       "tax-rate": 0.08,

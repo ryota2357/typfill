@@ -10,7 +10,7 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
 
 // Shared codec layer for template data.
 //
-// Each template supplies a single `isFields` predicate (ドメイン述語) plus
+// Each template supplies a single `isProps` predicate (ドメイン述語) plus
 // optional `ValueCodec`s for types that JSON can't represent natively
 // (`Uint8Array`, `Date`, …). `createCodec` walks the value tree automatically;
 // no template-specific `toWire`/`fromWire` or wire-shape predicate is needed.
@@ -79,7 +79,7 @@ export type SerializeOptions = {
 
 export interface CodecSpec<T> {
   schemaVersion: number;
-  isFields: (x: unknown) => x is T;
+  isProps: (x: unknown) => x is T;
   valueCodecs?: readonly AnyValueCodec[];
   sanitizeForShare?: (data: T) => T;
 }
@@ -216,7 +216,7 @@ export function createCodec<T>(spec: CodecSpec<T>): Codec<T> {
       const decoded = decodeTree(envelope.data, codecsByTag);
       if (decoded === DECODE_FAIL) return undefined;
 
-      return maybe(decoded, spec.isFields);
+      return maybe(decoded, spec.isProps);
     },
   };
 }

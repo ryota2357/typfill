@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { createTypstClient, type TypstClient } from "$lib/typst/worker-client";
 import { buildCompileInputs } from "./compile";
-import { EMPTY_FIELDS, SAMPLE_FIELDS } from "./defaults";
+import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
 
 // End-to-end smoke test: the codegen output must actually compile through the
 // Typst worker. The template's own `buildCompileInputs` is used so any drift
@@ -19,9 +19,9 @@ function getClient(): TypstClient {
 }
 
 describe("resume codegen — worker compile", () => {
-  it("compiles SAMPLE_FIELDS with no error diagnostics", async () => {
+  it("compiles SAMPLE_PROPS with no error diagnostics", async () => {
     const { svg, diagnostics } = await getClient().compile(
-      buildCompileInputs(SAMPLE_FIELDS),
+      buildCompileInputs(SAMPLE_PROPS),
     );
 
     const errors = diagnostics.filter((d) => d.severity === "error");
@@ -33,7 +33,7 @@ describe("resume codegen — worker compile", () => {
     // Exact payload from the user's bug report: headings, show rule, list,
     // and #link — all previously killed by markupLit escaping `#`.
     const input = buildCompileInputs({
-      ...structuredClone(SAMPLE_FIELDS),
+      ...structuredClone(SAMPLE_PROPS),
       志望動機: [
         "#show link: underline",
         "== リンク",
@@ -54,7 +54,7 @@ describe("resume codegen — worker compile", () => {
     // compiled SVG must contain the literal string so we know plainMarkupLit
     // escaped the `#`.
     const input = buildCompileInputs({
-      ...structuredClone(EMPTY_FIELDS),
+      ...structuredClone(EMPTY_PROPS),
       氏名: { 姓: "#sys.version", 名: "" },
     });
     const { svg, diagnostics } = await getClient().compile(input);
@@ -71,7 +71,7 @@ describe("resume codegen — worker compile", () => {
     // always takes longer than that, so the deadline fires before the
     // result arrives, the worker is terminated, and the lazy-respawn path
     // handles the next call.
-    const input = buildCompileInputs(EMPTY_FIELDS);
+    const input = buildCompileInputs(EMPTY_PROPS);
     client?.dispose();
     client = createTypstClient();
 

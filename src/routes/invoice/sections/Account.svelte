@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Fields } from "$lib/templates/invoice";
+  import type { Account } from "$lib/templates/invoice";
 
   interface Props {
-    value: Fields["account"];
+    value: Account;
   }
   let { value }: Props = $props();
 </script>

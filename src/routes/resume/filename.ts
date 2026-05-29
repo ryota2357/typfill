@@ -1,4 +1,4 @@
-import type { Fields } from "$lib/templates/resume";
+import type { TemplateProps } from "$lib/templates/resume";
 
 // Characters that are unsafe in filenames on at least one major OS, plus
 // control characters. Replaced with underscore so the downloaded PDF doesn't
@@ -28,7 +28,7 @@ function todayYmd(now: Date): string {
 //  - `data.日付` when specified explicitly
 //  - today (per `now`) when `data.日付 === 'auto'`
 export function buildResumeFilename(
-  data: Fields,
+  data: TemplateProps,
   now: Date = new Date(),
 ): string {
   const name = sanitizeName(`${data.氏名.姓}${data.氏名.名}`);

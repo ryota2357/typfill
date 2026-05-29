@@ -6,10 +6,10 @@
     Section,
     TextInput,
   } from "$lib/components/forms";
-  import type { Fields } from "$lib/templates/invoice";
+  import type { TemplateProps } from "$lib/templates/invoice";
 
   interface Props {
-    data: Fields;
+    data: TemplateProps;
   }
   let { data }: Props = $props();
 </script>

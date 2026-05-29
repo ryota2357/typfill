@@ -1,10 +1,10 @@
 <script lang="ts">
   import { AdvancedSection } from "$lib/components";
   import { Field, TextInput } from "$lib/components/forms";
-  import type { Fields } from "$lib/templates/resume";
+  import type { TemplateProps } from "$lib/templates/resume";
 
   interface Props {
-    data: Fields;
+    data: TemplateProps;
   }
   let { data }: Props = $props();
 </script>

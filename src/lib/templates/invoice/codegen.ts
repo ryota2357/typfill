@@ -1,10 +1,13 @@
 import { plainMarkupLit, rawMarkupLit } from "$lib/typst/escape";
-import type { Fields, InvoiceItem, Party } from "./schema";
+import type {
+  Account,
+  InvoiceItem,
+  Party,
+  PlainDate,
+  TemplateProps,
+} from "./schema";
 
-type Account = Fields["account"];
-type DateRecord = { year: number; month: number; day: number };
-
-function datetimeLit(d: DateRecord): string {
+function datetimeLit(d: PlainDate): string {
   return `datetime(year: ${d.year}, month: ${d.month}, day: ${d.day})`;
 }
 
@@ -55,7 +58,7 @@ function itemsArrayLit(items: InvoiceItem[], indent: string): string {
 // full Typst markup (headings, lists, `#link(...)`, math) in the memo area.
 // The body is emitted as a `#eval(...)` expression at the document top so
 // its output joins the main markup flow.
-export function buildMainTyp(data: Fields): string {
+export function buildMainTyp(data: TemplateProps): string {
   const lines: string[] = [];
   lines.push('#import "./lib.typ": invoice');
   lines.push("");

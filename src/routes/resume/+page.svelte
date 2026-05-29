@@ -16,7 +16,7 @@
   import Timeline from "./sections/Timeline.svelte";
 
   const state = createTemplateState(template, () =>
-    structuredClone(template.EMPTY_FIELDS),
+    structuredClone(template.EMPTY_PROPS),
   );
 
   const filename = $derived(buildResumeFilename(state.data));

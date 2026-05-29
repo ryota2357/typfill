@@ -9,12 +9,14 @@ const isDate = is.ObjectOf({
   month: is.Number,
   day: is.Number,
 });
+export type PlainDate = PredicateType<typeof isDate>;
 
 const isParty = is.ObjectOf({
   name: is.String,
   "postal-code": is.String,
   address: is.String,
 });
+export type Party = PredicateType<typeof isParty>;
 
 const isAccount = is.ObjectOf({
   bank: is.String,
@@ -23,15 +25,17 @@ const isAccount = is.ObjectOf({
   number: is.String,
   holder: is.String,
 });
+export type Account = PredicateType<typeof isAccount>;
 
-const isItem = is.ObjectOf({
+const isInvoiceItem = is.ObjectOf({
   name: is.String,
   amount: is.Number,
   unit: is.String,
   price: is.Number,
 });
+export type InvoiceItem = PredicateType<typeof isInvoiceItem>;
 
-export const isFields = is.ObjectOf({
+export const isTemplateProps = is.ObjectOf({
   title: is.String,
   date: is.UnionOf([is.LiteralOf("auto"), isDate]),
   "invoice-number-series": is.Number,
@@ -39,16 +43,9 @@ export const isFields = is.ObjectOf({
   recipient: isParty,
   issuer: isParty,
   account: isAccount,
-  items: is.ArrayOf(isItem),
+  items: is.ArrayOf(isInvoiceItem),
   "min-item-rows": is.Number,
   "tax-rate": is.Number,
   body: is.String,
 });
-
-export type Fields = PredicateType<typeof isFields>;
-
-// Per-field shape aliases. Only named when the same shape appears on 2+ fields
-// or when the alias carries a distinct semantic label worth surfacing to
-// consumers; single-use shapes are accessed via `Fields["…"]` directly.
-export type Party = Fields["recipient"]; // shared by recipient / issuer
-export type InvoiceItem = Fields["items"][number]; // referenced by form UI
+export type TemplateProps = PredicateType<typeof isTemplateProps>;

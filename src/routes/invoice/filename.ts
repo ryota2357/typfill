@@ -1,9 +1,9 @@
-import type { Fields } from "$lib/templates/invoice";
+import type { TemplateProps } from "$lib/templates/invoice";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function buildInvoiceFilename(
-  data: Fields,
+  data: TemplateProps,
   now: Date = new Date(),
 ): string {
   const d =

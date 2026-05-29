@@ -1,4 +1,4 @@
-import type { Fields } from "./schema";
+import type { TemplateProps } from "./schema";
 
 // Layout defaults track the upstream Typst template signature; see
 // `template/lib.typ`.
@@ -9,7 +9,7 @@ const LAYOUT_DEFAULTS = {
   志望動機の高さ: "22em",
   本人希望記入欄の高さ: "10em",
 } satisfies Pick<
-  Fields,
+  TemplateProps,
   | "学歴・職歴の最小行数"
   | "学歴と職歴の間の空行数"
   | "免許・資格の最小行数"
@@ -17,7 +17,7 @@ const LAYOUT_DEFAULTS = {
   | "本人希望記入欄の高さ"
 >;
 
-export const EMPTY_FIELDS: Fields = {
+export const EMPTY_PROPS: TemplateProps = {
   日付: "auto",
   氏名: { 姓: "", 名: "" },
   氏名ふりがな: { 姓: "", 名: "" },
@@ -34,7 +34,7 @@ export const EMPTY_FIELDS: Fields = {
   ...LAYOUT_DEFAULTS,
 };
 
-export const SAMPLE_FIELDS: Fields = {
+export const SAMPLE_PROPS: TemplateProps = {
   日付: "auto",
   氏名: { 姓: "履歴書", 名: "太郎" },
   氏名ふりがな: { 姓: "りれきしょ", 名: "たろう" },
