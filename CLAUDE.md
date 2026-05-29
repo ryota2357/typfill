@@ -2,103 +2,70 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project
-
-Typfill is a SvelteKit + Tailwind app that runs Typst (WASM, Web Worker) entirely in the browser to generate PDFs from form-driven templates (Japanese 履歴書 / 請求書). It deploys as a fully static SPA on Cloudflare Pages — no server runtime.
+Typfill is a SvelteKit + Tailwind app that runs Typst (WASM, Web Worker) entirely in the browser to generate PDFs from form-driven templates (Japanese 履歴書 / 請求書). It ships as a fully static SPA on Cloudflare Pages — no server runtime.
 
 ## Commands
 
-Package manager is **pnpm** (npm is not on PATH).
+```sh
+pnpm dev            # Vite dev server
+pnpm build          # production build → build/ (Cloudflare Pages, see wrangler.toml)
+pnpm test           # vitest run, both projects; test:unit to watch; `pnpm vitest run <file>` for one
+pnpm typecheck      # svelte-check, NOT tsc
+pnpm check          # Biome lint+format check (read-only); check:write to fix
+```
 
-- `pnpm dev` — Vite dev server.
-- `pnpm build` — production build (output: `build/`, consumed by Cloudflare Pages via `wrangler.toml`).
-- `pnpm typecheck` — `svelte-check`.
-- `pnpm check` — biome format & lint check.
-- `pnpm test` — vitest (both browser + node projects, single run). `pnpm test:unit` for watch.
-- `pnpm check:write` — biome format & lint fix.
+`pnpm` only — `npm` is not on PATH.
 
-Single test: `pnpm vitest run path/to/file.spec.ts` (or `.svelte.spec.ts` for the browser project).
-
-### Test file conventions
-
-Vitest runs two projects (`vite.config.ts`):
-- `*.svelte.spec.ts` / `*.svelte.test.ts` → **client** project (Playwright/Chromium, headless).
-- `*.spec.ts` / `*.test.ts` → **server** project (node environment).
-
-Place `.svelte.spec.ts` only when the test mounts a component or needs a browser; pure logic stays `.spec.ts`.
+Vitest runs two projects (`vite.config.ts`): `*.svelte.spec.ts` → **client** (Playwright/Chromium), everything else `*.spec.ts` → **server** (node). Use `.svelte.spec.ts` only when a test mounts a component or needs a browser.
 
 ## Architecture
 
-### Three-layer pipeline
+The data path, per template:
 
 ```
-Form (Svelte 5 runes)  →  codegen.ts (TS → main.typ string)  →  Worker (Typst WASM compile + render)
+Form (Svelte 5 runes)  →  codegen.ts (data → main.typ string)  →  Worker (Typst WASM compile → SVG / PDF)
 ```
 
-Each template lives in `src/lib/templates/<name>/` with a stable public surface:
+**Templates** (`src/lib/templates/<name>/`) — each has a fixed public surface that consumers reach via `import * as template from "$lib/templates/<name>"`:
+- `index.ts` — the only public exports (`templateId`, `label`, `storageKey`, `serialize`/`deserialize`, `buildCompileInputs`, `EMPTY_FIELDS`/`SAMPLE_FIELDS`, `Fields` type).
+- `schema.ts` — `is*` predicates (`@core/unknownutil`); `Fields = PredicateType<typeof isFields>` (single source, no parallel type+predicate).
+- `codegen.ts` — builds the `main.typ` string from data.
+- `compile.ts` — assembles `mainTyp` + `?raw`-imported `template/lib.typ` + binary assets into `CompileInputs`.
+- `template/` — the actual Typst sources, a **git submodule** from `ryota2357/typst-<name>-template` (fresh clones need `git submodule update --init`). Edit `.typ` upstream; here you only bump the pointer (and `codegen.ts`/`schema.ts` if the call surface changed).
 
-- `index.ts` — only public exports: `templateId`, `label`, `storageKey`, `serialize`/`deserialize` (from `createCodec`), `buildCompileInputs`, `EMPTY_FIELDS`/`SAMPLE_FIELDS`, plus `Fields` type. Consumers always do `import * as template from "$lib/templates/<name>"`.
-- `schema.ts` — `is*` predicates via `@core/unknownutil`; `Fields` type is `PredicateType<typeof isFields>` (no parallel type/predicate definitions).
-- `codegen.ts` — builds `main.typ` from data.
-- `compile.ts` — wires the per-call generated `mainTyp` together with `?raw`-imported `template/lib.typ` and any binary assets into `CompileInputs`.
-- `template/` — the actual Typst sources. Pulled in as a git submodule from `ryota2357/typst-<name>-template`; fresh clones need `git submodule update --init`. Edits to the `.typ` files belong upstream — the typfill side just bumps the submodule pointer (and updates `codegen.ts`/`schema.ts` if the call surface changed).
+Adding a template touches: the submodule + the files above + `registry.ts` + a `src/routes/<name>/` page (a `+page.svelte` that calls `createTemplateState(template, fresh)` and renders section components from `src/routes/<name>/sections/`).
 
-Adding a new template = add the upstream Typst repo as a submodule at `src/lib/templates/<name>/template`, fill in the surrounding `index.ts`/`schema.ts`/`codegen.ts`/`compile.ts`/`defaults.ts`, append it to `src/lib/templates/registry.ts`, and add a `src/routes/<name>/` page that imports it and renders `<TemplateEditor>`. Each route follows the same shape: `+page.svelte` instantiates `createTemplateState(template, fresh)` (see below) and renders a flat list of section components from `src/routes/<name>/sections/`.
+**Codec** (`src/lib/templates/codec.ts`) — one shared serializer for both localStorage autosave and share-URL fragments (JSON + lz-string + URL-safe base64). `createCodec` walks the data tree automatically; `ValueCodec`s cover non-JSON types (photo bytes), `sanitizeForShare` strips fields from share payloads (resume drops 写真).
 
-### Codec (`src/lib/templates/codec.ts`)
+**Typst worker** (`src/lib/typst/`) — `worker.ts` is the *only* code that touches `@myriaddreamin/typst.ts`. `worker-client.ts` wraps it in a Promise-based `TypstClient` (`compile()` → SVG, `exportPdf()` → Uint8Array), honoring `AbortSignal` + `timeoutMs`. On timeout the worker is terminated (WASM can't be interrupted mid-compile) and recreated lazily. Single-threaded → no COOP/COEP headers → plain static hosting works. Entry path is fixed at `MAIN_TYP_PATH`; templates supply its contents.
 
-Single shared serializer used for both `localStorage` autosave and share-URL fragments. `createCodec({ schemaVersion, isFields, valueCodecs?, sanitizeForShare? })` walks the data tree automatically — templates do not write per-shape `toWire`/`fromWire`. JSON + lz-string + URL-safe base64. `ValueCodec`s handle non-JSON runtime types (`UINT8ARRAY_CODEC` for photo bytes). `sanitizeForShare` lets a template strip fields from share payloads (resume strips 写真).
+**External binary assets** (`src/lib/typst/` + `scripts/`) — the compiler/renderer WASM and font are too large for Cloudflare's 25 MiB per-file limit, so they live in an R2 bucket and the worker fetches them at runtime. `scripts/external-assets.mjs` is the shared manifest (content-hashed filenames) consumed by both `vite.config.ts` (injects `__*_URL__` defines) and `scripts/upload-assets.mjs` (CI uploader), so referenced URLs and uploaded keys can't drift. In dev a Vite middleware serves the same files locally, so contributors need no R2 access. Adding an asset = manifest entry + `__*_URL__` define + `declare const`/use in `worker.ts`.
 
-### Typst worker (`src/lib/typst/`)
+**UI shell** —
+- `components/TemplateEditor.svelte` — generic, template-agnostic frame: 2-column form/preview, mobile tabs, debounced localStorage autosave, share-dialog + share-URL import detection.
+- `templates/state.svelte.ts` — `createTemplateState<T>` bundles the per-route lifecycle (load, decode share import, accept/cancel, reset). `.svelte.ts` is required for `$state`.
+- `components/forms/` — shared form primitives (re-exported via `forms/index.ts`). Per-template `sections/` compose these and live under `src/routes/`, never in `lib/`.
+- `typst/Preview.svelte` + `SandboxedSvg.svelte` — Preview orchestrates compile-debounce, diagnostics, PDF export; SandboxedSvg is the iframe boundary (see Security).
 
-`worker.ts` is the only place that touches `@myriaddreamin/typst.ts`. `worker-client.ts` exposes a `Promise`-based `TypstClient` with `compile()` (SVG) and `exportPdf()` (Uint8Array). Both honor `AbortSignal` (the WASM job still runs to completion; the result is dropped) and a `timeoutMs` option. On timeout, the worker is `terminate()`-ed because Typst WASM cannot be interrupted mid-compile; a fresh worker is created lazily on the next request. Defaults: 10s for `compile`, 20s for `exportPdf`. Each request fully replaces VFS sources and binary assets — no leak across jobs. The fixed entry path is `MAIN_TYP_PATH = "/main.typ"`; templates supply its contents via `CompileInputs.mainTyp`.
-
-Single-threaded — no COOP/COEP headers required, which is what lets the app deploy to plain static hosting.
-
-### External binary assets (R2)
-
-The compiler/renderer wasm and the bundled font are **not** shipped in the Workers static-assets payload — the typst compiler wasm alone is ~28 MiB, past the 25 MiB per-file limit. They live in a Cloudflare R2 public bucket and the worker fetches them at runtime.
-
-- `scripts/external-assets.mjs` is the shared manifest. It hashes each source file (sha256/16 hex chars) into the published filename, e.g. `typst_ts_web_compiler_bg-<hash>.wasm`. Both `vite.config.ts` (build-time URL injection) and `scripts/upload-assets.mjs` (CI uploader) consume it, so the URLs the worker references and the object keys CI puts to R2 cannot drift.
-- `vite.config.ts` injects three URLs via `define`: `__TYPST_COMPILER_WASM_URL__`, `__TYPST_RENDERER_WASM_URL__`, `__FONT_URL__`. They resolve to `${PUBLIC_ASSETS_BASE_URL}/<hashed-filename>` in production builds and to `/_external/<hashed-filename>` in dev — a Vite serve-only middleware streams the same files out of `node_modules` / `cdn-assets/` so contributors don't need any R2 access to run the app.
-- Adding a new external asset = append it to `sources` in `external-assets.mjs`, add a matching `__*_URL__` define in `vite.config.ts`, and `declare const` + use it in `worker.ts`. The CI uploader picks it up automatically.
-
-### Preview (`src/lib/typst/Preview.svelte` + `SandboxedSvg.svelte`)
-
-`Preview.svelte` orchestrates compile-debounce, diagnostics, and PDF export. The compiled SVG is handed to `SandboxedSvg.svelte`, which renders it inside `<iframe srcdoc sandbox="allow-popups allow-popups-to-escape-sandbox">`. Without `allow-scripts` or `allow-same-origin`, attacker-controlled SVG (typst.ts's bundled `<script>`, `<a href="javascript:...">`, `<foreignObject>` HTML reachable from `rawMarkupLit` share-URL content) is inert and can't read the parent origin's localStorage. External `<a target="_blank">` links still work via `allow-popups`. Iframes don't auto-size, so the component derives height from typst.ts's per-page `<svg>` width/height plus a ResizeObserver on its own width.
-
-### Editor shell (`src/lib/components/TemplateEditor.svelte`)
-
-Generic `<TemplateEditor>` is the shared frame: 2-column form/preview layout, mobile tab switch, debounced 500 ms `localStorage` autosave keyed by `template.storageKey`, share-URL hash detection (`parseShareFragment`), and the share dialog. Each route passes its template module + form snippet; the editor stays template-agnostic.
-
-### Template state hook (`src/lib/templates/state.svelte.ts`)
-
-`createTemplateState<T>(template, fresh)` bundles the per-route state lifecycle that both pages share — load from localStorage on mount, decode share-URL imports, accept/cancel the import, reset to a fresh snapshot. Returns a getter/setter object (`state.data`, `state.importPayload`, `state.hasStoredData`, `state.onImport`, `state.acceptImport`, `state.cancelImport`, `state.reset`); routes destructure into `<TemplateEditor>` and `<ImportDialog>` props directly. The `.svelte.ts` extension is mandatory — `$state` requires it. Autosave (`$effect`) and share-URL detection (`onMount`) stay in `TemplateEditor` because they need a component context the hook can't provide.
-
-### Form primitives (`src/lib/components/forms/`)
-
-Public surface re-exported via `forms/index.ts`: `Section` (with `cols={1|2}`), `Field`, `TextInput`, `TextArea`, `MarkupField`, `EntryList` (+ `EntryField` type), `DateInput`, `DateModeRadio`, `PhotoInput`. Per-template section components compose these — they live under `src/routes/<name>/sections/` and never inside `lib/`. The `MarkupField` is the form surface that promises Typst markup support (paired with `rawMarkupLit` in escape.ts; see Security boundary).
-
-### Routing
-
-`src/routes/<template>/+page.ts` sets `ssr = false; prerender = true` because the worker client + WASM imports touch browser-only APIs at module scope. `adapter-static` with `fallback: "index.html"` gives every route a directly-servable file plus a SPA catch-all.
+**Routing** — `src/routes/+layout.ts` sets `ssr = false; prerender = true` once for all routes (worker/WASM imports are browser-only). `adapter-static` with `fallback: "404.html"` (+ `not_found_handling = "404-page"` in `wrangler.toml`) prerenders every route to a servable file and serves a real 404 for unknown paths.
 
 ## Security boundary
 
-`src/lib/typst/escape.ts` is the **only** sanctioned path for embedding user strings into generated `.typ`. Pick the helper based on the field's role:
+User input becomes Typst source at compile time, and compiled output becomes rendered SVG — both are attack surfaces. Two layers contain them; preserve both.
 
-- `plainMarkupLit(s)` — data-value fields (name, address, phone, title, timeline entries, …). Treats the input as literal text: every Typst markup-significant character is escaped, including `=`, `-`, `+`, `/`, `~` so a stray `== 見出し` in a name field doesn't render as a heading.
-- `rawMarkupLit(s)` — opt-in free-text fields whose form surface promises Typst support (`MarkupField`). Emits `eval(string, mode: "markup")` so the user gets full Typst markup including `#link(…)[…]`, `#show`, math, raw blocks. The string is opaque to the outer parser, so unbalanced brackets/backticks in user input stay contained. This permits arbitrary Typst code execution at compile time — that is the intended capability for these fields.
-- `stringLit(s)` — Typst `"..."` string literals (VFS paths such as `写真: "/vfs/photo.png"`).
+**1. Embedding strings into `.typ` — `src/lib/typst/escape.ts` is the only sanctioned path.** Classify every new field and pick the helper, or it becomes a compile-time code-execution vector or a UX leak:
+- `plainMarkupLit` — data-value fields (name, address, timeline entries…). Escapes *all* markup-significant chars so a stray `== 見出し` in a name doesn't render as a heading.
+- `rawMarkupLit` — opt-in free-text fields whose form surface (`MarkupField`) promises Typst support. Emits `eval(…, mode: "markup")` — full markup incl. arbitrary compile-time code. **This is intended** for these fields; user input is opaque to the outer parser so it stays contained.
+- `stringLit` — Typst `"…"` literals (VFS paths like `写真: "/vfs/photo.png"`).
 
-Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`. Adding a new field means classifying it (data-value vs markup-opt-in) and picking the matching helper, or it becomes a code-execution vector at compile time or a UX leak where formatting accidentally renders.
+Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`.
 
-`rawMarkupLit`'s security model relies on two sandboxes layered together: the Typst WASM compiler (no file-system or network access beyond the controlled VFS), and the `<iframe sandbox>` in `SandboxedSvg.svelte` (no `allow-scripts`, no `allow-same-origin`). Together: Typst can run arbitrary `eval` markup but can only emit SVG that the iframe neutralizes — script tags, `javascript:` link targets, and foreignObject HTML all stay inside an origin-isolated frame. Any new SVG-rendering path must preserve that iframe boundary, otherwise share-URL authors regain XSS into the parent origin.
+**2. Rendering the SVG — `SandboxedSvg.svelte`'s `<iframe sandbox>` (no `allow-scripts`, no `allow-same-origin`).** `rawMarkupLit` lets Typst emit arbitrary SVG (script tags, `javascript:` links, foreignObject HTML), but the iframe neutralizes it and isolates it from the parent origin. Any new SVG-rendering path must keep this boundary or share-URL authors regain XSS.
 
 ## Conventions
 
-- Domain field names are intentionally written in Japanese throughout schema / codegen / Typst params (e.g. `氏名`, `現住所`, `免許・資格`). Don't latinize them.
-- Svelte 5 **runes are forced on** for project files (`svelte.config.js`); use `$state`, `$derived`, `$effect`, `$props`.
-- Path alias `$lib` → `src/lib`. Other aliases via SvelteKit config.
-- Biome formats with 2-space indent, double quotes, semicolons, 80-col width.
+- Domain field names are intentionally Japanese throughout schema/codegen/Typst params (`氏名`, `現住所`, `免許・資格`). Don't latinize them.
+- Svelte 5 runes forced on (`svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
+- Path alias `$lib` → `src/lib`.
+- Biome: 2-space indent, double quotes, semicolons, 80-col.
 - Comments document the *why* (constraints, security boundaries, non-obvious bugs); the code names the *what*.
