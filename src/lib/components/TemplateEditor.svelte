@@ -43,6 +43,15 @@
 
   const compileInputs = $derived(template.buildCompileInputs(data));
 
+  // saveState → StatusDot props. A lookup keeps the tone/label pairing in one
+  // place instead of two parallel nested ternaries in the markup.
+  const SAVE_INDICATOR = {
+    saving: { tone: "busy", label: "saving…" },
+    saved: { tone: "neutral", label: "autosaved" },
+    error: { tone: "error", label: "save failed" },
+  } as const;
+  const saveIndicator = $derived(SAVE_INDICATOR[saveState]);
+
   // The initial mount fires this effect once and writes the serialized payload
   // back — idempotent, and doubles as the "saved" signal for the indicator.
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -80,6 +89,21 @@
 
 <svelte:head><title>{template.label} - Typfill</title></svelte:head>
 
+{#snippet tabButton(id: "form" | "preview", label: string)}
+  <button
+    type="button"
+    role="tab"
+    aria-selected={tab === id}
+    onclick={() => (tab = id)}
+    class={[
+      "flex-1 cursor-pointer rounded px-2.5 py-1.5 transition",
+      tab === id ? "bg-white font-semibold shadow-sm" : "text-neutral-500",
+    ]}
+  >
+    {label}
+  </button>
+{/snippet}
+
 <main class="flex h-[100dvh] flex-col text-[13px] leading-[1.55]">
   <header
     class="flex flex-shrink-0 items-center justify-between gap-3 border-b border-neutral-200 px-5 py-2.5"
@@ -102,18 +126,7 @@
     </div>
     <div class="flex items-center gap-2">
       <div class="hidden items-center gap-2 md:flex">
-        <StatusDot
-          tone={saveState === "error"
-            ? "error"
-            : saveState === "saving"
-              ? "busy"
-              : "neutral"}
-          label={saveState === "saving"
-            ? "saving…"
-            : saveState === "error"
-              ? "save failed"
-              : "autosaved"}
-        />
+        <StatusDot {...saveIndicator} />
         <div class="h-4 w-px bg-neutral-200"></div>
       </div>
       <Button onclick={() => (shareOpen = true)}>共有</Button>
@@ -137,34 +150,8 @@
     <div
       class="flex gap-0.5 rounded-md border border-neutral-200 bg-neutral-100 p-0.5"
     >
-      <button
-        type="button"
-        role="tab"
-        aria-selected={tab === "form"}
-        onclick={() => (tab = "form")}
-        class={[
-          "flex-1 cursor-pointer rounded px-2.5 py-1.5 transition",
-          tab === "form"
-            ? "bg-white font-semibold shadow-sm"
-            : "text-neutral-500",
-        ]}
-      >
-        フォーム
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={tab === "preview"}
-        onclick={() => (tab = "preview")}
-        class={[
-          "flex-1 cursor-pointer rounded px-2.5 py-1.5 transition",
-          tab === "preview"
-            ? "bg-white font-semibold shadow-sm"
-            : "text-neutral-500",
-        ]}
-      >
-        プレビュー
-      </button>
+      {@render tabButton("form", "フォーム")}
+      {@render tabButton("preview", "プレビュー")}
     </div>
   </div>
 

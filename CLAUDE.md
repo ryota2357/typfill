@@ -67,5 +67,5 @@ Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`.
 - Domain field names are intentionally Japanese throughout schema/codegen/Typst params (`氏名`, `現住所`, `免許・資格`). Don't latinize them.
 - Svelte 5 runes forced on (`svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
 - Path alias `$lib` → `src/lib`.
-- Biome: 2-space indent, double quotes, semicolons, 80-col.
+- Biome: 2-space indent, double quotes, semicolons, 80-col. `.svelte` runs under `experimentalFullSupportEnabled`; the `**/*.svelte` override disables `noCommaOperator` + `noUnusedFunctionParameters` (false positives on function bindings / snippet params) — fix those there, not with per-line `biome-ignore`.
 - Comments document the *why* (constraints, security boundaries, non-obvious bugs); the code names the *what*.

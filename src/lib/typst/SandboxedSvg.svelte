@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { Attachment } from "svelte/attachments";
+  import type { PageDims } from "./svg-pages";
+
   // SVG is rendered inside a sandboxed `<iframe srcdoc>` rather than inlined
   // via `{@html}` because `rawMarkupLit` fields let share-URL authors emit
   // arbitrary Typst — the resulting SVG can include attacker-controlled
@@ -12,53 +15,20 @@
 
   interface Props {
     svg: string;
+    // Parsed once by the parent (Preview) and passed down, so page geometry is
+    // read from a single source. `null` when the SVG can't be measured.
+    pageDims: PageDims | null;
   }
-  let { svg }: Props = $props();
+  let { svg, pageDims }: Props = $props();
 
-  let iframeEl: HTMLIFrameElement | undefined = $state();
   let iframeHeight = $state(0);
-
-  type PageDims = {
-    pageWidth: number;
-    totalHeight: number;
-    pageCount: number;
-  };
-
-  // typst.ts emits one `<svg>` root per page with explicit `width`/`height`
-  // (units like `pt`, `px`). Only the ratio matters here, so the unit suffix
-  // is dropped and the numbers are treated as relative.
-  function parsePageDims(svgText: string): PageDims | null {
-    const opens = [...svgText.matchAll(/<svg\b[^>]*>/g)];
-    if (opens.length === 0) return null;
-    let pageWidth = 0;
-    let totalHeight = 0;
-    for (const m of opens) {
-      const tag = m[0];
-      const w =
-        Number.parseFloat(tag.match(/\bwidth="([\d.]+)/)?.[1] ?? "") ||
-        Number.parseFloat(
-          tag.match(/\bviewBox="[\d.\s-]*?\s([\d.]+)\s+[\d.]+"/)?.[1] ?? "",
-        );
-      const h =
-        Number.parseFloat(tag.match(/\bheight="([\d.]+)/)?.[1] ?? "") ||
-        Number.parseFloat(
-          tag.match(/\bviewBox="[\d.\s-]*?\s([\d.]+)"/)?.[1] ?? "",
-        );
-      if (!w || !h) continue;
-      if (!pageWidth) pageWidth = w;
-      totalHeight += h;
-    }
-    if (!pageWidth || !totalHeight) return null;
-    return { pageWidth, totalHeight, pageCount: opens.length };
-  }
 
   // Must stay in sync with the iframe srcdoc CSS below — the height estimate
   // adds these as fixed pixels independent of page scale.
   const PAGE_GAP_PX = 12;
   const BODY_PADDING_PX = 16;
 
-  let pageDims = $derived(parsePageDims(svg));
-  let srcdoc = $derived(buildSrcdoc(svg));
+  const srcdoc = $derived(buildSrcdoc(svg));
 
   function buildSrcdoc(svgText: string): string {
     return [
@@ -73,13 +43,14 @@
     ].join("");
   }
 
-  // Iframes don't auto-size, and `sandbox` without `allow-scripts` rules out
-  // a postMessage resize from inside. Compute the height by mirroring the
-  // `max-width:100%` page scale against the iframe's own width.
-  $effect(() => {
-    const el = iframeEl;
+  // Iframes don't auto-size, and `sandbox` without `allow-scripts` rules out a
+  // postMessage resize from inside. Mirror the srcdoc's `max-width:100%` page
+  // scale against the iframe's own width to compute the height. As an
+  // attachment the ResizeObserver is bound to the iframe's lifecycle and
+  // re-runs whenever `pageDims` changes (a new compile → new page geometry).
+  const sizeToContent: Attachment<HTMLIFrameElement> = (el) => {
     const dims = pageDims;
-    if (!el || !dims) {
+    if (!dims) {
       iframeHeight = 0;
       return;
     }
@@ -96,14 +67,14 @@
     });
     obs.observe(el);
     return () => obs.disconnect();
-  });
+  };
 </script>
 
 <iframe
-  bind:this={iframeEl}
   title="Typst preview"
   {srcdoc}
   sandbox={SANDBOX}
   style:height={iframeHeight ? `${iframeHeight}px` : "100%"}
   class="block w-full border-0"
+  {@attach sizeToContent}
 ></iframe>

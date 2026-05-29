@@ -1,13 +1,10 @@
 <script lang="ts">
-  import {
-    ImportDialog,
-    type PreviewItem,
-    TemplateEditor,
-  } from "$lib/components";
+  import { ImportDialog, TemplateEditor } from "$lib/components";
   import { MarkupField } from "$lib/components/forms";
   import * as template from "$lib/templates/resume";
   import { createTemplateState } from "$lib/templates/state.svelte";
   import { buildResumeFilename } from "./filename";
+  import { buildResumePreviewItems } from "./preview";
   import Address from "./sections/Address.svelte";
   import Advanced from "./sections/Advanced.svelte";
   import DocumentDate from "./sections/DocumentDate.svelte";
@@ -20,59 +17,8 @@
   );
 
   const filename = $derived(buildResumeFilename(state.data));
-
-  function truncate(s: string, max: number): string {
-    return s.length > max ? `${s.slice(0, max)}…` : s;
-  }
-
-  function addressPreview(c: template.Contact): string {
-    const postal = c.郵便番号.trim();
-    const addr = c.住所.trim();
-    if (!postal && !addr) return "（未設定）";
-    const postalPart = postal ? `〒${postal}` : "";
-    const addrPart = addr ? truncate(addr, 30) : "";
-    return [postalPart, addrPart].filter(Boolean).join(" ");
-  }
-
-  function formatDate(d: { year: number; month: number; day: number }): string {
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.year}-${pad(d.month)}-${pad(d.day)}`;
-  }
-
-  const previewItems = $derived<readonly PreviewItem[]>(
-    state.importPayload === null
-      ? []
-      : (() => {
-          const p = state.importPayload;
-          const fullName = (p.氏名.姓 + p.氏名.名).trim() || "（未設定）";
-          return [
-            { label: "氏名", value: fullName, format: "break-all" },
-            {
-              label: "生年月日",
-              value: formatDate(p.生年月日),
-              format: "tabular",
-            },
-            {
-              label: "現住所",
-              value: addressPreview(p.現住所),
-              format: "break-all",
-            },
-            {
-              label: "連絡先",
-              value: addressPreview(p.連絡先),
-              format: "break-all",
-            },
-            { label: "学歴", value: `${p.学歴.length} 件` },
-            { label: "職歴", value: `${p.職歴.length} 件` },
-            { label: "免許・資格", value: `${p["免許・資格"].length} 件` },
-            { label: "志望動機", value: `${p.志望動機.length} 文字` },
-            {
-              label: "本人希望記入欄",
-              value: `${p.本人希望記入欄.length} 文字`,
-            },
-            { label: "写真", value: p.写真 ? "あり" : "なし" },
-          ];
-        })(),
+  const previewItems = $derived(
+    state.importPayload ? buildResumePreviewItems(state.importPayload) : [],
   );
 </script>
 

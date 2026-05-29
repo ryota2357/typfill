@@ -50,9 +50,7 @@
   }
 </script>
 
-{#snippet rowControl(
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: Biome doesn't track usage in snippet yet
-  props: {
+{#snippet rowControl(props: {
   ariaLabel: string;
   icon: Component<{ size: number }>;
   onclick: () => void;

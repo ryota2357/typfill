@@ -45,10 +45,9 @@
     <span>指定する</span>
   </label>
   {#if value !== "auto"}
-    <DateInput
-      bind:value={// biome-ignore lint/complexity/noCommaOperator: Biome doesn't support svelte function bindings syntax
-      () => value as DateRecord,
-      (v) => value = v}
-    />
+    <!-- Function binding: the parent holds "auto" | DateRecord, but inside this
+         block value is always a DateRecord, so the getter narrows it for the
+         child while the setter writes back. -->
+    <DateInput bind:value={() => value as DateRecord, (v) => (value = v)} />
   {/if}
 </div>

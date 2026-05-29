@@ -29,7 +29,12 @@
   };
 </script>
 
-<Dialog title="共有リンクから読み込み" onclose={oncancel} size="md">
+<Dialog
+  title="共有リンクから読み込み"
+  onclose={oncancel}
+  size="md"
+  closeOnBackdropClick={false}
+>
   <p class="text-[13px] text-neutral-700">
     この URL には{dataLabel}が含まれています。読み込みますか？
   </p>

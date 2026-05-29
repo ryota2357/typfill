@@ -3,6 +3,7 @@
   import { Button, StatusDot } from "$lib/components";
   import type { CompileInputs, TypstDiagnostic } from "./protocol";
   import SandboxedSvg from "./SandboxedSvg.svelte";
+  import { parsePageDims } from "./svg-pages";
   import { type TypstClient, TypstCompileError } from "./worker-client";
 
   interface Props {
@@ -24,10 +25,24 @@
   let exporting = $state(false);
   let lastCompileMs = $state(0);
 
-  // typst.ts emits one `<svg>` root per page; count opening tags. SandboxedSvg
-  // does the same parse internally and isn't exported, so the count is
-  // duplicated here rather than threading state across components.
-  const pageCount = $derived((svg.match(/<svg\b/g) ?? []).length);
+  // status → StatusDot props. Built inside `$derived` because the `ready`
+  // label interpolates the latest compile time; `as const` keeps the tones as
+  // literals so they satisfy StatusDot's `tone` union.
+  const compileIndicator = $derived(
+    (
+      {
+        booting: { tone: "busy", label: "ワーカー起動中…" },
+        compiling: { tone: "busy", label: "compiling…" },
+        ready: { tone: "ok", label: `compiled · ${lastCompileMs} ms` },
+        failed: { tone: "error", label: "compile failed" },
+      } as const
+    )[status],
+  );
+
+  // Parsed once here and threaded into SandboxedSvg, which uses it for the
+  // iframe height; the footer reads the page count from the same source.
+  const pageDims = $derived(parsePageDims(svg));
+  const pageCount = $derived(pageDims?.pageCount ?? 0);
 
   // Zoom controls (−/100%/+) intentionally omitted: POC scaling conflicted
   // with SandboxedSvg's ResizeObserver-driven height — the rescaled iframe
@@ -109,20 +124,7 @@
   <div
     class="flex flex-shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-2.5"
   >
-    <StatusDot
-      tone={status === "ready"
-        ? "ok"
-        : status === "failed"
-          ? "error"
-          : "busy"}
-      label={status === "booting"
-        ? "ワーカー起動中…"
-        : status === "compiling"
-          ? "compiling…"
-          : status === "ready"
-            ? `compiled · ${lastCompileMs} ms`
-            : "compile failed"}
-    />
+    <StatusDot {...compileIndicator} />
     <Button
       variant="primary"
       onclick={downloadPdf}
@@ -162,7 +164,7 @@
 
   <div class="flex min-h-0 flex-1 justify-center overflow-auto p-6">
     {#if svg}
-      <SandboxedSvg {svg} />
+      <SandboxedSvg {svg} {pageDims} />
     {:else if status === "booting"}
       <p class="self-center text-neutral-500">ワーカーを起動中…</p>
     {:else if status === "compiling"}

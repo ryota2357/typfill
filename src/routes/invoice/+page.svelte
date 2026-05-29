@@ -1,13 +1,10 @@
 <script lang="ts">
-  import {
-    ImportDialog,
-    type PreviewItem,
-    TemplateEditor,
-  } from "$lib/components";
+  import { ImportDialog, TemplateEditor } from "$lib/components";
   import { MarkupField } from "$lib/components/forms";
   import * as template from "$lib/templates/invoice";
   import { createTemplateState } from "$lib/templates/state.svelte";
   import { buildInvoiceFilename } from "./filename";
+  import { buildInvoicePreviewItems } from "./preview";
   import Account from "./sections/Account.svelte";
   import Advanced from "./sections/Advanced.svelte";
   import Basics from "./sections/Basics.svelte";
@@ -26,46 +23,8 @@
   const state = createTemplateState(template, freshProps);
 
   const filename = $derived(buildInvoiceFilename(state.data));
-
-  function formatDate(d: { year: number; month: number; day: number }): string {
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.year}-${pad(d.month)}-${pad(d.day)}`;
-  }
-
-  const previewItems = $derived<readonly PreviewItem[]>(
-    state.importPayload === null
-      ? []
-      : (() => {
-          const p = state.importPayload;
-          return [
-            {
-              label: "タイトル",
-              value: p.title || "（未設定）",
-              format: "break-all",
-            },
-            {
-              label: "発行日",
-              value: p.date === "auto" ? "自動（発行時）" : formatDate(p.date),
-              format: "tabular",
-            },
-            {
-              label: "支払期限",
-              value: formatDate(p["due-date"]),
-              format: "tabular",
-            },
-            {
-              label: "請求先",
-              value: p.recipient.name || "（未設定）",
-              format: "break-all",
-            },
-            {
-              label: "請求元",
-              value: p.issuer.name || "（未設定）",
-              format: "break-all",
-            },
-            { label: "項目", value: `${p.items.length} 件` },
-          ];
-        })(),
+  const previewItems = $derived(
+    state.importPayload ? buildInvoicePreviewItems(state.importPayload) : [],
   );
 </script>
 
