@@ -91,7 +91,6 @@
   <Address label="現住所" value={state.data.現住所} />
   <Address label="連絡先（現住所と異なる場合のみ）" value={state.data.連絡先} />
   <Timeline label="学歴" items={state.data.学歴} />
-  <Timeline label="学歴" items={state.data.学歴} />
   <Timeline label="職歴" items={state.data.職歴} />
   <Timeline label="免許・資格" items={state.data["免許・資格"]} />
   <MarkupField label="志望動機" bind:value={state.data.志望動機} />
