@@ -37,10 +37,10 @@
   },
   "dependencies": {
     "@core/unknownutil": "jsr:4.4.0-pre.1",
-    "@lucide/svelte": "1.16.0",
-    "@myriaddreamin/typst-ts-renderer": "0.7.0-rc2",
-    "@myriaddreamin/typst-ts-web-compiler": "0.7.0-rc2",
-    "@myriaddreamin/typst.ts": "0.7.0-rc2",
+    "@lucide/svelte": "1.17.0",
+    "@myriaddreamin/typst-ts-renderer": "0.7.0",
+    "@myriaddreamin/typst-ts-web-compiler": "0.7.0",
+    "@myriaddreamin/typst.ts": "0.7.0",
     "lz-string": "1.5.0"
   }
 }
