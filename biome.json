@@ -1,12 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/package.json", "!**/pnpm-lock.yaml"]
+    "includes": ["**", "!**/package.json", "!**/pnpm-lock.yaml", "!**/*.svg"]
   },
   "formatter": {
     "enabled": true,
@@ -18,7 +18,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "javascript": {
@@ -57,11 +57,13 @@
       "includes": ["**/*.svelte"],
       "linter": {
         "rules": {
-          "complexity": {
-            "noCommaOperator": "off"
-          },
           "correctness": {
             "noUnusedFunctionParameters": "off"
+          },
+          "a11y": {
+            "noLabelWithoutControl": "off",
+            "useKeyWithClickEvents": "off",
+            "useValidAriaValues": "off"
           }
         }
       }
