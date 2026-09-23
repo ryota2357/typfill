@@ -1,5 +1,6 @@
 import * as invoice from "./invoice";
 import * as resume from "./resume";
+import * as soufujo from "./soufujo";
 
 // Thin catalog surfaced to the landing page. Each template namespace module
 // exports `templateId` + `label`; the catalog adds presentation fields
@@ -31,6 +32,14 @@ export const catalog = [
     repo: "ryota2357/typst-invoice-template",
     enabled: true,
     href: "/invoice",
+  },
+  {
+    templateId: soufujo.templateId,
+    label: soufujo.label,
+    sub: "Cover Letter",
+    repo: "ryota2357/typst-soufujo-template",
+    enabled: true,
+    href: "/soufujo",
   },
 ] as const satisfies readonly CatalogEntry[];
 

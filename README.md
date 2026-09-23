@@ -9,6 +9,7 @@ Nothing is sent to a server — compilation runs in-browser via WebAssembly.
 
 - 履歴書 ([ryota2357/typst-resume-template](https://github.com/ryota2357/typst-resume-template))
 - 請求書 ([ryota2357/typst-invoice-template](https://github.com/ryota2357/typst-invoice-template))
+- 送付状 ([ryota2357/typst-soufujo-template](https://github.com/ryota2357/typst-soufujo-template))
 
 ## Stack
 

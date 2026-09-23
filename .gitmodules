@@ -4,3 +4,6 @@
 [submodule "src/lib/templates/resume/template"]
 	path = src/lib/templates/resume/template
 	url = https://github.com/ryota2357/typst-resume-template.git
+[submodule "src/lib/templates/soufujo/template"]
+	path = src/lib/templates/soufujo/template
+	url = https://github.com/ryota2357/typst-soufujo-template.git
