@@ -48,8 +48,7 @@
   {/snippet}
 
   <p class="text-[13px] text-neutral-700">
-    URL のフラグメント（<code class="font-mono text-[12px]"
-      >#…</code
+    URL のフラグメント（<code class="font-mono text-[12px]">#…</code
     >）に圧縮して埋め込みます。個人情報はサーバーに送信されません。
   </p>
 

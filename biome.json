@@ -57,13 +57,9 @@
       "includes": ["**/*.svelte"],
       "linter": {
         "rules": {
-          "correctness": {
-            "noUnusedFunctionParameters": "off"
-          },
           "a11y": {
             "noLabelWithoutControl": "off",
-            "useKeyWithClickEvents": "off",
-            "useValidAriaValues": "off"
+            "useKeyWithClickEvents": "off"
           }
         }
       }

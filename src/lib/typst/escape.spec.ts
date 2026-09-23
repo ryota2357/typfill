@@ -122,14 +122,17 @@ describe("rawMarkupLit", () => {
     ["unclosed raw block", "`unclosed"],
     ["unclosed math", "$unclosed"],
     ["nested unbalanced open", "x[y"],
-  ])("wraps adversarial input %s as a well-formed eval call", (_name, input) => {
-    const wrapped = rawMarkupLit(input);
-    // The wrapper has a well-formed outer shape `eval("...", mode: "markup")`.
-    // What's inside the quotes is opaque to the Typst parser at the call site —
-    // it's an atomic string token followed by a named argument.
-    expect(wrapped.startsWith('eval("')).toBe(true);
-    expect(wrapped.endsWith('", mode: "markup")')).toBe(true);
-  });
+  ])(
+    "wraps adversarial input %s as a well-formed eval call",
+    (_name, input) => {
+      const wrapped = rawMarkupLit(input);
+      // The wrapper has a well-formed outer shape `eval("...", mode: "markup")`.
+      // What's inside the quotes is opaque to the Typst parser at the call site —
+      // it's an atomic string token followed by a named argument.
+      expect(wrapped.startsWith('eval("')).toBe(true);
+      expect(wrapped.endsWith('", mode: "markup")')).toBe(true);
+    },
+  );
 });
 
 describe("escapeString", () => {
