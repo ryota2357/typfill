@@ -17,7 +17,7 @@ describe("DateModeRadio — manual mode editing", () => {
       value: { year: 2020, month: 1, day: 2 },
     });
 
-    const screen = render(DateModeRadio, {
+    const screen = await render(DateModeRadio, {
       props: {
         get value() {
           return bound.value;
