@@ -16,6 +16,6 @@
 </script>
 
 <span class="flex items-center gap-1.5 font-mono text-[11px] text-neutral-500">
-  <span class={["h-1.5 w-1.5 rounded-full", DOT_TONE[tone]]}></span>
+  <span class={["size-1.5 rounded-full", DOT_TONE[tone]]}></span>
   {label}
 </span>

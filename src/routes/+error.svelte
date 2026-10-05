@@ -25,9 +25,9 @@
 
 <svelte:head><title>{status} · Typfill</title></svelte:head>
 
-<div class="flex min-h-[100dvh] flex-col">
+<div class="flex min-h-dvh flex-col">
   <header
-    class="flex flex-shrink-0 items-center justify-between border-b border-divider px-8 py-4 font-mono text-[12px]"
+    class="flex shrink-0 items-center justify-between border-b border-divider px-8 py-4 font-mono text-[12px]"
   >
     <a
       href="/"
@@ -111,7 +111,7 @@
   </main>
 
   <footer
-    class="flex flex-shrink-0 items-center justify-between border-t border-divider px-8 py-4 font-mono text-[11px] text-neutral-400"
+    class="flex shrink-0 items-center justify-between border-t border-divider px-8 py-4 font-mono text-[11px] text-neutral-400"
   >
     <span>HTTP {status} · {status === 404 ? "Not Found" : "Error"}</span>
     <a

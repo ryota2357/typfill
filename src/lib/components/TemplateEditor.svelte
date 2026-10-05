@@ -115,9 +115,9 @@
   </button>
 {/snippet}
 
-<main class="flex h-[100dvh] flex-col text-[13px] leading-[1.55]">
+<main class="flex h-dvh flex-col text-[13px] leading-[1.55]">
   <header
-    class="flex flex-shrink-0 items-center justify-between gap-3 border-b border-neutral-200 px-5 py-2.5"
+    class="flex shrink-0 items-center justify-between gap-3 border-b border-neutral-200 px-5 py-2.5"
   >
     <div class="flex min-w-0 items-baseline gap-3">
       <a
@@ -147,14 +147,14 @@
 
   {#if importError}
     <p
-      class="flex-shrink-0 border-b border-red-200 bg-red-50 px-5 py-2 text-[12px] text-red-800"
+      class="shrink-0 border-b border-red-200 bg-red-50 px-5 py-2 text-[12px] text-red-800"
     >
       共有リンクの読み込みに失敗: {importError}
     </p>
   {/if}
 
   <div
-    class="flex-shrink-0 border-b border-neutral-200 bg-white px-3 py-2 md:hidden"
+    class="shrink-0 border-b border-neutral-200 bg-white px-3 py-2 md:hidden"
     role="tablist"
     aria-label="画面切り替え"
   >

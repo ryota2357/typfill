@@ -125,7 +125,7 @@
 
 <div class="flex h-full min-h-0 flex-col bg-neutral-50">
   <div
-    class="flex flex-shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-2.5"
+    class="flex shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white px-4 py-2.5"
   >
     <StatusDot {...compileIndicator} />
     <Button
@@ -139,13 +139,13 @@
 
   {#if error}
     <pre
-      class="flex-shrink-0 border-b border-red-200 bg-red-50 px-4 py-2 text-[11px] whitespace-pre-wrap text-red-800"
+      class="shrink-0 border-b border-red-200 bg-red-50 px-4 py-2 text-[11px] whitespace-pre-wrap text-red-800"
     >{error}</pre>
   {/if}
 
   {#if diagnostics.length > 0}
     <ul
-      class="flex-shrink-0 max-h-32 space-y-0.5 overflow-y-auto border-b border-neutral-200 bg-white px-4 py-2 text-[11px]"
+      class="shrink-0 max-h-32 space-y-0.5 overflow-y-auto border-b border-neutral-200 bg-white px-4 py-2 text-[11px]"
     >
       {#each diagnostics as d, i (i)}
         <li class={d.severity === "error" ? "text-red-800" : "text-yellow-900"}>
@@ -176,11 +176,11 @@
   </div>
 
   <div
-    class="flex flex-shrink-0 items-center justify-between gap-2 border-t border-neutral-200 bg-white px-4 py-2 font-mono text-[11px] text-neutral-400"
+    class="flex shrink-0 items-center justify-between gap-2 border-t border-neutral-200 bg-white px-4 py-2 font-mono text-[11px] text-neutral-400"
   >
-    <span class="overflow-hidden text-ellipsis whitespace-nowrap">
+    <span class="truncate">
       {downloadName}
     </span>
-    <span class="flex-shrink-0">A4 · {pageCount || 1}p</span>
+    <span class="shrink-0">A4 · {pageCount || 1}p</span>
   </div>
 </div>
