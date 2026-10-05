@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { Button, StatusDot } from "#lib/components/index.ts";
   import type { CompileInputs, TypstDiagnostic } from "./protocol.ts";
   import SandboxedSvg from "./SandboxedSvg.svelte";
   import { parsePageDims } from "./svg-pages.ts";
-  import { type TypstClient, TypstCompileError } from "./worker-client.ts";
+  import {
+    createTypstClient,
+    type TypstClient,
+    TypstCompileError,
+  } from "./worker-client.ts";
 
   interface Props {
     inputs: CompileInputs;
@@ -52,15 +56,14 @@
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let activeAbort: AbortController | null = null;
 
-  onMount(async () => {
-    const { createTypstClient } = await import("./worker-client.ts");
-    client = createTypstClient();
-  });
-
-  onDestroy(() => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    activeAbort?.abort();
-    client?.dispose();
+  onMount(() => {
+    const c = createTypstClient();
+    client = c;
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      activeAbort?.abort();
+      c.dispose();
+    };
   });
 
   $effect(() => {
