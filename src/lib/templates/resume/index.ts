@@ -2,15 +2,15 @@
 // `import * as template from "#lib/templates/resume/index.ts"` and rely on
 // the exports below; nothing else in this directory is considered public.
 
-import { createCodec, UINT8ARRAY_CODEC } from "../codec";
-import { isTemplateProps, type TemplateProps } from "./schema";
+import { createCodec, UINT8ARRAY_CODEC } from "../codec.ts";
+import { isTemplateProps, type TemplateProps } from "./schema.ts";
 
 export const templateId = "resume" as const;
 export const label = "履歴書";
 export const storageKey = "typfill.resume.v1";
 
-export { buildCompileInputs } from "./compile";
-export { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
+export { buildCompileInputs } from "./compile.ts";
+export { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults.ts";
 export type {
   Contact,
   Name,
@@ -18,7 +18,7 @@ export type {
   PlainDate,
   TemplateProps,
   TimelineEntry,
-} from "./schema";
+} from "./schema.ts";
 
 export const { serialize, deserialize, schemaVersion } =
   createCodec<TemplateProps>({

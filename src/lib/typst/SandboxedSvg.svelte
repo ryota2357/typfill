@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Attachment } from "svelte/attachments";
-  import type { PageDims } from "./svg-pages";
+  import type { PageDims } from "./svg-pages.ts";
 
   // SVG is rendered inside a sandboxed `<iframe srcdoc>` rather than inlined
   // via `{@html}` because `rawMarkupLit` fields let share-URL authors emit

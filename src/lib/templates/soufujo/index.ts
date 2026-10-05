@@ -3,22 +3,22 @@
 // rely on the exports below; nothing else in this directory is considered
 // public.
 
-import { createCodec } from "../codec";
-import { isTemplateProps, type TemplateProps } from "./schema";
+import { createCodec } from "../codec.ts";
+import { isTemplateProps, type TemplateProps } from "./schema.ts";
 
 export const templateId = "soufujo" as const;
 export const label = "送付状";
 export const storageKey = "typfill.soufujo.v1";
 
-export { buildCompileInputs } from "./compile";
-export { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
+export { buildCompileInputs } from "./compile.ts";
+export { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults.ts";
 export type {
   Enclosure,
   PlainDate,
   Recipient,
   Sender,
   TemplateProps,
-} from "./schema";
+} from "./schema.ts";
 
 export const { serialize, deserialize, schemaVersion } =
   createCodec<TemplateProps>({

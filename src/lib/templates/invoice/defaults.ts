@@ -1,4 +1,4 @@
-import type { Account, Party, PlainDate, TemplateProps } from "./schema";
+import type { Account, Party, PlainDate, TemplateProps } from "./schema.ts";
 
 const EMPTY_PARTY: Party = { name: "", "postal-code": "", address: "" };
 const EMPTY_ACCOUNT: Account = {

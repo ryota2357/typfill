@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { buildMainTyp } from "./codegen";
-import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
-import type { TemplateProps } from "./schema";
+import { buildMainTyp } from "./codegen.ts";
+import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults.ts";
+import type { TemplateProps } from "./schema.ts";
 
 function clone(data: TemplateProps): TemplateProps {
   return structuredClone(data);

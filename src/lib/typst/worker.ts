@@ -13,7 +13,7 @@ import {
   type TypstRequest,
   type TypstResponse,
   type TypstSources,
-} from "./protocol";
+} from "./protocol.ts";
 
 // URLs are injected via Vite `define` (see vite.config.ts). In production
 // they point at the R2 public bucket; in dev they resolve to /_external/...

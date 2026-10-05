@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextMonthEnd } from "./defaults";
+import { nextMonthEnd } from "./defaults.ts";
 
 describe("nextMonthEnd", () => {
   it("returns the last day of the month after the given date", () => {

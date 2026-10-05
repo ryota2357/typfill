@@ -66,6 +66,6 @@ Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`.
 
 - Domain field names are intentionally Japanese throughout schema/codegen/Typst params (`氏名`, `現住所`, `免許・資格`). Don't latinize them.
 - Svelte 5 runes forced on (`compilerOptions` of the `sveltekit()` plugin in `vite.config.ts`; SvelteKit 3 has no `svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
-- `#lib/*` → `src/lib/*` via `imports` in `package.json` (Node subpath imports; SvelteKit 3 dropped `$lib`). Specifiers need the real file extension: `#lib/templates/url.ts`, `#lib/components/index.ts`.
+- `#lib/*` → `src/lib/*` via `imports` in `package.json` (Node subpath imports; SvelteKit 3 dropped `$lib`). Specifiers need the real file extension: `#lib/templates/url.ts`, `#lib/components/index.ts`. Relative imports follow the same rule (`./schema.ts`, `./worker.ts?worker`), enforced by Biome's `useImportExtensions`.
 - Biome: 2-space indent, double quotes, semicolons, 80-col. `.svelte` runs under `experimentalFullSupportEnabled`; the `**/*.svelte` override disables `noLabelWithoutControl` + `useKeyWithClickEvents`.
 - Comments document the *why* (constraints, security boundaries, non-obvious bugs); the code names the *what*.

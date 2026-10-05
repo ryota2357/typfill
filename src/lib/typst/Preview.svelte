@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { Button, StatusDot } from "#lib/components/index.ts";
-  import type { CompileInputs, TypstDiagnostic } from "./protocol";
+  import type { CompileInputs, TypstDiagnostic } from "./protocol.ts";
   import SandboxedSvg from "./SandboxedSvg.svelte";
-  import { parsePageDims } from "./svg-pages";
-  import { type TypstClient, TypstCompileError } from "./worker-client";
+  import { parsePageDims } from "./svg-pages.ts";
+  import { type TypstClient, TypstCompileError } from "./worker-client.ts";
 
   interface Props {
     inputs: CompileInputs;
@@ -53,7 +53,7 @@
   let activeAbort: AbortController | null = null;
 
   onMount(async () => {
-    const { createTypstClient } = await import("./worker-client");
+    const { createTypstClient } = await import("./worker-client.ts");
     client = createTypstClient();
   });
 

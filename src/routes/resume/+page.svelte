@@ -3,8 +3,8 @@
   import { ImportDialog, TemplateEditor } from "#lib/components/index.ts";
   import * as template from "#lib/templates/resume/index.ts";
   import { createTemplateState } from "#lib/templates/state.svelte.ts";
-  import { buildResumeFilename } from "./filename";
-  import { buildResumePreviewItems } from "./preview";
+  import { buildResumeFilename } from "./filename.ts";
+  import { buildResumePreviewItems } from "./preview.ts";
   import Address from "./sections/Address.svelte";
   import Advanced from "./sections/Advanced.svelte";
   import DocumentDate from "./sections/DocumentDate.svelte";

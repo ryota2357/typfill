@@ -5,7 +5,7 @@ import type {
   Recipient,
   Sender,
   TemplateProps,
-} from "./schema";
+} from "./schema.ts";
 
 function datetimeLit(d: PlainDate): string {
   return `datetime(year: ${d.year}, month: ${d.month}, day: ${d.day})`;

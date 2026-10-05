@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deserialize, EMPTY_PROPS, SAMPLE_PROPS, serialize } from "./index";
+import { deserialize, EMPTY_PROPS, SAMPLE_PROPS, serialize } from "./index.ts";
 
 describe("invoice template codec", () => {
   it("roundtrips EMPTY_PROPS", () => {

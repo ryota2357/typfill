@@ -4,8 +4,8 @@ import {
   type TypstDiagnostic,
   type TypstRequest,
   type TypstResponse,
-} from "./protocol";
-import TypstWorker from "./worker?worker";
+} from "./protocol.ts";
+import TypstWorker from "./worker.ts?worker";
 
 type Pending = {
   resolve: (value: TypstResponse) => void;

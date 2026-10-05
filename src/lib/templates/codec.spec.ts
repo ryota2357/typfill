@@ -10,7 +10,7 @@ import {
   UINT8ARRAY_CODEC,
   UnknownValueTypeError,
   type ValueCodec,
-} from "./codec";
+} from "./codec.ts";
 
 // A permissive predicate that accepts any non-undefined value. Useful when the
 // test focuses on the walker itself rather than on domain validation.

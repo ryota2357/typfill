@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_PROPS, SAMPLE_PROPS } from "#lib/templates/resume/index.ts";
-import { buildResumeFilename } from "./filename";
+import { buildResumeFilename } from "./filename.ts";
 
 describe("buildResumeFilename", () => {
   const frozenNow = new Date(2026, 3, 17); // 2026-04-17, local time

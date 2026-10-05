@@ -3,8 +3,8 @@
   import { ImportDialog, TemplateEditor } from "#lib/components/index.ts";
   import * as template from "#lib/templates/soufujo/index.ts";
   import { createTemplateState } from "#lib/templates/state.svelte.ts";
-  import { buildSoufujoFilename } from "./filename";
-  import { buildSoufujoPreviewItems } from "./preview";
+  import { buildSoufujoFilename } from "./filename.ts";
+  import { buildSoufujoPreviewItems } from "./preview.ts";
   import Basics from "./sections/Basics.svelte";
   import Enclosures from "./sections/Enclosures.svelte";
   import Greeting from "./sections/Greeting.svelte";

@@ -1,4 +1,4 @@
-import type { TemplateProps } from "./schema";
+import type { TemplateProps } from "./schema.ts";
 
 // Layout defaults track the upstream Typst template signature; see
 // `template/lib.typ`.

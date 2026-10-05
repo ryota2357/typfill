@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { deserialize, EMPTY_PROPS, SAMPLE_PROPS, serialize } from "./index";
-import type { TemplateProps } from "./schema";
+import { deserialize, EMPTY_PROPS, SAMPLE_PROPS, serialize } from "./index.ts";
+import type { TemplateProps } from "./schema.ts";
 
 // Round-trips that exercise the UINT8ARRAY_CODEC wiring end-to-end. If a
 // future refactor drops the codec from `valueCodecs`, the photo roundtrip

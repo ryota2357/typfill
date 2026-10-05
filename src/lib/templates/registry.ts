@@ -1,6 +1,6 @@
-import * as invoice from "./invoice";
-import * as resume from "./resume";
-import * as soufujo from "./soufujo";
+import * as invoice from "./invoice/index.ts";
+import * as resume from "./resume/index.ts";
+import * as soufujo from "./soufujo/index.ts";
 
 // Thin catalog surfaced to the landing page. Each template namespace module
 // exports `templateId` + `label`; the catalog adds presentation fields

@@ -1,4 +1,4 @@
-import type { TemplateProps } from "./schema";
+import type { TemplateProps } from "./schema.ts";
 
 export const EMPTY_PROPS: TemplateProps = {
   日付: "auto",

@@ -3,8 +3,8 @@ import {
   createTypstClient,
   type TypstClient,
 } from "#lib/typst/worker-client.ts";
-import { buildCompileInputs } from "./compile";
-import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
+import { buildCompileInputs } from "./compile.ts";
+import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults.ts";
 
 // End-to-end smoke test: the codegen output must actually compile through the
 // Typst worker against the real upstream `lib.typ`.

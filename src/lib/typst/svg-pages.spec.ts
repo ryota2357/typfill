@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parsePageDims } from "./svg-pages";
+import { parsePageDims } from "./svg-pages.ts";
 
 describe("parsePageDims", () => {
   it("reads width/height from a single <svg> root", () => {

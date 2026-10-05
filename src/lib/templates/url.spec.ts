@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildShareFragment, buildShareUrl, parseShareFragment } from "./url";
+import {
+  buildShareFragment,
+  buildShareUrl,
+  parseShareFragment,
+} from "./url.ts";
 
 describe("share URL", () => {
   it("roundtrips a payload through build/parse", () => {

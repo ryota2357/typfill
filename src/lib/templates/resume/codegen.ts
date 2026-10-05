@@ -5,7 +5,7 @@ import type {
   PlainDate,
   TemplateProps,
   TimelineEntry,
-} from "./schema";
+} from "./schema.ts";
 
 // Typst length literals (e.g. "22em", "10mm"). Validated at codegen time.
 type TypstLength = string;

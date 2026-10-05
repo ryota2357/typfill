@@ -3,8 +3,8 @@
   import { ImportDialog, TemplateEditor } from "#lib/components/index.ts";
   import * as template from "#lib/templates/invoice/index.ts";
   import { createTemplateState } from "#lib/templates/state.svelte.ts";
-  import { buildInvoiceFilename } from "./filename";
-  import { buildInvoicePreviewItems } from "./preview";
+  import { buildInvoiceFilename } from "./filename.ts";
+  import { buildInvoicePreviewItems } from "./preview.ts";
   import Account from "./sections/Account.svelte";
   import Advanced from "./sections/Advanced.svelte";
   import Basics from "./sections/Basics.svelte";

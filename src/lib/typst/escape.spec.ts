@@ -5,7 +5,7 @@ import {
   plainMarkupLit,
   rawMarkupLit,
   stringLit,
-} from "./escape";
+} from "./escape.ts";
 
 describe("escapePlainMarkup", () => {
   it("returns empty string unchanged", () => {
