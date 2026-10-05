@@ -89,7 +89,10 @@
 
 <svelte:head><title>{template.label} - Typfill</title></svelte:head>
 
-{#snippet tabButton(id: "form" | "preview", label: string)}
+{#snippet tabButton(
+  id: "form" | "preview",
+  label: string,
+)}
   <button
     type="button"
     role="tab"
@@ -180,7 +183,10 @@
 {#if shareOpen}
   <ShareDialog
     {data}
-    template={{ templateId: template.templateId, serialize: template.serialize }}
+    template={{
+      templateId: template.templateId,
+      serialize: template.serialize,
+    }}
     onclose={() => (shareOpen = false)}
     extraNotice={shareExtraNotice}
   />
