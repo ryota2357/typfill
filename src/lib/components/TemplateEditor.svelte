@@ -72,13 +72,21 @@
   });
 
   // Scrub the hash after handing off the payload so a reload doesn't
-  // re-trigger the import modal.
+  // re-trigger the import modal. `goto(..., { shallow: true })` isn't usable
+  // here: the router only starts after the initial mount, so calling it from
+  // `onMount` errors in dev and aborts the in-flight initial navigation in
+  // prod. Passing `history.state` through keeps SvelteKit's history metadata
+  // (scroll restoration, navigation index) intact.
   onMount(() => {
     const frag = parseShareFragment(location.hash);
     if (!frag) return;
     if (frag.templateId !== template.templateId) return;
     onimport?.(frag.payload);
-    history.replaceState(null, "", location.pathname + location.search);
+    history.replaceState(
+      history.state,
+      "",
+      location.pathname + location.search,
+    );
   });
 
   function resetAll() {
