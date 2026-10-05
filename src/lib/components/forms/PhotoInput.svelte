@@ -16,7 +16,7 @@
 
   let previewUrl = $state<string | null>(null);
   let error = $state("");
-  let fileInput: HTMLInputElement | undefined = $state();
+  let fileInput = $state<HTMLInputElement>();
 
   $effect(() => {
     if (!value) {
@@ -112,8 +112,9 @@
 </div>
 
 <style>
-  /* The diagonal-striped placeholder is too specific to live in a Tailwind utility — repeating-linear-gradient + dashed border + monospace label are only used here. */
-  /* Scoped styles keep it bound to this component.@charset */
+  /* The diagonal-striped placeholder is too specific to live in a Tailwind
+     utility — repeating-linear-gradient + dashed border + monospace label are
+     only used here, so a scoped style keeps it bound to this component. */
   .placeholder {
     height: 110px;
     width: 88px;

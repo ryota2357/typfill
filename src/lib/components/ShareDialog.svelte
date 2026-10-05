@@ -1,5 +1,6 @@
 <script lang="ts" generics="T">
   import X from "@lucide/svelte/icons/x";
+  import type { Snippet } from "svelte";
   import { buildShareUrl } from "#lib/templates/url.ts";
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
@@ -11,7 +12,7 @@
       serialize: (data: T, options?: { for?: "share" | "storage" }) => string;
     };
     onclose: () => void;
-    extraNotice?: import("svelte").Snippet;
+    extraNotice?: Snippet;
   }
   let { data, template, onclose, extraNotice }: Props = $props();
 

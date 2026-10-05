@@ -70,8 +70,8 @@
 </dialog>
 
 <style>
-  /* ::backdrop can't reliably inherit custom properties across browsers, so the
-           dim overlay uses a literal color rather than a Tailwind utility. */
+  /* ::backdrop can't reliably inherit custom properties across browsers, so
+     the dim overlay uses a literal color rather than a Tailwind utility. */
   dialog::backdrop {
     background: rgb(0 0 0 / 0.4);
   }

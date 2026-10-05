@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { EntryField } from "#lib/components/forms/index.ts";
-  import { EntryList } from "#lib/components/forms/index.ts";
+  import { type EntryField, EntryList } from "#lib/components/forms/index.ts";
   import type { TimelineEntry } from "#lib/templates/resume/index.ts";
 
   const TIMELINE_FIELDS: readonly EntryField<TimelineEntry>[] = [
