@@ -1,3 +1,4 @@
+import { resolve } from "$app/paths";
 import * as invoice from "./invoice/index.ts";
 import * as resume from "./resume/index.ts";
 import * as soufujo from "./soufujo/index.ts";
@@ -23,7 +24,7 @@ export const catalog = [
     sub: "Resume",
     repo: "ryota2357/typst-resume-template",
     enabled: true,
-    href: "/resume",
+    href: resolve("/resume"),
   },
   {
     templateId: invoice.templateId,
@@ -31,7 +32,7 @@ export const catalog = [
     sub: "Invoice",
     repo: "ryota2357/typst-invoice-template",
     enabled: true,
-    href: "/invoice",
+    href: resolve("/invoice"),
   },
   {
     templateId: soufujo.templateId,
@@ -39,7 +40,7 @@ export const catalog = [
     sub: "Cover Letter",
     repo: "ryota2357/typst-soufujo-template",
     enabled: true,
-    href: "/soufujo",
+    href: resolve("/soufujo"),
   },
 ] as const satisfies readonly CatalogEntry[];
 

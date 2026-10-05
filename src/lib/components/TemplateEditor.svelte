@@ -4,6 +4,7 @@
   import { parseShareFragment } from "#lib/templates/url.ts";
   import Preview from "#lib/typst/Preview.svelte";
   import type { CompileInputs } from "#lib/typst/protocol.ts";
+  import { resolve } from "$app/paths";
   import Button from "./Button.svelte";
   import ShareDialog from "./ShareDialog.svelte";
   import StatusDot from "./StatusDot.svelte";
@@ -121,7 +122,7 @@
   >
     <div class="flex min-w-0 items-baseline gap-3">
       <a
-        href="/"
+        href={resolve("/")}
         aria-label="トップへ戻る"
         class="text-neutral-500 hover:text-neutral-900"
       >

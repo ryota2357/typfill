@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { asset } from "$app/paths";
+
   // GitHub brand guidelines (https://brand.github.com/foundations/logo) forbid
   // modifying the Invertocat mark (color, dimensions). Serve the source SVG
   // byte-identical via <img> to foreclose the `currentColor` recoloring that
@@ -12,7 +14,7 @@
 </script>
 
 <img
-  src="/GitHub_Invertocat_Black.svg"
+  src={asset("GitHub_Invertocat_Black.svg")}
   width={size}
   alt=""
   aria-hidden="true"

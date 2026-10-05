@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GithubMark } from "#lib/components/index.ts";
   import { listTemplates } from "#lib/templates/registry.ts";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
 
   const enabledTemplates = listTemplates().filter((t) => t.enabled);
@@ -30,7 +31,7 @@
     class="flex shrink-0 items-center justify-between border-b border-divider px-8 py-4 font-mono text-[12px]"
   >
     <a
-      href="/"
+      href={resolve("/")}
       class="text-[14px] font-semibold text-neutral-900 no-underline"
       style="font-family: inherit;"
     >
@@ -80,7 +81,7 @@
       <ul class="flex flex-col gap-2">
         <li>
           <a
-            href="/"
+            href={resolve("/")}
             class="flex items-baseline justify-between rounded-sm border border-neutral-200 px-3.5 py-3 text-inherit no-underline hover:bg-neutral-50"
           >
             <span class="flex items-baseline gap-2">
