@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { type EntryField, EntryList } from "$lib/components/forms";
-  import type { InvoiceItem } from "$lib/templates/invoice";
+  import { type EntryField, EntryList } from "#lib/components/forms/index.ts";
+  import type { InvoiceItem } from "#lib/templates/invoice/index.ts";
 
   interface Props {
     items: InvoiceItem[];

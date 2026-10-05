@@ -26,7 +26,7 @@ The data path, per template:
 Form (Svelte 5 runes)  →  codegen.ts (data → main.typ string)  →  Worker (Typst WASM compile → SVG / PDF)
 ```
 
-**Templates** (`src/lib/templates/<name>/`) — each has a fixed public surface that consumers reach via `import * as template from "$lib/templates/<name>"`:
+**Templates** (`src/lib/templates/<name>/`) — each has a fixed public surface that consumers reach via `import * as template from "#lib/templates/<name>/index.ts"`:
 - `index.ts` — the only public exports (`templateId`, `label`, `storageKey`, `serialize`/`deserialize`, `buildCompileInputs`, `EMPTY_PROPS`/`SAMPLE_PROPS`, `TemplateProps` type).
 - `schema.ts` — `is*` predicates (`@core/unknownutil`); `TemplateProps = PredicateType<typeof isTemplateProps>` (single source, no parallel type+predicate).
 - `codegen.ts` — builds the `main.typ` string from data.
@@ -65,7 +65,7 @@ Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`.
 ## Conventions
 
 - Domain field names are intentionally Japanese throughout schema/codegen/Typst params (`氏名`, `現住所`, `免許・資格`). Don't latinize them.
-- Svelte 5 runes forced on (`svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
-- Path alias `$lib` → `src/lib`.
+- Svelte 5 runes forced on (`compilerOptions` of the `sveltekit()` plugin in `vite.config.ts`; SvelteKit 3 has no `svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
+- `#lib/*` → `src/lib/*` via `imports` in `package.json` (Node subpath imports; SvelteKit 3 dropped `$lib`). Specifiers need the real file extension: `#lib/templates/url.ts`, `#lib/components/index.ts`.
 - Biome: 2-space indent, double quotes, semicolons, 80-col. `.svelte` runs under `experimentalFullSupportEnabled`; the `**/*.svelte` override disables `noLabelWithoutControl` + `useKeyWithClickEvents`.
 - Comments document the *why* (constraints, security boundaries, non-obvious bugs); the code names the *what*.

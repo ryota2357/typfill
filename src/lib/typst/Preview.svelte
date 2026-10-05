@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { Button, StatusDot } from "$lib/components";
+  import { Button, StatusDot } from "#lib/components/index.ts";
   import type { CompileInputs, TypstDiagnostic } from "./protocol";
   import SandboxedSvg from "./SandboxedSvg.svelte";
   import { parsePageDims } from "./svg-pages";

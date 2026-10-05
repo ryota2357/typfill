@@ -1,4 +1,5 @@
 import { createReadStream } from "node:fs";
+import adapter from "@sveltejs/adapter-static";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
@@ -56,7 +57,19 @@ function externalAssetsServer(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [externalAssetsServer(), tailwindcss(), sveltekit()],
+  plugins: [
+    externalAssetsServer(),
+    tailwindcss(),
+    sveltekit({
+      compilerOptions: {
+        // Force runes mode for the project, except for libraries. Can be
+        // removed in svelte 6.
+        runes: ({ filename }) =>
+          filename.split(/[/\\]/).includes("node_modules") ? undefined : true,
+      },
+      adapter: adapter({ fallback: "404.html" }),
+    }),
+  ],
   define: {
     __TYPST_COMPILER_WASM_URL__: JSON.stringify(
       urlFor(externalAssets.compilerWasm.filename),

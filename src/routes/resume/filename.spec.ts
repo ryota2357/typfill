@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EMPTY_PROPS, SAMPLE_PROPS } from "$lib/templates/resume";
+import { EMPTY_PROPS, SAMPLE_PROPS } from "#lib/templates/resume/index.ts";
 import { buildResumeFilename } from "./filename";
 
 describe("buildResumeFilename", () => {

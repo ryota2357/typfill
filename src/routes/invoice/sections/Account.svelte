@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Account } from "$lib/templates/invoice";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { Account } from "#lib/templates/invoice/index.ts";
 
   interface Props {
     value: Account;

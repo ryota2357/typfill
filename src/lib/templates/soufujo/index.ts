@@ -1,6 +1,7 @@
 // Public API for the soufujo (送付状) template. Consumers (`<TemplateEditor>`,
-// routes) `import * as template from "$lib/templates/soufujo"` and rely on the
-// exports below; nothing else in this directory is considered public.
+// routes) `import * as template from "#lib/templates/soufujo/index.ts"` and
+// rely on the exports below; nothing else in this directory is considered
+// public.
 
 import { createCodec } from "../codec";
 import { isTemplateProps, type TemplateProps } from "./schema";

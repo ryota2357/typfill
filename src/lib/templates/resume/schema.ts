@@ -1,7 +1,7 @@
 import { is, type PredicateType } from "@core/unknownutil";
 
 // Runtime predicate for resume data. The codec layer handles `Uint8Array ↔
-// base64` transparently (see `$lib/templates/codec`), so the schema describes
+// base64` transparently (see `#lib/templates/codec.ts`), so the schema describes
 // the domain shape only — no separate wire-form predicate.
 
 const isDate = is.ObjectOf({

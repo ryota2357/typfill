@@ -1,4 +1,4 @@
-import { plainMarkupLit, rawMarkupLit } from "$lib/typst/escape";
+import { plainMarkupLit, rawMarkupLit } from "#lib/typst/escape.ts";
 import type {
   Account,
   InvoiceItem,

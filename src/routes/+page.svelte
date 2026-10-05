@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { GithubMark } from "$lib/components";
-  import { listTemplates } from "$lib/templates/registry";
+  import { GithubMark } from "#lib/components/index.ts";
+  import { listTemplates } from "#lib/templates/registry.ts";
 
   const templates = listTemplates();
 </script>

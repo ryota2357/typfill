@@ -1,5 +1,5 @@
-import type { PreviewItem } from "$lib/components";
-import type { PlainDate, TemplateProps } from "$lib/templates/invoice";
+import type { PreviewItem } from "#lib/components/index.ts";
+import type { PlainDate, TemplateProps } from "#lib/templates/invoice/index.ts";
 
 // View-model for the share-import confirmation dialog: condenses a decoded
 // payload into the summary rows ImportDialog renders. Kept out of the page

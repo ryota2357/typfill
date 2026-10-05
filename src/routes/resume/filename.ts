@@ -1,4 +1,4 @@
-import type { TemplateProps } from "$lib/templates/resume";
+import type { TemplateProps } from "#lib/templates/resume/index.ts";
 
 // Characters that are unsafe in filenames on at least one major OS, plus
 // control characters. Replaced with underscore so the downloaded PDF doesn't

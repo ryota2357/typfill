@@ -1,6 +1,6 @@
 import { maybe } from "@core/unknownutil";
 import lzString from "lz-string";
-import { base64ToBytes, bytesToBase64 } from "$lib/base64";
+import { base64ToBytes, bytesToBase64 } from "#lib/base64.ts";
 
 // lz-string ships as CommonJS; named imports fail under Vite SSR. Destructure
 // from the default export so the landing page can load the registry chain

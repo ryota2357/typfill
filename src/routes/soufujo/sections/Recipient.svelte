@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Recipient } from "$lib/templates/soufujo";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { Recipient } from "#lib/templates/soufujo/index.ts";
 
   interface Props {
     value: Recipient;

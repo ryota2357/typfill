@@ -1,6 +1,6 @@
 <script lang="ts" generics="T">
   import X from "@lucide/svelte/icons/x";
-  import { buildShareUrl } from "$lib/templates/url";
+  import { buildShareUrl } from "#lib/templates/url.ts";
   import Button from "./Button.svelte";
   import Dialog from "./Dialog.svelte";
 

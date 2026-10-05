@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Sender } from "$lib/templates/soufujo";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { Sender } from "#lib/templates/soufujo/index.ts";
 
   interface Props {
     value: Sender;

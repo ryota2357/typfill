@@ -1,5 +1,8 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { createTypstClient, type TypstClient } from "$lib/typst/worker-client";
+import {
+  createTypstClient,
+  type TypstClient,
+} from "#lib/typst/worker-client.ts";
 import { buildCompileInputs } from "./compile";
 import { EMPTY_PROPS, SAMPLE_PROPS } from "./defaults";
 

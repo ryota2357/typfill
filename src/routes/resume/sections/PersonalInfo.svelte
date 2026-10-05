@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { DateInput, Field, Section, TextInput } from "$lib/components/forms";
-  import type { TemplateProps } from "$lib/templates/resume";
+  import {
+    DateInput,
+    Field,
+    Section,
+    TextInput,
+  } from "#lib/components/forms/index.ts";
+  import type { TemplateProps } from "#lib/templates/resume/index.ts";
 
   interface Props {
     data: TemplateProps;

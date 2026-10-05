@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { ImportDialog, TemplateEditor } from "$lib/components";
-  import { MarkupField } from "$lib/components/forms";
-  import * as template from "$lib/templates/invoice";
-  import { createTemplateState } from "$lib/templates/state.svelte";
+  import { MarkupField } from "#lib/components/forms/index.ts";
+  import { ImportDialog, TemplateEditor } from "#lib/components/index.ts";
+  import * as template from "#lib/templates/invoice/index.ts";
+  import { createTemplateState } from "#lib/templates/state.svelte.ts";
   import { buildInvoiceFilename } from "./filename";
   import { buildInvoicePreviewItems } from "./preview";
   import Account from "./sections/Account.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { TemplateProps } from "$lib/templates/soufujo";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { TemplateProps } from "#lib/templates/soufujo/index.ts";
 
   interface Props {
     data: TemplateProps;

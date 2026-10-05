@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { DateModeRadio, Section } from "$lib/components/forms";
-  import type { PlainDate } from "$lib/templates/resume";
+  import { DateModeRadio, Section } from "#lib/components/forms/index.ts";
+  import type { PlainDate } from "#lib/templates/resume/index.ts";
 
   interface Props {
     value: "auto" | PlainDate;

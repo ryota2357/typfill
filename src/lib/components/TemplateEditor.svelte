@@ -1,9 +1,9 @@
 <script lang="ts" generics="T">
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import { onMount, type Snippet } from "svelte";
-  import { parseShareFragment } from "$lib/templates/url";
-  import Preview from "$lib/typst/Preview.svelte";
-  import type { CompileInputs } from "$lib/typst/protocol";
+  import { parseShareFragment } from "#lib/templates/url.ts";
+  import Preview from "#lib/typst/Preview.svelte";
+  import type { CompileInputs } from "#lib/typst/protocol.ts";
   import Button from "./Button.svelte";
   import ShareDialog from "./ShareDialog.svelte";
   import StatusDot from "./StatusDot.svelte";

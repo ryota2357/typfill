@@ -5,8 +5,8 @@
     Field,
     Section,
     TextInput,
-  } from "$lib/components/forms";
-  import type { TemplateProps } from "$lib/templates/invoice";
+  } from "#lib/components/forms/index.ts";
+  import type { TemplateProps } from "#lib/templates/invoice/index.ts";
 
   interface Props {
     data: TemplateProps;

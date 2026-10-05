@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { GithubMark } from "#lib/components/index.ts";
+  import { listTemplates } from "#lib/templates/registry.ts";
   import { page } from "$app/state";
-  import { GithubMark } from "$lib/components";
-  import { listTemplates } from "$lib/templates/registry";
 
   const enabledTemplates = listTemplates().filter((t) => t.enabled);
   const status = $derived(page.status);

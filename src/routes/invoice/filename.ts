@@ -1,4 +1,4 @@
-import type { TemplateProps } from "$lib/templates/invoice";
+import type { TemplateProps } from "#lib/templates/invoice/index.ts";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 

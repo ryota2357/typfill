@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { PhotoInput, Section } from "$lib/components/forms";
-  import type { Photo } from "$lib/templates/resume";
+  import { PhotoInput, Section } from "#lib/components/forms/index.ts";
+  import type { Photo } from "#lib/templates/resume/index.ts";
 
   interface Props {
     value: Photo | null;

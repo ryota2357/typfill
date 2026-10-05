@@ -1,6 +1,6 @@
 // Public API for the invoice template. Consumers (`<TemplateEditor>`, routes)
-// `import * as template from "$lib/templates/invoice"` and rely on the exports
-// below; nothing else in this directory is considered public.
+// `import * as template from "#lib/templates/invoice/index.ts"` and rely on
+// the exports below; nothing else in this directory is considered public.
 
 import { createCodec } from "../codec";
 import { isTemplateProps, type TemplateProps } from "./schema";

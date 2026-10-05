@@ -1,4 +1,4 @@
-import type { CompileInputs } from "$lib/typst/protocol";
+import type { CompileInputs } from "#lib/typst/protocol.ts";
 import { buildMainTyp } from "./codegen";
 import type { TemplateProps } from "./schema";
 import libTyp from "./template/lib.typ?raw";

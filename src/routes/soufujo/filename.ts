@@ -1,4 +1,4 @@
-import type { TemplateProps } from "$lib/templates/soufujo";
+import type { TemplateProps } from "#lib/templates/soufujo/index.ts";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 

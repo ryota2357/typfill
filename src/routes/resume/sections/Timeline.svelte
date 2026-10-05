@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { EntryField } from "$lib/components/forms";
-  import { EntryList } from "$lib/components/forms";
-  import type { TimelineEntry } from "$lib/templates/resume";
+  import type { EntryField } from "#lib/components/forms/index.ts";
+  import { EntryList } from "#lib/components/forms/index.ts";
+  import type { TimelineEntry } from "#lib/templates/resume/index.ts";
 
   const TIMELINE_FIELDS: readonly EntryField<TimelineEntry>[] = [
     { key: "year", label: "年", type: "number", width: "5em" },

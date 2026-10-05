@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { ImportDialog, TemplateEditor } from "$lib/components";
-  import { MarkupField } from "$lib/components/forms";
-  import * as template from "$lib/templates/resume";
-  import { createTemplateState } from "$lib/templates/state.svelte";
+  import { MarkupField } from "#lib/components/forms/index.ts";
+  import { ImportDialog, TemplateEditor } from "#lib/components/index.ts";
+  import * as template from "#lib/templates/resume/index.ts";
+  import { createTemplateState } from "#lib/templates/state.svelte.ts";
   import { buildResumeFilename } from "./filename";
   import { buildResumePreviewItems } from "./preview";
   import Address from "./sections/Address.svelte";

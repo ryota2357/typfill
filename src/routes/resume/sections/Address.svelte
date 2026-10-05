@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Contact } from "$lib/templates/resume";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { Contact } from "#lib/templates/resume/index.ts";
 
   interface Props {
     label: string;

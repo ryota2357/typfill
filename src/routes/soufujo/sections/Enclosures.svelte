@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { type EntryField, EntryList } from "$lib/components/forms";
-  import type { Enclosure } from "$lib/templates/soufujo";
+  import { type EntryField, EntryList } from "#lib/components/forms/index.ts";
+  import type { Enclosure } from "#lib/templates/soufujo/index.ts";
 
   interface Props {
     items: Enclosure[];

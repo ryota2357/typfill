@@ -1,5 +1,9 @@
-import type { PreviewItem } from "$lib/components";
-import type { Contact, PlainDate, TemplateProps } from "$lib/templates/resume";
+import type { PreviewItem } from "#lib/components/index.ts";
+import type {
+  Contact,
+  PlainDate,
+  TemplateProps,
+} from "#lib/templates/resume/index.ts";
 
 // View-model for the share-import confirmation dialog: condenses a decoded
 // payload into the summary rows ImportDialog renders. Kept out of the page

@@ -1,4 +1,4 @@
-import { plainMarkupLit, rawMarkupLit, stringLit } from "$lib/typst/escape";
+import { plainMarkupLit, rawMarkupLit, stringLit } from "#lib/typst/escape.ts";
 import type {
   Contact,
   Name,

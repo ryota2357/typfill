@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { AdvancedSection } from "$lib/components";
-  import { Field, TextInput } from "$lib/components/forms";
-  import type { TemplateProps } from "$lib/templates/invoice";
+  import { Field, TextInput } from "#lib/components/forms/index.ts";
+  import { AdvancedSection } from "#lib/components/index.ts";
+  import type { TemplateProps } from "#lib/templates/invoice/index.ts";
 
   interface Props {
     data: TemplateProps;

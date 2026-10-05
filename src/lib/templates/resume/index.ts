@@ -1,6 +1,6 @@
 // Public API for the resume template. Consumers (`<TemplateEditor>`, routes)
-// `import * as template from "$lib/templates/resume"` and rely on the exports
-// below; nothing else in this directory is considered public.
+// `import * as template from "#lib/templates/resume/index.ts"` and rely on
+// the exports below; nothing else in this directory is considered public.
 
 import { createCodec, UINT8ARRAY_CODEC } from "../codec";
 import { isTemplateProps, type TemplateProps } from "./schema";

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Field, Section, TextInput } from "$lib/components/forms";
-  import type { Party } from "$lib/templates/invoice";
+  import { Field, Section, TextInput } from "#lib/components/forms/index.ts";
+  import type { Party } from "#lib/templates/invoice/index.ts";
 
   interface Props {
     label: string;
