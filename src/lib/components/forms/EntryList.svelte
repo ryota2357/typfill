@@ -65,9 +65,7 @@
     class={[
       "grid h-7 w-6 cursor-pointer place-items-center rounded-sm border border-neutral-200 bg-white",
       "hover:bg-neutral-50 disabled:opacity-30",
-      props.danger
-        ? "text-neutral-400 hover:text-red-700"
-        : "text-neutral-500",
+      props.danger ? "text-neutral-400 hover:text-red-700" : "text-neutral-500",
     ]}
   >
     <props.icon size={14} />
