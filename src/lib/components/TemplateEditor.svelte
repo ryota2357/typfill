@@ -98,10 +98,7 @@
 
 <svelte:head><title>{template.label} - Typfill</title></svelte:head>
 
-{#snippet tabButton(
-  id: "form" | "preview",
-  label: string,
-)}
+{#snippet tabButton(id: "form" | "preview", label: string)}
   <button
     type="button"
     role="tab"
