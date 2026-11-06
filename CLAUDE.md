@@ -37,7 +37,7 @@ Adding a template touches: the submodule + the files above + `registry.ts` + a `
 
 **Codec** (`src/lib/templates/codec.ts`) — one shared serializer for both localStorage autosave and share-URL fragments (JSON + lz-string + URL-safe base64). `createCodec` walks the data tree automatically; `ValueCodec`s cover non-JSON types (photo bytes), `sanitizeForShare` strips fields from share payloads (resume drops 写真).
 
-**Typst worker** (`src/lib/typst/`) — `worker.ts` is the *only* code that touches `@myriaddreamin/typst.ts`. `worker-client.ts` wraps it in a Promise-based `TypstClient` (`compile()` → SVG, `exportPdf()` → Uint8Array), honoring `AbortSignal` + `timeoutMs`. On timeout the worker is terminated (WASM can't be interrupted mid-compile) and recreated lazily. Single-threaded → no COOP/COEP headers → plain static hosting works. Entry path is fixed at `MAIN_TYP_PATH`; templates supply its contents.
+**Typst worker** (`src/lib/typst/`) — `worker.ts` is the _only_ code that touches `@myriaddreamin/typst.ts`. `worker-client.ts` wraps it in a Promise-based `TypstClient` (`compile()` → SVG, `exportPdf()` → Uint8Array), honoring `AbortSignal` + `timeoutMs`. On timeout the worker is terminated (WASM can't be interrupted mid-compile) and recreated lazily. Single-threaded → no COOP/COEP headers → plain static hosting works. Entry path is fixed at `MAIN_TYP_PATH`; templates supply its contents.
 
 **External binary assets** (`src/lib/typst/` + `scripts/`) — the compiler/renderer WASM and font are too large for Cloudflare's 25 MiB per-file limit, so they live in an R2 bucket and the worker fetches them at runtime. `scripts/external-assets.mjs` is the shared manifest (content-hashed filenames) consumed by both `vite.config.ts` (injects `__*_URL__` defines) and `scripts/upload-assets.mjs` (CI uploader), so referenced URLs and uploaded keys can't drift. In dev a Vite middleware serves the same files locally, so contributors need no R2 access. Adding an asset = manifest entry + `__*_URL__` define + `declare const`/use in `worker.ts`.
 
@@ -54,7 +54,7 @@ Adding a template touches: the submodule + the files above + `registry.ts` + a `
 User input becomes Typst source at compile time, and compiled output becomes rendered SVG — both are attack surfaces. Two layers contain them; preserve both.
 
 **1. Embedding strings into `.typ` — `src/lib/typst/escape.ts` is the only sanctioned path.** Classify every new field and pick the helper, or it becomes a compile-time code-execution vector or a UX leak:
-- `plainMarkupLit` — data-value fields (name, address, timeline entries…). Escapes *all* markup-significant chars so a stray `== 見出し` in a name doesn't render as a heading.
+- `plainMarkupLit` — data-value fields (name, address, timeline entries…). Escapes _all_ markup-significant chars so a stray `== 見出し` in a name doesn't render as a heading.
 - `rawMarkupLit` — opt-in free-text fields whose form surface (`MarkupField`) promises Typst support. Emits `eval(…, mode: "markup")` — full markup incl. arbitrary compile-time code. **This is intended** for these fields; user input is opaque to the outer parser so it stays contained.
 - `stringLit` — Typst `"…"` literals (VFS paths like `写真: "/vfs/photo.png"`).
 
@@ -68,4 +68,4 @@ Lengths go through the `LENGTH_PATTERN` whitelist in `resume/codegen.ts`.
 - Svelte 5 runes forced on (`compilerOptions` of the `sveltekit()` plugin in `vite.config.ts`; SvelteKit 3 has no `svelte.config.js`): `$state`, `$derived`, `$effect`, `$props`.
 - `#lib/*` → `src/lib/*` via `imports` in `package.json` (Node subpath imports; SvelteKit 3 dropped `$lib`). Specifiers need the real file extension: `#lib/templates/url.ts`, `#lib/components/index.ts`. Relative imports follow the same rule (`./schema.ts`, `./worker.ts?worker`), enforced by Biome's `useImportExtensions`.
 - Biome: 2-space indent, double quotes, semicolons, 80-col. `.svelte` runs under `experimentalFullSupportEnabled`; the `**/*.svelte` override disables `noLabelWithoutControl` + `useKeyWithClickEvents`.
-- Comments document the *why* (constraints, security boundaries, non-obvious bugs); the code names the *what*.
+- Comments document the _why_ (constraints, security boundaries, non-obvious bugs); the code names the _what_.

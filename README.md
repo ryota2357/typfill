@@ -2,7 +2,7 @@
 
 [typfill.ryota2357.com](https://typfill.ryota2357.com)
 
-A web app that generates PDFs from Typst templates entirely in the browser. 
+A web app that generates PDFs from Typst templates entirely in the browser.
 Nothing is sent to a server — compilation runs in-browser via WebAssembly.
 
 ## Templates
