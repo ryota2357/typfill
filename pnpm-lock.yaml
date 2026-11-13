@@ -12,8 +12,8 @@ importers:
         specifier: jsr:4.4.0-pre.1
         version: '@jsr/core__unknownutil@4.4.0-pre.1'
       '@lucide/svelte':
-        specifier: 1.64.0
-        version: 1.64.0(svelte@5.57.3)
+        specifier: 1.72.0
+        version: 1.72.0(svelte@5.57.3)
       '@myriaddreamin/typst-ts-renderer':
         specifier: 0.7.0
         version: 0.7.0
@@ -543,8 +543,8 @@ packages:
   '@jsr/core__unknownutil@4.4.0-pre.1':
     resolution: {integrity: sha512-al13EQTUm6z9gn13y5PyADkln1ACmPC1X+j70zLLps/6rZ5i2NBWVZw8cuh+YHbxLXXRiytrbtHS3hLeXIQvzg==, tarball: https://npm.jsr.io/~/11/@jsr/core__unknownutil/4.4.0-pre.1.tgz}
 
-  '@lucide/svelte@1.64.0':
-    resolution: {integrity: sha512-PSFui8Gkk0JcU4nXljZzy+MnBhXeY4DIblvvcDNPIvL6r5NIngeDfAvBs4C/XDlz+dTth9+LcHy6/zdhEmxEwQ==}
+  '@lucide/svelte@1.72.0':
+    resolution: {integrity: sha512-DRwtZ5p/m5ZRsNlfCzELJRDzd2z19mc76eMs8rwllx/JWfvykmLoTFs3RyzFN519ldQxHt8Jxum/LKukgzuTLQ==}
     peerDependencies:
       svelte: ^5
 
@@ -1697,7 +1697,7 @@ snapshots:
 
   '@jsr/core__unknownutil@4.4.0-pre.1': {}
 
-  '@lucide/svelte@1.64.0(svelte@5.57.3)':
+  '@lucide/svelte@1.72.0(svelte@5.57.3)':
     dependencies:
       svelte: 5.57.3
 
